@@ -1,11 +1,13 @@
+import { Button } from "./components/ui/button"
+
  
 
 function App() {
  
-
   return (
     <>
-    <p>Hello Dev</p>
+    <p className="text-4xl">Hello Dev</p>
+    <Button className="bg-blue-400">check</Button>
     </>
   )
 }
