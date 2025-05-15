@@ -11,7 +11,7 @@ interface DashboardProps {
 export default function Applayout({ children, student }: DashboardProps) {
   return (
     <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gray-50">
+      <div className="min-h-screen flex w-full bg-gray-100">
         <Sidebar student={student} />
 
         <div className="flex-1">

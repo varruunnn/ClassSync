@@ -39,9 +39,9 @@ export default function SidebarComponent({ student }: SidebarComponentProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center space-x-2 px-2">
+        {/* <div className="flex items-center space-x-2 px-2">
           <h2 className="text-xl font-bold">EduSRM</h2>
-        </div>
+        </div> */}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

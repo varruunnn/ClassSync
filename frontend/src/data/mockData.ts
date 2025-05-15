@@ -43,7 +43,31 @@ export const subjects: Subject[] = [
     name: "Art & Design",
     type: "art",
     teacher: "Mrs. Lisa Zhang"
-  }
+  },
+  {
+    id: "sub6",
+    name: "Geography",
+    type: "art",
+    teacher: "Mr Pankaj "
+  },
+  {
+    id: "sub7",
+    name: "Hindi",
+    type: "art",
+    teacher: "Mrs. Radha Sharma"
+  },
+  {
+    id: "sub7",
+    name: "Sanskrit",
+    type: "art",
+    teacher: "Mrs. Radha Sharma"
+  },
+  {
+    id: "sub7",
+    name: "French",
+    type: "art",
+    teacher: "Mr Levi"
+  },
 ];
 
 // Mock test data

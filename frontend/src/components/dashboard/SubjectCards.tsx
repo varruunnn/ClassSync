@@ -7,7 +7,7 @@ interface SubjectCardsProps {
 
 export default function SubjectCards({ subjects }: SubjectCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4">
       {subjects.map((subject) => (
         <Card key={subject.id} className={`border-l-4 border-${subject.type} hover:shadow-md transition-all duration-300`}>
           <CardContent className="p-4">
