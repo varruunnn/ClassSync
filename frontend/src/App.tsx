@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./components/Pages/Index";
 import NotFound from "./components/Pages/NotFound";
 import LandingPage from "./components/Pages/LandingPage";
+import Test from "./test/Test";
  
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
 \
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/test" element={<Test/>} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
