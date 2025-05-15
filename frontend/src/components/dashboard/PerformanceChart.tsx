@@ -15,7 +15,7 @@ interface PerformanceChartProps {
 }
 
 export default function PerformanceChart({ performanceData }: PerformanceChartProps) {
-  const subjectColors = {
+  const subjectColors: Record<SubjectType, string> = {
     math: "#3b82f6", 
     science: "#10b981", 
     english: "#8b5cf6", 
@@ -23,8 +23,12 @@ export default function PerformanceChart({ performanceData }: PerformanceChartPr
     art: "#ec4899"
   };
 
-  // Extract subject names for tabs
-  const subjects = Object.keys(performanceData[0]).filter(key => key !== 'month') as SubjectType[];
+  // Extract subject names for tabs and ensure they're of SubjectType
+  const subjects = Object.keys(performanceData[0])
+    .filter(key => key !== 'month')
+    .filter((key): key is SubjectType => 
+      ['math', 'science', 'english', 'history', 'art'].includes(key)
+    );
 
   return (
     <Card className="w-full">
@@ -43,30 +47,8 @@ export default function PerformanceChart({ performanceData }: PerformanceChartPr
             ))}
           </TabsList>
           
-          <TabsContent value="all" className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Legend />
-                {subjects.map((subject) => (
-                  <Line
-                    key={subject}
-                    type="monotone"
-                    dataKey={subject}
-                    name={subject.charAt(0).toUpperCase() + subject.slice(1)}
-                    stroke={subjectColors[subject]}
-                    activeDot={{ r: 8 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </TabsContent>
-
-          {subjects.map((subject) => (
-            <TabsContent key={subject} value={subject} className="h-[300px]">
+          <TabsContent value="all">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={performanceData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -74,15 +56,41 @@ export default function PerformanceChart({ performanceData }: PerformanceChartPr
                   <YAxis domain={[0, 100]} />
                   <Tooltip />
                   <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey={subject}
-                    name={subject.charAt(0).toUpperCase() + subject.slice(1)}
-                    stroke={subjectColors[subject]}
-                    activeDot={{ r: 8 }}
-                  />
+                  {subjects.map((subject) => (
+                    <Line
+                      key={subject}
+                      type="monotone"
+                      dataKey={subject}
+                      name={subject.charAt(0).toUpperCase() + subject.slice(1)}
+                      stroke={subjectColors[subject]}
+                      activeDot={{ r: 8 }}
+                    />
+                  ))}
                 </LineChart>
               </ResponsiveContainer>
+            </div>
+          </TabsContent>
+
+          {subjects.map((subject) => (
+            <TabsContent key={subject} value={subject}>
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={performanceData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" />
+                    <YAxis domain={[0, 100]} />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey={subject}
+                      name={subject.charAt(0).toUpperCase() + subject.slice(1)}
+                      stroke={subjectColors[subject]}
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </TabsContent>
           ))}
         </Tabs>
