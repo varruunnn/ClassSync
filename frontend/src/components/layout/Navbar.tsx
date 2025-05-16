@@ -1,34 +1,54 @@
-import type { Student } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { User, ChevronDown, Menu } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useSidebar } from '../contexts/SidebarContext';
 
-interface NavbarProps {
-  student: Student;
-  title?: string;
-}
 
-export default function Navbar({ student, title = "Student Dashboard" }: NavbarProps) {
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("");
-  };
+const Navbar = () => {
+  const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="border-b bg-white py-4 px-6 flex justify-between items-center">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger />
-        <h1 className="text-2xl font-bold">{title}</h1>
+    <header className="bg-gray-200 shadow-lg p-4 flex items-center justify-between border">
+      <div className='flex items-center gap-4'>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={toggleSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        <h1 className="text-lg font-medium text-gray-700">Student Dashboard</h1>
       </div>
-      <div className="flex items-center gap-4">
-        <Button variant="outline">Help</Button>
-        <Avatar>
-          <AvatarImage src={student.avatar} />
-          <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
-        </Avatar>
+      
+      <div className="flex items-center space-x-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-2">
+              <User size={18} />
+              <span>User</span>
+              <ChevronDown size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
-}
+};
+
+export default Navbar;

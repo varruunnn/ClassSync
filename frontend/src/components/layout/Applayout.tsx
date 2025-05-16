@@ -1,24 +1,32 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
-import type { Student } from "@/types";
-import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import React from 'react';
+import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 
-interface DashboardProps {
+
+interface AppLayoutProps {
   children: React.ReactNode;
-  student: Student;
 }
 
-export default function Applayout({ children, student }: DashboardProps) {
+const AppLayout = ({ children }: AppLayoutProps) => {
   return (
-    <SidebarProvider defaultOpen={true}>
-      <div className="min-h-screen flex w-full bg-gray-100">
-        <Sidebar student={student} />
+    <div className="flex h-screen overflow-hidden bg-background">
+      {/* Sidebar - Fixed */}
+      <Sidebar />
 
-        <div className="flex-1">
-          <Navbar student={student} />
-          <main className="p-6">{children}</main>
-        </div>
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 h-full">
+        {/* Header - Fixed */}
+        <Navbar />
+
+        {/* Scrollable Content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 p-2 relative  ">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
-}
+};
+
+
+
+export default AppLayout;

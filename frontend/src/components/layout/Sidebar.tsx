@@ -1,129 +1,114 @@
-import type { Student } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { 
-  LayoutDashboard, 
-  BookOpen, 
-  FileText, 
-  Users, 
-  Calendar, 
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  FilePlus2,
+  BellRing,
   Settings,
-  LogOut
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
+  Calendar,
+  Home,
+} from 'lucide-react';
+import { useSidebar } from '../contexts/SidebarContext';
+ 
+
+const navigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Subjects', href: '/subject', icon: FileText },
+  { name: 'Assignments', href: '/assignment', icon: FilePlus2 },
+  { name: 'Home Work', href: '/home-work', icon: Home },
+  { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Notifications', href: '/notifications', icon: BellRing },
+  { name: 'Settings', href: '/settings', icon: Settings },
   
-} from "@/components/ui/sidebar";
+];
 
-interface SidebarComponentProps {
-  student: Student;
-}
-
-export default function SidebarComponent({ student }: SidebarComponentProps) {
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("");
-  };
+const Sidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const { isOpen, isMobile, toggleSidebar } = useSidebar();
+  const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        {/* <div className="flex items-center space-x-2 px-2">
-          <h2 className="text-xl font-bold">EduSRM</h2>
-        </div> */}
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard">
-                  <a href="/" className="flex items-center">
-                    <LayoutDashboard className="w-5 h-5 mr-2" />
-                    <span>Dashboard</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Subjects">
-                  <a href="#" className="flex items-center">
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    <span>Subjects</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Assessments">
-                  <a href="#" className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
-                    <span>Assessments</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Calendar">
-                  <a href="#" className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-2" />
-                    <span>Calendar</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Parent Portal">
-                  <a href="#" className="flex items-center">
-                    <Users className="w-5 h-5 mr-2" />
-                    <span>Parent Portal</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings">
-                  <a href="#" className="flex items-center">
-                    <Settings className="w-5 h-5 mr-2" />
-                    <span>Settings</span>
-                  </a>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <div className="flex items-center px-4 py-2">
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage src={student.avatar} />
-              <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{student.name}</span>
-              <span className="text-xs text-muted-foreground">{student.grade}</span>
+    <>
+      {/* Overlay for mobile */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-40 bg-gray-300 text-black transition-all duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-60",
+        isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
+        "md:relative"
+      )}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
+            <Link to="/dashboard" className="flex items-center space-x-2">
+              <span className={cn("text-xl font-bold", collapsed && "hidden")}>logo</span>
+            </Link>
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 rounded-md hover:bg-primary-foreground/10 hidden md:block"
+            >
+              {collapsed ? (
+                <ChevronRight className="w-5 h-5" />
+              ) : (
+                <ChevronLeft className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-2 py-4 space-y-4 ">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => isMobile && toggleSidebar()}
+                  className={cn(
+                    "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive 
+                      ? "bg-primary-foreground/20 text-primary-foreground " 
+                      : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
+                  )}
+                >
+                  <item.icon className="w-5 h-5 mr-3 text-black" />
+                  {!collapsed && <span className='text-black'>{item.name}</span>}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* User Info */}
+          <div className="p-4 border-t border-gray-400">
+            <div className="flex items-center space-x-3">
+              <img 
+                src='https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740'
+                alt='user' 
+                className='w-8 h-auto rounded-full'
+              />
+              {!collapsed && (
+                <div>
+                  <p className="text-sm font-medium">John Doe</p>
+                  <p className="text-sm text-gray-700">john@example.com</p>
+                </div>
+              )}
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="ml-auto">
-            <LogOut className="w-5 h-5" />
-          </Button>
         </div>
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </>
   );
-}
+};
+
+export default Sidebar;
