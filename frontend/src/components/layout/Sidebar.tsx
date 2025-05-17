@@ -16,7 +16,7 @@ import { useSidebar } from '../contexts/SidebarContext';
  
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Subjects', href: '/subject', icon: FileText },
   { name: 'Assignments', href: '/assignment', icon: FilePlus2 },
   { name: 'Home Work', href: '/home-work', icon: Home },
