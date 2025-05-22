@@ -39,7 +39,7 @@ const Login = () => {
         {/* Left Side Image */}
         <div className="md:w-1/2 flex justify-center items-center mb-8 md:mb-0 md:pr-10">
           <img
-            src="https://img.freepik.com/free-vector/illustration-people-with-justice-order-icons_53876-77429.jpg"
+            src="https://www.ptecheducation.com/assets/images/login.png"
             alt="Law and justice illustration"
             className="w-full h-auto rounded-xl object-cover"
           />

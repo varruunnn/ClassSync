@@ -17,7 +17,7 @@ import { AlertCircle, BookOpen, Clock, FileText } from "lucide-react";
 
 const Index = () => {
   return (
-    <div className="space-y-6">
+    <div className=" px-8 space-y-6">
       <div className="flex flex-col md:flex-row gap-6">
         <div className="md:w-2/3">
           <h2 className="text-2xl font-bold mb-4">

@@ -11,7 +11,10 @@ import { SidebarProvider } from "./components/contexts/SidebarContext";
 import AppLayout from "./components/layout/Applayout";
 import Login from "./components/authentication/AuthPage/Login";
 import Register from "./components/authentication/AuthPage/Register";
- 
+import Subjects from "./components/Pages/Subjects";
+import Assessments from "./components/Pages/Assessments";
+import Calendar from "./components/Pages/Calender";
+import ParentPortal from "./components/Pages/ParentPortal";
  
 
 const queryClient = new QueryClient();
@@ -25,13 +28,20 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayoutWrapper/>}> 
+
           <Route path="/" element={<Index />} />
-          
+           <Route path="/subjects" element={<Subjects/>} />
+           <Route path="/assessment" element={<Assessments/>} />
+           <Route path="/calendar" element={<Calendar/>} />
+           <Route path="/parent" element={<ParentPortal/>} />
           </Route>
+
           <Route path="/index" element={<LandingPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/test" element={<Test/>} />
+         
+          
 
           {/* Authentication Page */}
           <Route path="/login" element={<Login/>} />

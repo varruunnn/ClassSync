@@ -16,9 +16,23 @@ const Subjects = () => {
 
   const groupedSubjects = Object.entries(subjectsByType);
 
+  const getColorForType = (type: string): string => {
+    const colorMap: Record<string, string> = {
+      math: '#3b82f6',      // blue-500
+      science: '#10b981',   // green-500
+      english: '#f59e0b',   // amber-500
+      history: '#ef4444',   // red-500
+      art: '#eab308',       // yellow-500
+      default: '#9ca3af'    // gray-400
+    };
+  
+    return colorMap[type.toLowerCase()] || colorMap.default;
+  };
+  
+
   return (
    
-      <div className="space-y-6">
+      <div className=" px-8 space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold">My Subjects</h1>
         </div>
@@ -31,7 +45,12 @@ const Subjects = () => {
           <TabsContent value="all">
             <div className="grid grid-cols-1 gap-6 mt-4">
               {groupedSubjects.map(([type, subjectsOfType]) => (
-                <Card key={type} className={`border-l-4 border-${type}`}>
+                <Card
+                key={type}
+                className="border-l-8"
+                style={{ borderLeftColor: getColorForType(type) }}
+              >
+              
                   <CardHeader>
                     <CardTitle className="capitalize">{type}</CardTitle>
                   </CardHeader>
@@ -62,6 +81,7 @@ const Subjects = () => {
               ))}
             </div>
           </TabsContent>
+          
           <TabsContent value="schedule">
             <Card className="mt-4">
               <CardHeader>
@@ -74,11 +94,11 @@ const Subjects = () => {
                       <h3 className="font-medium text-center">{day}</h3>
                       {day === 'Monday' && (
                         <>
-                          <Card className="border-l-4 border-math p-3">
+                          <Card className="border-l-4 border-blue-400 p-3">
                             <p className="font-medium">Math</p>
                             <p className="text-xs text-muted-foreground">8:00 - 9:30</p>
                           </Card>
-                          <Card className="border-l-4 border-science p-3">
+                          <Card className="border-l-4 border-green-400 p-3">
                             <p className="font-medium">Science</p>
                             <p className="text-xs text-muted-foreground">10:00 - 11:30</p>
                           </Card>
@@ -86,11 +106,11 @@ const Subjects = () => {
                       )}
                       {day === 'Tuesday' && (
                         <>
-                          <Card className="border-l-4 border-english p-3">
+                          <Card className="border-l-4 border-red-400 p-3">
                             <p className="font-medium">English</p>
                             <p className="text-xs text-muted-foreground">8:00 - 9:30</p>
                           </Card>
-                          <Card className="border-l-4 border-history p-3">
+                          <Card className="border-l-4 border-orange-400 p-3">
                             <p className="font-medium">History</p>
                             <p className="text-xs text-muted-foreground">10:00 - 11:30</p>
                           </Card>
@@ -98,11 +118,11 @@ const Subjects = () => {
                       )}
                       {day === 'Wednesday' && (
                         <>
-                          <Card className="border-l-4 border-math p-3">
+                          <Card className="border-l-4 border-blue-400 p-3">
                             <p className="font-medium">Math</p>
                             <p className="text-xs text-muted-foreground">8:00 - 9:30</p>
                           </Card>
-                          <Card className="border-l-4 border-art p-3">
+                          <Card className="border-l-4 border-yellow-400 p-3">
                             <p className="font-medium">Art</p>
                             <p className="text-xs text-muted-foreground">10:00 - 11:30</p>
                           </Card>
@@ -110,11 +130,11 @@ const Subjects = () => {
                       )}
                       {day === 'Thursday' && (
                         <>
-                          <Card className="border-l-4 border-english p-3">
+                          <Card className="border-l-4 border-slate-400 p-3">
                             <p className="font-medium">English</p>
                             <p className="text-xs text-muted-foreground">8:00 - 9:30</p>
                           </Card>
-                          <Card className="border-l-4 border-science p-3">
+                          <Card className="border-l-4 border-pink-400 p-3">
                             <p className="font-medium">Science</p>
                             <p className="text-xs text-muted-foreground">10:00 - 11:30</p>
                           </Card>
@@ -122,11 +142,11 @@ const Subjects = () => {
                       )}
                       {day === 'Friday' && (
                         <>
-                          <Card className="border-l-4 border-math p-3">
+                          <Card className="border-l-4 border-green-400 p-3">
                             <p className="font-medium">Math</p>
                             <p className="text-xs text-muted-foreground">8:00 - 9:30</p>
                           </Card>
-                          <Card className="border-l-4 border-history p-3">
+                          <Card className="border-l-4 border-amber-400 p-3">
                             <p className="font-medium">History</p>
                             <p className="text-xs text-muted-foreground">10:00 - 11:30</p>
                           </Card>

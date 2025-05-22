@@ -7,22 +7,23 @@ import {
   ChevronRight,
   LayoutDashboard,
   FilePlus2,
-  BellRing,
-  Settings,
+  // BellRing,
+  // Settings,
   Calendar,
-  Home,
+
+  UserCircle,
 } from 'lucide-react';
 import { useSidebar } from '../contexts/SidebarContext';
  
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Subjects', href: '/subject', icon: FileText },
-  { name: 'Assignments', href: '/assignment', icon: FilePlus2 },
-  { name: 'Home Work', href: '/home-work', icon: Home },
+  { name: 'Subjects', href: '/subjects', icon: FileText },
+  { name: 'Assignments', href: '/assessment', icon: FilePlus2 },
+  { name: 'Parent Portal', href: '/parent', icon: UserCircle },
   { name: 'Calendar', href: '/calendar', icon: Calendar },
-  { name: 'Notifications', href: '/notifications', icon: BellRing },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  // { name: 'Notifications', href: '/notifications', icon: BellRing },
+  // { name: 'Settings', href: '/settings', icon: Settings },
   
 ];
 
@@ -43,7 +44,7 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-40 bg-gray-300 text-black transition-all duration-300 ease-in-out",
+        "fixed inset-y-0 left-0 z-40 bg-slate-700 text-white transition-all duration-300 ease-in-out",
         collapsed ? "w-20" : "w-60",
         isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
         "md:relative"
@@ -67,7 +68,7 @@ const Sidebar = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-2 py-4 space-y-4 ">
+          <nav className="flex-1 px-2 py-4 space-y-4">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -76,14 +77,14 @@ const Sidebar = () => {
                   to={item.href}
                   onClick={() => isMobile && toggleSidebar()}
                   className={cn(
-                    "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    "flex items-center px-4 py-2 text-sm font-medium  rounded-md transition-colors",
                     isActive 
-                      ? "bg-primary-foreground/20 text-primary-foreground " 
-                      : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
+                      ? "bg-gray-600 text-primary-foreground " 
+                      : "text-primary-foreground/70 hover:bg-slate-600 hover:text-primary-foreground"
                   )}
                 >
-                  <item.icon className="w-5 h-5 mr-3 text-black" />
-                  {!collapsed && <span className='text-black'>{item.name}</span>}
+                  <item.icon className="w-5 h-5 mr-3 text-gray-400" />
+                  {!collapsed && <span className='text-gray-200'>{item.name}</span>}
                 </Link>
               );
             })}
@@ -100,7 +101,7 @@ const Sidebar = () => {
               {!collapsed && (
                 <div>
                   <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-sm text-gray-700">john@example.com</p>
+                  <p className="text-sm text-gray-400">john@example.com</p>
                 </div>
               )}
             </div>

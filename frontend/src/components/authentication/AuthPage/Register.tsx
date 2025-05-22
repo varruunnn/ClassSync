@@ -24,7 +24,7 @@ const Register = () => {
         {/* Left Side with Image */}
         <div className="md:w-1/2 flex justify-center items-center mb-8 md:mb-0 md:pr-10">
           <img
-            src="https://img.freepik.com/premium-vector/confident-female-attorney-illustrating-legal-concepts_1263357-36022.jpg"
+            src="https://img.freepik.com/free-vector/thesis-concept-illustration_114360-7560.jpg?semt=ais_hybrid&w=740"
             alt="Law and justice illustration"
             className="w-full h-auto rounded-xl object-cover"
           />
