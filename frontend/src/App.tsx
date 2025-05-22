@@ -9,6 +9,8 @@ import LandingPage from "./components/Pages/LandingPage";
 import Test from "./test/Test";
 import { SidebarProvider } from "./components/contexts/SidebarContext";
 import AppLayout from "./components/layout/Applayout";
+import Login from "./components/authentication/AuthPage/Login";
+import Register from "./components/authentication/AuthPage/Register";
  
  
 
@@ -30,6 +32,10 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
           <Route path="/test" element={<Test/>} />
+
+          {/* Authentication Page */}
+          <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register/>} />
         </Routes>
       </BrowserRouter>
       </SidebarProvider>
