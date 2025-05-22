@@ -84,7 +84,7 @@ const RegisterForm: React.FC = () => {
     setIsLoading(true);
   
     try {
-      const res = await axios.post<RegisterResponse>("http://localhost:5000/api/users/register", {
+      const res = await axios.post<RegisterResponse>("http://localhost:3001/api/auth/register", {
         name: fullName,
         email,
         password,
@@ -149,8 +149,8 @@ const RegisterForm: React.FC = () => {
         <SelectValue placeholder="Select user type" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="user">Client</SelectItem>
-        <SelectItem value="lawyer">Lawyer</SelectItem>
+        <SelectItem value="student">student</SelectItem>
+        <SelectItem value="teacher">teacher</SelectItem>
       </SelectContent>
     </Select>
     {errors.userType && <p className="text-destructive text-xs mt-1">{errors.userType}</p>}
