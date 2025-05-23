@@ -1,6 +1,5 @@
 import type { PerformanceStats, Student, Subject, Test } from "@/types";
 
- 
 
 // Mock student data
 export const currentStudent: Student = {
