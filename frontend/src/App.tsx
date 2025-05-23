@@ -15,6 +15,7 @@ import Subjects from "./components/Pages/Subjects";
 import Assessments from "./components/Pages/Assessments";
 import Calendar from "./components/Pages/Calender";
 import ParentPortal from "./components/Pages/ParentPortal";
+import TeacherDashboardPage from "./components/dashboard/Teacher/TeacherDashboard";
  
 
 const queryClient = new QueryClient();
@@ -35,6 +36,8 @@ const App = () => (
            <Route path="/calendar" element={<Calendar/>} />
            <Route path="/parent" element={<ParentPortal/>} />
           </Route>
+
+          <Route path="/teacher" element={<TeacherDashboardPage />} />
 
           <Route path="/index" element={<LandingPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

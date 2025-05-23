@@ -6,11 +6,11 @@ import {
   performanceHistory,
   activityFeed,
 } from "@/data/mockData";
-import PerformanceOverview from "@/components/dashboard/PerformanceOverview";
-import RecentTests from "@/components/dashboard/RecentTests";
-import PerformanceChart from "@/components/dashboard/PerformanceChart";
-import ActivityFeed from "@/components/dashboard/ActivityFeed";
-import SubjectCards from "@/components/dashboard/SubjectCards";
+import PerformanceOverview from "@/components/dashboard/Students/PerformanceOverview";
+import RecentTests from "@/components/dashboard/Students/RecentTests";
+import PerformanceChart from "@/components/dashboard/Students/PerformanceChart";
+import ActivityFeed from "@/components/dashboard/Students/ActivityFeed";
+import SubjectCards from "@/components/dashboard/Students/SubjectCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, BookOpen, Clock, FileText } from "lucide-react";

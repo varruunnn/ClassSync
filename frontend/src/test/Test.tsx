@@ -1,4 +1,4 @@
-import PerformanceChart from "@/components/dashboard/PerformanceChart"
+import PerformanceChart from "@/components/dashboard/Students/PerformanceChart"
 import {  performanceHistory } from "@/data/mockData";
 
 const Test = () => {
