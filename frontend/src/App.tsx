@@ -16,8 +16,8 @@ import Assessments from "./components/Pages/Assessments";
 import Calendar from "./components/Pages/Calender";
 import ParentPortal from "./components/Pages/ParentPortal";
 import TeacherDashboardPage from "./components/dashboard/Teacher/TeacherDashboard";
+import AdminDashboardPage from "./components/dashboard/Admin/AdminDashboard";
  
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -28,8 +28,9 @@ const App = () => (
       <SidebarProvider>    
       <BrowserRouter>
         <Routes>
-          <Route element={<AppLayoutWrapper/>}> 
 
+          {/* Student Dashboard */}
+          <Route element={<AppLayoutWrapper/>}> 
           <Route path="/" element={<Index />} />
            <Route path="/subjects" element={<Subjects/>} />
            <Route path="/assessment" element={<Assessments/>} />
@@ -37,7 +38,11 @@ const App = () => (
            <Route path="/parent" element={<ParentPortal/>} />
           </Route>
 
+          {/* Teacher Dashboard */}
           <Route path="/teacher" element={<TeacherDashboardPage />} />
+
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminDashboardPage />} />
 
           <Route path="/index" element={<LandingPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
