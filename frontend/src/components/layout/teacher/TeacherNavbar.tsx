@@ -1,55 +1,65 @@
-import { User, ChevronDown, Menu } from 'lucide-react';
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { useSidebar } from '@/components/contexts/SidebarContext';
+import type{ Student } from "@/types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Bell, Search, MessageSquare, Plus } from "lucide-react";
 
+interface TeacherNavbarProps {
+  student: Student;
+  title?: string;
+}
 
-
-const Navbar = () => {
-  const { toggleSidebar } = useSidebar();
+export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: TeacherNavbarProps) {
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("");
+  };
 
   return (
-    <header className="bg-gray-200 shadow-lg p-4 flex items-center justify-between border">
-      <div className='flex items-center gap-4'>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={toggleSidebar}
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-        <h1 className="text-lg font-medium text-gray-700">Teacher Dashboard</h1>
+    <header className="border-b bg-white py-4 px-6 flex justify-between items-center shadow-sm">
+      <div className="flex items-center gap-8">
+        <SidebarTrigger />
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          <p className="text-sm text-gray-500">Welcome back, Prof. Johnson</p>
+        </div>
       </div>
       
-      <div className="flex items-center space-x-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2">
-              <User size={18} />
-              <span>Teacher</span>
-              <ChevronDown size={16} />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-2">
+          <Button variant="outline" size="sm">
+            <Search className="h-4 w-4 mr-2" />
+            Search
+          </Button>
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            New Assignment
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="relative">
+            <MessageSquare className="h-5 w-5" />
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-green-500">
+              3
+            </Badge>
+          </Button>
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="h-5 w-5" />
+            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500">
+              5
+            </Badge>
+          </Button>
+        </div>
+        
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={student.avatar} />
+          <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
+        </Avatar>
       </div>
     </header>
   );
-};
-
-export default Navbar;
+}

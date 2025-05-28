@@ -1,8 +1,10 @@
-import type{ Student } from "@/types";
 
-import TeacherNavbar from "./TeacherNavbar";
-import TeacherSidebar from "./TeacherSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import type{ Student } from "@/types";
+import AdminNavbar from "./AdminNavbar";
+import AdminSidebar from "./AdminSidebar";
+
+ 
+ 
 
 
 interface TeacherDashboardProps {
@@ -11,17 +13,16 @@ interface TeacherDashboardProps {
   title?: string;
 }
 
-export default function TeacherDashboard({ children, student, title }: TeacherDashboardProps) {
+export default function AdminDashboard({ children }: TeacherDashboardProps) {
   return (
-    <SidebarProvider defaultOpen={true}>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar - Fixed */}
-      <TeacherSidebar student={student}/>
+      <AdminSidebar />
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 h-full">
         {/* Header - Fixed */}
-        <TeacherNavbar  student={student} title={title}/>
+        <AdminNavbar />
 
         {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 p-2 relative  ">
@@ -29,6 +30,5 @@ export default function TeacherDashboard({ children, student, title }: TeacherDa
         </main>
       </div>
     </div>
-    </SidebarProvider>
   );
 }
