@@ -3,7 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Bell, Search, MessageSquare, Plus } from "lucide-react";
+import { Bell, MessageSquare, Plus } from "lucide-react";
+import { ClassroomSelector } from "@/components/dashboard/Teacher/components/ClassroomSelector";
 
 interface TeacherNavbarProps {
   student: Student;
@@ -29,11 +30,8 @@ export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: 
       </div>
       
       <div className="flex items-center gap-4">
+      <ClassroomSelector />
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Button>
           <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
             <Plus className="h-4 w-4 mr-2" />
             New Assignment

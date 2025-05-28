@@ -3,6 +3,7 @@ import type{ Student } from "@/types";
 import TeacherNavbar from "./TeacherNavbar";
 import TeacherSidebar from "./TeacherSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { TeacherClassroomProvider } from "@/components/contexts/TeacherClassroomContext";
 
 
 interface TeacherDashboardProps {
@@ -13,6 +14,7 @@ interface TeacherDashboardProps {
 
 export default function TeacherDashboard({ children, student, title }: TeacherDashboardProps) {
   return (
+    <TeacherClassroomProvider> 
     <SidebarProvider defaultOpen={true}>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar - Fixed */}
@@ -30,5 +32,6 @@ export default function TeacherDashboard({ children, student, title }: TeacherDa
       </div>
     </div>
     </SidebarProvider>
+    </TeacherClassroomProvider>
   );
 }
