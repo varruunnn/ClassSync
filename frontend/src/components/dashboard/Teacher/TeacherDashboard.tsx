@@ -1,37 +1,41 @@
+import TeacherDashboard from "@/components/layout/teacher/TeacherDashboard";
 import { currentStudent } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BookOpen, FileText, Calendar, Clock, TrendingUp, CheckCircle, AlertCircle, Star, Award } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import TeacherDashboard from "@/components/layout/teacher/TeacherDashboard";
+import { useTeacherClassroom } from "@/components/contexts/TeacherClassroomContext";
+ 
 
 const TeacherDashboardPage = () => {
+  const { selectedClassroom } = useTeacherClassroom();
+
   const teacherStats = {
-    totalStudents: 120,
+    totalStudents: selectedClassroom?.students || 0,
     activeClasses: 5,
     pendingAssignments: 8,
     upcomingTests: 3,
-    averageGrade: 85,
-    attendanceRate: 92
+    averageGrade: selectedClassroom?.averageGrade || 0,
+    attendanceRate: selectedClassroom?.attendance || 0
   };
 
   const recentClasses = [
-    { id: 1, name: "Mathematics Grade 10", time: "9:00 AM", students: 25, room: "101", status: "ongoing" },
+    { id: 1, name: selectedClassroom?.name || "No class selected", time: "9:00 AM", students: selectedClassroom?.students || 0, room: selectedClassroom?.room || "N/A", status: "ongoing" },
     { id: 2, name: "Physics Grade 11", time: "11:00 AM", students: 22, room: "Lab 1", status: "upcoming" },
     { id: 3, name: "Mathematics Grade 9", time: "2:00 PM", students: 28, room: "102", status: "completed" }
   ];
 
   const pendingGrading = [
-    { id: 1, assignment: "Algebra Quiz", subject: "Mathematics", submissions: 24, total: 25, dueDate: "2025-05-24", priority: "high" },
+    { id: 1, assignment: "Algebra Quiz", subject: selectedClassroom?.subject || "Mathematics", submissions: 24, total: selectedClassroom?.students || 25, dueDate: "2025-05-24", priority: "high" },
     { id: 2, assignment: "Physics Lab Report", subject: "Physics", submissions: 20, total: 22, dueDate: "2025-05-25", priority: "medium" },
-    { id: 3, assignment: "Geometry Test", subject: "Mathematics", submissions: 22, total: 28, dueDate: "2025-05-26", priority: "low" }
+    { id: 3, assignment: "Geometry Test", subject: selectedClassroom?.subject || "Mathematics", submissions: 22, total: selectedClassroom?.students || 28, dueDate: "2025-05-26", priority: "low" }
   ];
 
   const topPerformers = [
-    { name: "Sarah Johnson", subject: "Mathematics", grade: 98, improvement: "+5%" },
+    { name: "Sarah Johnson", subject: selectedClassroom?.subject || "Mathematics", grade: 98, improvement: "+5%" },
     { name: "Michael Chen", subject: "Physics", grade: 96, improvement: "+3%" },
-    { name: "Emma Davis", subject: "Mathematics", grade: 94, improvement: "+7%" }
+    { name: "Emma Davis", subject: selectedClassroom?.subject || "Mathematics", grade: 94, improvement: "+7%" }
   ];
 
   const quickActions = [
@@ -49,7 +53,11 @@ const TeacherDashboardPage = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold mb-2">Good Morning, Prof. Johnson! 👋</h1>
-              <p className="text-blue-100">You have 3 classes today and 8 assignments pending review</p>
+              <p className="text-blue-100">
+                {selectedClassroom 
+                  ? `Teaching ${selectedClassroom.name} - ${selectedClassroom.students} students in Room ${selectedClassroom.room}`
+                  : "Select a classroom to view specific data"}
+              </p>
             </div>
             <div className="hidden md:block">
               <div className="bg-white/20 backdrop-blur rounded-lg p-4">
@@ -59,6 +67,32 @@ const TeacherDashboardPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Current Classroom Info */}
+        {selectedClassroom && (
+          <Card className="border-l-4 border-l-blue-500 bg-blue-50">
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">Room</p>
+                  <p className="text-2xl font-bold text-blue-600">{selectedClassroom.room}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">Students</p>
+                  <p className="text-2xl font-bold text-green-600">{selectedClassroom.students}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">Attendance</p>
+                  <p className="text-2xl font-bold text-orange-600">{selectedClassroom.attendance}%</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm text-gray-600">Next Class</p>
+                  <p className="text-sm font-medium text-gray-800">{selectedClassroom.nextClass}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -84,7 +118,7 @@ const TeacherDashboardPage = () => {
                   <p className="text-3xl font-bold text-blue-600">{teacherStats.totalStudents}</p>
                   <p className="text-xs text-green-600 flex items-center mt-1">
                     <TrendingUp className="h-3 w-3 mr-1" />
-                    +5% from last month
+                    Current Class
                   </p>
                 </div>
                 <Users className="h-12 w-12 text-blue-600 opacity-20" />
@@ -96,9 +130,9 @@ const TeacherDashboardPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Classes</p>
-                  <p className="text-3xl font-bold text-green-600">{teacherStats.activeClasses}</p>
-                  <p className="text-xs text-gray-500">Across 2 departments</p>
+                  <p className="text-sm text-muted-foreground">Class Average</p>
+                  <p className="text-3xl font-bold text-green-600">{teacherStats.averageGrade}%</p>
+                  <p className="text-xs text-gray-500">{selectedClassroom?.name || 'Select class'}</p>
                 </div>
                 <BookOpen className="h-12 w-12 text-green-600 opacity-20" />
               </div>
@@ -109,9 +143,9 @@ const TeacherDashboardPage = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Pending Grading</p>
-                  <p className="text-3xl font-bold text-orange-600">{teacherStats.pendingAssignments}</p>
-                  <p className="text-xs text-orange-600">Due this week</p>
+                  <p className="text-sm text-muted-foreground">Attendance Rate</p>
+                  <p className="text-3xl font-bold text-orange-600">{teacherStats.attendanceRate}%</p>
+                  <p className="text-xs text-orange-600">This month</p>
                 </div>
                 <FileText className="h-12 w-12 text-orange-600 opacity-20" />
               </div>
