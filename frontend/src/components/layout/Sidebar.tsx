@@ -17,11 +17,11 @@ import { useSidebar } from '../contexts/SidebarContext';
  
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Subjects', href: '/subjects', icon: FileText },
-  { name: 'Assignments', href: '/assessment', icon: FilePlus2 },
-  { name: 'Parent Portal', href: '/parent', icon: UserCircle },
-  { name: 'Calendar', href: '/calendar', icon: Calendar },
+  { name: 'Dashboard', href: '/student', icon: LayoutDashboard },
+  { name: 'Subjects', href: '/student/subjects', icon: FileText },
+  { name: 'Assignments', href: '/student/assessment', icon: FilePlus2 },
+  { name: 'Parent Portal', href: '/student/parent', icon: UserCircle },
+  { name: 'Calendar', href: '/student/calendar', icon: Calendar },
   // { name: 'Notifications', href: '/notifications', icon: BellRing },
   // { name: 'Settings', href: '/settings', icon: Settings },
   

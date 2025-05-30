@@ -18,7 +18,7 @@ import { useSidebar } from '@/components/contexts/SidebarContext';
  
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { name: 'Subjects', href: '/subjects', icon: FileText },
   { name: 'Assignments', href: '/assessment', icon: FilePlus2 },
   { name: 'Parent Portal', href: '/parent', icon: UserCircle },
