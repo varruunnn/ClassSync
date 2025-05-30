@@ -40,11 +40,11 @@ const App = () => (
           <Routes>
             {/* Student Dashboard */}
             <Route element={<AppLayoutWrapper />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/subjects" element={<Subjects />} />
-              <Route path="/assessment" element={<Assessments />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/parent" element={<ParentPortal />} />
+              <Route path="/student" element={<Index />} />
+              <Route path="/student/subjects" element={<Subjects />} />
+              <Route path="/student/assessment" element={<Assessments />} />
+              <Route path="/student/calendar" element={<Calendar />} />
+              <Route path="/student/parent" element={<ParentPortal />} />
             </Route>
 
             {/* Teacher Dashboard */}
@@ -70,7 +70,7 @@ const App = () => (
             {/* Admin Dashboard */}
             <Route path="/admin" element={<AdminDashboardPage />} />
 
-            <Route path="/index" element={<LandingPage />} />
+            <Route path="/" element={<LandingPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
             <Route path="/test" element={<Test />} />
