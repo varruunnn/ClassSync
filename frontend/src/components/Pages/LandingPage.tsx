@@ -75,7 +75,7 @@ const LandingPage: React.FC = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-0 z-50 backdrop-blur-lg bg-slate-900/80 border-b border-slate-800"
+        className="fixed top-2 left-2 right-2 z-50  px-3 sm:px-6 py-2 sm:py-3 backdrop-blur-md bg-slate-900/60 dark:bg-gray-900/70 shadow-lg transition-all duration-500 ease-in-out rounded-b-xl rounded-t-xl"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
