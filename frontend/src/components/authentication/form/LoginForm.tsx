@@ -26,7 +26,7 @@ const LoginForm: React.FC = () => {
   const [errors, setErrors] = useState({ email: '', password: '' });
 
   const navigate = useNavigate();
-  const auth = useAuth(); // ✅ use auth context
+  const auth = useAuth();
 
   const validate = () => {
     const newErrors = { email: '', password: '' };
@@ -65,12 +65,8 @@ const LoginForm: React.FC = () => {
         throw new Error("No token received");
       }
 
-      // ✅ Use context to store and update authentication
       auth?.login(token);
-
       toast.success('Login successful. Welcome back!');
-
-      // ✅ Navigate after auth state is updated
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
@@ -81,33 +77,43 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium pb-1">Email</Label>
+        <Label htmlFor="email" className="text-sm font-medium text-slate-200">
+          Email
+        </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`pl-10 ${errors.email ? 'border-destructive' : ''}`}
+            className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+              errors.email ? 'border-red-500 focus:border-red-500' : ''
+            }`}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isLoading}
           />
         </div>
-        {errors.email && <p className="text-destructive text-xs mt-1">{errors.email}</p>}
+        {errors.email && (
+          <p className="text-red-400 text-xs mt-1">{errors.email}</p>
+        )}
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium pb-1">Password</Label>
+        <Label htmlFor="password" className="text-sm font-medium text-slate-200">
+          Password
+        </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
-            className={`pl-10 ${errors.password ? 'border-destructive' : ''}`}
+            className={`pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+              errors.password ? 'border-red-500 focus:border-red-500' : ''
+            }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
@@ -115,7 +121,7 @@ const LoginForm: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
           >
             {showPassword ? (
               <EyeOffIcon className="h-5 w-5" />
@@ -124,24 +130,39 @@ const LoginForm: React.FC = () => {
             )}
           </button>
         </div>
-        {errors.password && <p className="text-destructive text-xs mt-1">{errors.password}</p>}
+        {errors.password && (
+          <p className="text-red-400 text-xs mt-1">{errors.password}</p>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <input type="checkbox" id="remember" className="h-4 w-4 rounded border-gray-300 text-legal focus:ring-legal" />
-          <Label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">Remember me</Label>
+          <input
+            type="checkbox"
+            id="remember"
+            className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
+          />
+          <Label htmlFor="remember" className="text-sm text-slate-300 cursor-pointer">
+            Remember me
+          </Label>
         </div>
-        <a href="#" className="text-sm text-legal hover:underline">Forgot password?</a>
+        <a href="#" className="text-sm text-indigo-400 hover:text-indigo-300 hover:underline">
+          Forgot password?
+        </a>
       </div>
 
       <button
         type="submit"
-        className={`bg-blue-400 hover:bg-blue-500 text-white cursor-pointer w-full py-2 rounded-md font-semibold ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+        className={`w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
+          isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-indigo-600/30 hover:scale-[1.02]'
+        }`}
         disabled={isLoading}
       >
         {isLoading ? (
-          <><span className="mr-2">Signing in</span><span className="animate-pulse">...</span></>
+          <div className="flex items-center justify-center">
+            <span className="mr-2">Signing in</span>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+          </div>
         ) : (
           'Sign In'
         )}
