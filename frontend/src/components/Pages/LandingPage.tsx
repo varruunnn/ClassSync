@@ -1,6 +1,9 @@
 import type React from "react"
 import { useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion, useScroll, useTransform, AnimatePresence, useInView } from "framer-motion"
+import studentDashboardImage from '@/assets/studentDashboard.png';
+import teacherDashboardImage from '@/assets/teacherDashboard.png';
 import {
   ArrowRight,
   Bell,
@@ -19,6 +22,7 @@ import {
 import { cn } from "@/lib/utils"
 
 const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
   const heroRef = useRef<HTMLDivElement>(null)
@@ -122,10 +126,11 @@ const LandingPage: React.FC = () => {
                 </motion.a>
               ))}
               <motion.button
-                className="ml-6 px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20"
+                className="ml-6 px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20"
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                onClick={() => navigate("/login")}
               >
                 Login
               </motion.button>
@@ -568,7 +573,7 @@ const HowItWorksSection = () => {
               id="for-students"
               title="For Students"
               description="Access assignments, check timetables, download admit cards, and view results in real-time."
-              image="/placeholder.svg?height=400&width=600"
+              image={studentDashboardImage} 
               steps={[
                 "Log in with your school code and student credentials",
                 "View your personalized dashboard with pending tasks",
@@ -600,7 +605,7 @@ const HowItWorksSection = () => {
               id="for-teachers"
               title="For Teachers"
               description="Manage classes, assign and grade work, create timetables, and communicate with parents."
-              image="/placeholder.svg?height=400&width=600"
+              image={teacherDashboardImage}
               steps={[
                 "Log in with teacher credentials provided by the school",
                 "Create and assign work to classes or individual students",
