@@ -18,7 +18,7 @@ export default function TeacherDashboard({ children, student, title }: TeacherDa
     <SidebarProvider defaultOpen={true}>
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Sidebar - Fixed */}
-      <TeacherSidebar student={student}/>
+      <TeacherSidebar />
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 h-full">

@@ -1,165 +1,125 @@
-import type{ Student } from "@/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { 
-  LayoutDashboard, 
-  BookOpen, 
-  Users, 
-  FileText, 
-  Calendar, 
-  GraduationCap,
-  ClipboardList,
-  BarChart3,
-  MessageSquare,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  FilePlus2,
+  Calendar,
+  UserCircle,
+  BellRing,
   Settings,
-  LogOut
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "@/components/ui/sidebar";
+  School,
+} from 'lucide-react';
+import { useSidebar } from '@/components/contexts/SidebarContext';
 
-interface TeacherSidebarProps {
-  student: Student;
-}
+ 
 
-export default function TeacherSidebar({ student }: TeacherSidebarProps) {
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("");
-  };
+const navigation = [
+  { name: 'Dashboard', href: '/teacher', icon: LayoutDashboard },
+  { name: 'My Class', href: '/teacher/classes', icon: School },
+  { name: 'Subjects', href: '/teacher/subjects', icon: FileText },
+  { name: 'Assignments', href: '/teacher/assignments', icon: FilePlus2 },
+  { name: 'GradeBook', href: '/teacher/gradebook', icon: UserCircle },
+  { name: 'Message', href: '/teacher/messages', icon: Calendar },
+  { name: 'Calender', href: '/teacher/calendar', icon: BellRing },
+  { name: 'Settings', href: '/teacher/settings', icon: Settings      },
+  
+];
+
+const TeacherSidebar = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  const { isOpen, isMobile, toggleSidebar } = useSidebar();
+  const location = useLocation();
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <div className="flex items-center space-x-2 px-2">
-          <GraduationCap className="h-8 w-8 text-blue-600" />
-          <h2 className="text-xl font-bold text-blue-600">Logo</h2>
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Teaching</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard">
-                  <Link to="/teacher" className="flex items-center">
-                    <LayoutDashboard className="w-8 h-8 mr-2" />
-                    <span>Dashboard</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="My Classes">
-                  <Link to="/teacher/classes" className="flex items-center">
-                    <Users className="w-5 h-5 mr-2" />
-                    <span>My Classes</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Subjects">
-                  <Link to="/teacher/subjects" className="flex items-center">
-                    <BookOpen className="w-5 h-5 mr-2" />
-                    <span>Subjects</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Assignments">
-                  <Link to="/teacher/assignments" className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
-                    <span>Assignments</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Gradebook">
-                  <Link to="/teacher/gradebook" className="flex items-center">
-                    <ClipboardList className="w-5 h-5 mr-2" />
-                    <span>Gradebook</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Analytics">
-                  <Link to="/teacher/analytics" className="flex items-center">
-                    <BarChart3 className="w-5 h-5 mr-2" />
-                    <span>Analytics</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Communication</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Messages">
-                  <Link to="/teacher/messages" className="flex items-center">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    <span>Messages</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Calendar">
-                  <Link to="/teacher/calendar" className="flex items-center">
-                    <Calendar className="w-5 h-5 mr-2" />
-                    <span>Calendar</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings">
-                  <Link to="/teacher/settings" className="flex items-center">
-                    <Settings className="w-5 h-5 mr-2" />
-                    <span>Settings</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarFooter>
-        <div className="flex items-center px-4 py-2">
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage src={student.avatar} />
-              <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">Prof. Johnson</span>
-              <span className="text-xs text-muted-foreground">Mathematics Dept.</span>
+    <>
+      {/* Overlay for mobile */}
+      {isMobile && isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div className={cn(
+        "fixed inset-y-0 left-0 z-40 bg-white text-black transition-all duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-50",
+        isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
+        "md:relative"
+      )}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
+            <Link to="/dashboard" className="flex items-center space-x-2">
+              <span className={cn("text-xl font-bold", collapsed && "hidden")}>logo</span>
+            </Link>
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              className="p-2 rounded-md hover:bg-primary-foreground/10 hidden md:block"
+            >
+              {collapsed ? (
+                <ChevronRight className="w-5 h-5" />
+              ) : (
+                <ChevronLeft className="w-5 h-5" />
+              )}
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-2 py-4 space-y-4">
+            {navigation.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                key={item.name}
+                to={item.href}
+                onClick={() => isMobile && toggleSidebar()}
+                className={cn(
+                  "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  isActive
+                    ? "bg-gray-200 text-primary-foreground"
+                    : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
+                )}
+              >
+                <item.icon className={cn("w-7 h-7 text-blue-900 transition-all duration-300", !collapsed && "mr-3")} />
+                <span
+                  className={cn(
+                    "text-black font-normal transition-all duration-300 overflow-hidden whitespace-nowrap",
+                    collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-[200px]"
+                  )}
+                >
+                  {item.name}
+                </span>
+              </Link>
+              
+              );
+            })}
+          </nav>
+
+          {/* User Info */}
+          <div className="p-4 border-t border-gray-400">
+            <div className="flex items-center space-x-3">
+              <img 
+                src='https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740'
+                alt='user' 
+                className='w-8 h-auto rounded-full'
+              />
+              {!collapsed && (
+                <div>
+                  <p className="text-sm font-medium">John Doe</p>
+                  <p className="text-sm text-gray-400">john@example.com</p>
+                </div>
+              )}
             </div>
           </div>
-          <Button variant="ghost" size="icon" className="ml-auto">
-            <LogOut className="w-5 h-5" />
-          </Button>
         </div>
-      </SidebarFooter>
-    </Sidebar>
+      </div>
+    </>
   );
-}
+};
+
+export default TeacherSidebar;

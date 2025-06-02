@@ -7,8 +7,6 @@ import {
   ChevronRight,
   LayoutDashboard,
   FilePlus2,
-  // BellRing,
-  // Settings,
   Calendar,
 
   UserCircle,
@@ -22,9 +20,6 @@ const navigation = [
   { name: 'Assignments', href: '/student/assessment', icon: FilePlus2 },
   { name: 'Parent Portal', href: '/student/parent', icon: UserCircle },
   { name: 'Calendar', href: '/student/calendar', icon: Calendar },
-  // { name: 'Notifications', href: '/notifications', icon: BellRing },
-  // { name: 'Settings', href: '/settings', icon: Settings },
-  
 ];
 
 const Sidebar = () => {
@@ -44,8 +39,8 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div className={cn(
-        "fixed inset-y-0 left-0 z-40 bg-slate-700 text-white transition-all duration-300 ease-in-out",
-        collapsed ? "w-20" : "w-60",
+        "fixed inset-y-0 left-0 z-40 bg-white text-black transition-all duration-300 ease-in-out",
+        collapsed ? "w-20" : "w-50",
         isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
         "md:relative"
       )}>
@@ -73,19 +68,27 @@ const Sidebar = () => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => isMobile && toggleSidebar()}
+                key={item.name}
+                to={item.href}
+                onClick={() => isMobile && toggleSidebar()}
+                className={cn(
+                  "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                  isActive
+                    ? "bg-gray-200 text-primary-foreground"
+                    : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
+                )}
+              >
+                <item.icon className={cn("w-7 h-7 text-blue-900 transition-all duration-300", !collapsed && "mr-3")} />
+                <span
                   className={cn(
-                    "flex items-center px-4 py-2 text-sm font-medium  rounded-md transition-colors",
-                    isActive 
-                      ? "bg-gray-600 text-primary-foreground " 
-                      : "text-primary-foreground/70 hover:bg-slate-600 hover:text-primary-foreground"
+                    "text-black font-normal transition-all duration-300 overflow-hidden whitespace-nowrap",
+                    collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-[200px]"
                   )}
                 >
-                  <item.icon className="w-5 h-5 mr-3 text-gray-400" />
-                  {!collapsed && <span className='text-gray-200'>{item.name}</span>}
-                </Link>
+                  {item.name}
+                </span>
+              </Link>
+              
               );
             })}
           </nav>

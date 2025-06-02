@@ -19,7 +19,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <Navbar />
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-gray-100 p-2 relative  ">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-slate-100 p-2 relative  ">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>

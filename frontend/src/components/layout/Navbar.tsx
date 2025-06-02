@@ -15,7 +15,7 @@ const Navbar = () => {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <header className="bg-gray-200 shadow-lg p-4 flex items-center justify-between border">
+    <header className="bg-white shadow-lg p-4 flex items-center justify-between border">
       <div className='flex items-center gap-4'>
         <Button
           variant="ghost"

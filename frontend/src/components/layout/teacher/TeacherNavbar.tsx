@@ -2,7 +2,6 @@ import type{ Student } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Bell, MessageSquare, Plus } from "lucide-react";
 import { ClassroomSelector } from "@/components/dashboard/Teacher/components/ClassroomSelector";
 
@@ -20,9 +19,8 @@ export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: 
   };
 
   return (
-    <header className="border-b bg-white py-4 px-6 flex justify-between items-center shadow-sm">
+    <header className="border-b bg-white py-4 px-10 flex justify-between items-center shadow-sm">
       <div className="flex items-center gap-8">
-        <SidebarTrigger />
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
           <p className="text-sm text-gray-500">Welcome back, Prof. Johnson</p>
