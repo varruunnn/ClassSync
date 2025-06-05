@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginResponse {
   token: string;
+  role : string;
   message: string;
   user: {
     id: string;
@@ -60,14 +61,22 @@ const LoginForm: React.FC = () => {
         password,
       });
 
-      const { token } = response.data;
-      if (!token) {
+      const { token , role} = response.data;
+      if (!token && !role) {
         throw new Error("No token received");
       }
 
-      auth?.login(token);
-      toast.success('Login successful. Welcome back!');
-      navigate('/dashboard');
+      auth?.login(token , role);
+      toast.success('Login successfull. Welcome back!');
+
+      if (role === "student") {
+         navigate('/student');
+      }else if (role === "teacher"){
+        navigate('/teacher');
+      }else{
+        navigate('/admin');
+      }
+     
     } catch (error: any) {
       console.error('Login error:', error);
       toast.error(error.response?.data?.message || 'Login failed');
