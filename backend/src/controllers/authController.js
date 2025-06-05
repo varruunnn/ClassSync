@@ -57,7 +57,9 @@ export const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    return res.json({ message: 'Login successful!', token });
+
+    const role = user.role;
+    return res.json({ message: 'Login successful!', token , role });
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ message: 'Server error during login.' });
