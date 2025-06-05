@@ -3,9 +3,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
-  if (!name || !email || !password || !role) {
-    return res.status(400).json({ message: 'Name, email, password, and role are all required.' });
+  const { name, email, password, role ,schoolId } = req.body;
+  if (!name || !email || !password || !role || !schoolId) {
+    return res.status(400).json({ message: 'Name, email, password, and role , schoolId are all required.' });
   }
 
   try {
@@ -20,10 +20,11 @@ export const register = async (req, res) => {
       email: email.toLowerCase().trim(),
       password: hashed,
       role, 
+      schoolId
     });
     await user.save();
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role , schoolId: user.schoolId },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -52,7 +53,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials.' });
     }
     const token = jwt.sign(
-      { userId: user._id, role: user.role },
+      { userId: user._id, role: user.role , schoolId: user.schoolId },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
