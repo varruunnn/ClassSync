@@ -14,6 +14,7 @@ const Login = () => {
   useEffect(() => {
     if (isAuthenticated) {
       const getrole = localStorage.getItem('role');
+      
 
       if (getrole === "student") {
         navigate("/student");

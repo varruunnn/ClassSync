@@ -1,48 +1,46 @@
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { EyeIcon, EyeOffIcon, Mail, Lock } from 'lucide-react';
-import { toast } from 'sonner';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+// /src/components/authentication/form/LoginForm.tsx
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { EyeIcon, EyeOffIcon, Mail, Lock } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 interface LoginResponse {
-  token: string;
-  role : string;
+  role: string;
+  schoolId: number;
   message: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
 }
 
 const LoginForm: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+  });
 
   const navigate = useNavigate();
   const auth = useAuth();
 
   const validate = () => {
-    const newErrors = { email: '', password: '' };
+    const newErrors = { email: "", password: "" };
     let isValid = true;
 
     if (!email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
       isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = "Email is invalid";
       isValid = false;
     }
-
     if (!password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
       isValid = false;
     }
 
@@ -56,30 +54,33 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>('http://localhost:3001/api/auth/login', {
-        email,
-        password,
-      });
+      const response = await axios.post<LoginResponse>(
+        "http://localhost:3001/api/auth/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
 
-      const { token , role} = response.data;
-      if (!token && !role) {
-        throw new Error("No token received");
-      }
+      const { role, schoolId } = response.data;
+      localStorage.setItem("schoolId", schoolId.toString());
+      localStorage.setItem("role", role);
 
-      auth?.login(token , role);
-      toast.success('Login successfull. Welcome back!');
+      auth?.login(role, schoolId);
+
+      toast.success("Login successful. Welcome back!");
 
       if (role === "student") {
-         navigate('/student');
-      }else if (role === "teacher"){
-        navigate('/teacher');
-      }else{
-        navigate('/admin');
+        navigate("/student");
+      } else if (role === "teacher") {
+        navigate("/teacher");
+      } else {
+        navigate("/admin");
       }
-     
     } catch (error: any) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed');
+      console.error("Login error:", error);
+      toast.error(error.response?.data?.message || "Login failed");
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +99,7 @@ const LoginForm: React.FC = () => {
             type="email"
             placeholder="name@example.com"
             className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.email ? 'border-red-500 focus:border-red-500' : ''
+              errors.email ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -118,10 +119,10 @@ const LoginForm: React.FC = () => {
           <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
           <Input
             id="password"
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
             className={`pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.password ? 'border-red-500 focus:border-red-500' : ''
+              errors.password ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -151,11 +152,17 @@ const LoginForm: React.FC = () => {
             id="remember"
             className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
           />
-          <Label htmlFor="remember" className="text-sm text-slate-300 cursor-pointer">
+          <Label
+            htmlFor="remember"
+            className="text-sm text-slate-300 cursor-pointer"
+          >
             Remember me
           </Label>
         </div>
-        <a href="#" className="text-sm text-indigo-400 hover:text-indigo-300 hover:underline">
+        <a
+          href="#"
+          className="text-sm text-indigo-400 hover:text-indigo-300 hover:underline"
+        >
           Forgot password?
         </a>
       </div>
@@ -163,7 +170,9 @@ const LoginForm: React.FC = () => {
       <button
         type="submit"
         className={`w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
-          isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:shadow-indigo-600/30 hover:scale-[1.02]'
+          isLoading
+            ? "opacity-70 cursor-not-allowed"
+            : "hover:shadow-indigo-600/30 hover:scale-[1.02]"
         }`}
         disabled={isLoading}
       >
@@ -173,7 +182,7 @@ const LoginForm: React.FC = () => {
             <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
           </div>
         ) : (
-          'Sign In'
+          "Sign In"
         )}
       </button>
     </form>
