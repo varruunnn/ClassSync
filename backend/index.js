@@ -6,6 +6,8 @@ import connectDB from './src/db/index.js'
 import authRoutes from './src/routes/auth.js'; 
 import dataRoutes from './src/routes/dataRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
+import noticeRoutes from './src/routes/noticeRoutes.js';
+
 
 const app = express();
 
@@ -25,6 +27,8 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/notices', noticeRoutes);
+
 
 const PORT = process.env.PORT || 3001;
 

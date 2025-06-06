@@ -95,7 +95,6 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
     useEffect(() => {
-    // wait until AuthContext finishes loading
     if (!loading) {
       if (!isAuthenticated || userRole !== "admin") {
         navigate("/login");
@@ -104,7 +103,6 @@ export default function AdminDashboard() {
   }, [isAuthenticated, userRole, loading, navigate]);
   useEffect(() => {
     const fetchStats = async () => {
-      // Only check schoolId (not token)
       const storedSchoolId = localStorage.getItem("schoolId");
       if (!storedSchoolId) {
         setError("Missing schoolId");
@@ -117,7 +115,7 @@ export default function AdminDashboard() {
           `http://localhost:3001/api/admin/${storedSchoolId}/stats`,
           {
             method: "GET",
-            credentials: "include", // ← send the cookie automatically
+            credentials: "include",
             headers: {
               "Content-Type": "application/json",
             },
@@ -125,7 +123,6 @@ export default function AdminDashboard() {
         );
 
         if (!response.ok) {
-          // If backend replies 401 or 403, handle it:
           const json = await response.json();
           throw new Error(json.error || "Failed to fetch stats");
         }

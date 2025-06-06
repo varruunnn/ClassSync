@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+
 const noticeSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -37,12 +38,11 @@ const noticeSchema = new mongoose.Schema({
     required: true
   },
   schoolId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'School',
-    required: true
+    type: Number,
+    required:true
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Notice', noticeSchema);
+export default mongoose.model('Notice', noticeSchema);
