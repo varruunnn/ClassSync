@@ -1,15 +1,17 @@
 import express from 'express';
 import { getSchoolStats } from '../controllers/statsController.js';
 import protect from '../middlewares/auth.js';
+import isAdmin from '../middlewares/isAdmin.js';
 
 const router = express.Router();
 
 router.get(
   '/:schoolId/stats',
-  protect,
+  protect,   
+  isAdmin,    
   (req, res, next) => {
-    const tokenSchoolId  = req.schoolId;                  
-    const paramSchoolId  = Number(req.params.schoolId);   
+    const tokenSchoolId = req.schoolId;               
+    const paramSchoolId = Number(req.params.schoolId);
 
     console.log('→ token.schoolId:', tokenSchoolId);
     console.log('→ params.schoolId:', paramSchoolId);
@@ -21,7 +23,7 @@ router.get(
     }
     next();
   },
-  getSchoolStats
+  getSchoolStats 
 );
 
 export default router;

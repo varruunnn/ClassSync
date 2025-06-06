@@ -3,9 +3,6 @@ import type{ Student } from "@/types";
 import AdminNavbar from "./AdminNavbar";
 import AdminSidebar from "./AdminSidebar";
 
- 
- 
-
 
 interface TeacherDashboardProps {
   children: React.ReactNode;
