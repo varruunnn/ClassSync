@@ -1,4 +1,3 @@
-// src/pages/StudentsPage.tsx
 import { useEffect, useState } from "react";
 import {
   Card,
