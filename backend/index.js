@@ -8,6 +8,7 @@ import dataRoutes from './src/routes/dataRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import noticeRoutes from './src/routes/noticeRoutes.js';
 import adminStudentRoutes from './src/routes/studentRoutes.js';
+import teacherRoutes from './src/routes/teacherRoutes.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/data", dataRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/admin', adminStudentRoutes);
 app.use('/api/notices', noticeRoutes);
+app.use('/api/admin', teacherRoutes)
 
 
 const PORT = process.env.PORT || 3001;

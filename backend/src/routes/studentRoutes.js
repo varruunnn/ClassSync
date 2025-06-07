@@ -1,4 +1,3 @@
-// /src/routes/studentRoutes.js
 import express from 'express';
 import { getStudentsBySchool, deleteStudent } from '../controllers/studentController.js';
 import protect from '../middlewares/auth.js';
