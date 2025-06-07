@@ -28,6 +28,12 @@ const UserSchema = new mongoose.Schema({
     ref: 'School',
     required: true,
   },
+  class: {
+    type: Number,
+    required: function() { return this.role === 'student'; },
+    min: 1,
+    max: 12,
+  },
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);

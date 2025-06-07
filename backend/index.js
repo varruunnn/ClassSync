@@ -7,7 +7,7 @@ import authRoutes from './src/routes/auth.js';
 import dataRoutes from './src/routes/dataRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import noticeRoutes from './src/routes/noticeRoutes.js';
-
+import adminStudentRoutes from './src/routes/studentRoutes.js';
 
 const app = express();
 
@@ -27,6 +27,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/admin', adminStudentRoutes);
 app.use('/api/notices', noticeRoutes);
 
 
