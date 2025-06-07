@@ -3,12 +3,13 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
-  const { name, email, password, role, schoolId } = req.body;
-  if (!name || !email || !password || !role || !schoolId) {
+  const { name, email, password, role, schoolId, class: studentClass } = req.body;
+
+  if (!name || !email || !password || !role || !schoolId || (role === 'student' && !studentClass)) {
     return res
       .status(400)
       .json({
-        message: "Name, email, password, and role , schoolId are all required.",
+        message: "Name, email, password, role, schoolId, and class (for students) are required.",
       });
   }
 
@@ -19,6 +20,7 @@ export const register = async (req, res) => {
         .status(400)
         .json({ message: "User with this email already exists." });
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
     const user = new User({
@@ -27,13 +29,17 @@ export const register = async (req, res) => {
       password: hashed,
       role,
       schoolId,
+      class: role === 'student' ? studentClass : undefined,
     });
+
     await user.save();
+
     const token = jwt.sign(
       { userId: user._id, role: user.role, schoolId: user.schoolId },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
+
     return res.status(201).json({
       message: "Registration successful!",
       token,
@@ -45,6 +51,7 @@ export const register = async (req, res) => {
       .json({ message: "Server error during registration." });
   }
 };
+
 export const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
