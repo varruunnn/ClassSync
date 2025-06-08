@@ -30,7 +30,7 @@ import {
   User,
   ChevronDown,
 } from "lucide-react"
-import { Link, useLocation } from "react-router-dom" // ✅ useLocation instead of usePathname
+import { Link, useLocation } from "react-router-dom" 
 
 const navigation = [
   {
@@ -53,7 +53,21 @@ const navigation = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
-  const pathname = location.pathname // ✅ get path from React Router
+  const pathname = location.pathname
+
+  const handleLogout = async (): Promise<void> => {
+    try {
+      await fetch('http://localhost:3001/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', 
+      })
+      localStorage.removeItem('schoolId')
+      localStorage.removeItem('role')
+      window.location.reload()
+    } catch (err) {
+      console.error('Logout failed:', err)
+    }
+  }
 
   return (
     <SidebarProvider>
@@ -123,7 +137,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>

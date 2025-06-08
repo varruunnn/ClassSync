@@ -91,13 +91,14 @@ export const login = async (req, res) => {
   }
 };
 export const logout = (req, res) => {
-  res.cookie('token', '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    expires: new Date(0), 
-  });
-  return res.json({ message: 'Logged out successfully.' });
+  res
+    .cookie('token', '', {
+      httpOnly: true,
+      secure: true,    
+      sameSite: 'none', 
+      expires: new Date(0),
+    })
+    .json({ message: 'Logged out' });
 };
 export const me = (req, res) => {
   return res.json({
