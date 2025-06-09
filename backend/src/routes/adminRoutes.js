@@ -13,9 +13,6 @@ router.get(
     const tokenSchoolId = req.schoolId;               
     const paramSchoolId = Number(req.params.schoolId);
 
-    console.log('→ token.schoolId:', tokenSchoolId);
-    console.log('→ params.schoolId:', paramSchoolId);
-
     if (tokenSchoolId !== paramSchoolId) {
       return res
         .status(403)
