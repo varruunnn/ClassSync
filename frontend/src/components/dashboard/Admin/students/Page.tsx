@@ -519,7 +519,7 @@ export default function StudentsPage() {
                       </td>
                       <td className="py-4 px-6">
                         <span className="font-mono text-sm text-gray-700">
-                          {student.id}
+                          {student.rollNumber}
                         </span>
                       </td>
                       <td className="py-4 px-6">

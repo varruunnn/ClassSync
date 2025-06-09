@@ -1,12 +1,9 @@
+// src/models/User.js
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    name: { type: String, required: true, trim: true },
     email: {
       type: String,
       required: true,
@@ -14,28 +11,43 @@ const UserSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    password: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true },
     role: {
       type: String,
       enum: ["student", "teacher", "admin"],
       required: true,
       default: "student",
     },
-    schoolId: {
-      type: Number,
-      ref: "School",
-      required: true,
-    },
+    schoolId: { type: Number, required: true },
     class: {
-      type: Number,
+      type: String,
       required: function () {
         return this.role === "student";
       },
-      min: 1,
-      max: 12,
+    },
+    rollNumber: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    parentContact: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    subject: {
+      type: String,
+      required: function () {
+        return this.role === "teacher";
+      },
+    },
+    phone: {
+      type: String,
+      required: function () {
+        return this.role === "teacher";
+      },
     },
     classAssigned: {
       type: String,
@@ -45,5 +57,4 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", UserSchema);
-export default User;
+export default mongoose.model("User", UserSchema);
