@@ -63,6 +63,18 @@ const LandingPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+    const [title, setTitle] = useState("Login");
+
+  useEffect(()=>{
+     const getrole = localStorage.getItem('role');
+     
+     if (getrole === null) {
+      setTitle("Login");
+     }else{
+      setTitle("Dashboard");
+     }
+  },[])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-hidden">
       {/* Animated background */}
@@ -130,9 +142,9 @@ const LandingPage: React.FC = () => {
                 whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(99, 102, 241, 0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/login")}  /*login page will automatically handle where to navigate */
               >
-                Login
+               {title}
               </motion.button>
             </div>
             <div className="flex items-center md:hidden">

@@ -16,7 +16,14 @@ import Assessments from "./components/Pages/Assessments";
 import Calendar from "./components/Pages/Calender";
 import ParentPortal from "./components/Pages/ParentPortal";
 import TeacherDashboardPage from "./components/dashboard/Teacher/TeacherDashboard";
-import AdminDashboardPage from "./components/dashboard/Admin/AdminDashboard";
+
+import AdminLayout from "./components/dashboard/Admin/Layout";
+import AdminDashboard from "./components/dashboard/Admin/Page";
+import TeachersPage from "./components/dashboard/Admin/teachers/Page";
+import StudentsPage from "./components/dashboard/Admin/students/Page";
+import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
+import NoticesPage from "./components/dashboard/Admin/notices/Page";
+
 
 import TeacherClasses from "./components/dashboard/Teacher/components/TeacherClasses";
 import TeacherSubjects from "./components/dashboard/Teacher/components/TeacherSubjects";
@@ -35,52 +42,61 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <SidebarProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Student Dashboard */}
-            <Route element={<AppLayoutWrapper />}>
-              <Route path="/student" element={<Index />} />
-              <Route path="/student/subjects" element={<Subjects />} />
-              <Route path="/student/assessment" element={<Assessments />} />
-              <Route path="/student/calendar" element={<Calendar />} />
-              <Route path="/student/parent" element={<ParentPortal />} />
-            </Route>
+      <BrowserRouter>
+        <Routes>
+          {/* Student Dashboard */}
+          <Route
+            element={
+              <SidebarProvider>
+                <AppLayoutWrapper />
+              </SidebarProvider>
+            }
+          >
+            <Route path="/student" element={<Index />} />
+            <Route path="/student/subjects" element={<Subjects />} />
+            <Route path="/student/assessment" element={<Assessments />} />
+            <Route path="/student/calendar" element={<Calendar />} />
+            <Route path="/student/parent" element={<ParentPortal />} />
+          </Route>
 
-            {/* Teacher Dashboard */}
-            <Route
-              path="/teacher"
-              element={
+          {/* Teacher Dashboard */}
+          <Route
+            path="/teacher"
+            element={
+              <SidebarProvider>
                 <TeacherClassroomProvider>
-                  <Outlet />
+                  <AppLayoutWrapper />
                 </TeacherClassroomProvider>
-              }
-            >
-              <Route index element={<TeacherDashboardPage />} />
-              <Route path="classes" element={<TeacherClasses />} />
-              <Route path="subjects" element={<TeacherSubjects />} />
-              <Route path="assignments" element={<TeacherAssignments />} />
-              <Route path="gradebook" element={<TeacherGradebook />} />
-              <Route path="analytics" element={<TeacherAnalytics />} />
-              <Route path="messages" element={<TeacherMessages />} />
-              <Route path="calendar" element={<TeacherCalendar />} />
-              <Route path="settings" element={<TeacherSettings />} />
-            </Route>
+              </SidebarProvider>
+            }
+          >
+            <Route index element={<TeacherDashboardPage />} />
+            <Route path="classes" element={<TeacherClasses />} />
+            <Route path="subjects" element={<TeacherSubjects />} />
+            <Route path="assignments" element={<TeacherAssignments />} />
+            <Route path="gradebook" element={<TeacherGradebook />} />
+            <Route path="analytics" element={<TeacherAnalytics />} />
+            <Route path="messages" element={<TeacherMessages />} />
+            <Route path="calendar" element={<TeacherCalendar />} />
+            <Route path="settings" element={<TeacherSettings />} />
+          </Route>
 
-            {/* Admin Dashboard */}
-            <Route path="/admin" element={<AdminDashboardPage />} />
+          {/* Admin Dashboard */}
+          <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+          <Route path="/admin/teachers" element={<AdminLayout><TeachersPage /></AdminLayout>} />
+          <Route path="/admin/students" element={<AdminLayout><StudentsPage /></AdminLayout>} />
+          <Route path="/admin/assign" element={<AdminLayout><AssignTeacherPage /></AdminLayout>} />
+          <Route path="/admin/notices" element={<AdminLayout><NoticesPage /></AdminLayout>} />
 
-            <Route path="/" element={<LandingPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-            <Route path="/test" element={<Test />} />
 
-            {/* Authentication Page */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-          </Routes>
-        </BrowserRouter>
-      </SidebarProvider>
+          {/* Other Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/test" element={<Test />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

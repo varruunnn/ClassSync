@@ -13,7 +13,17 @@ const Login = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/dashboard");
+      const getrole = localStorage.getItem('role');
+      
+
+      if (getrole === "student") {
+        navigate("/student");
+      }else if (getrole === "teacher"){
+         navigate("/teacher");
+      }else {
+        navigate("/admin");
+      }
+      
     }
   }, [isAuthenticated, navigate]);
 
