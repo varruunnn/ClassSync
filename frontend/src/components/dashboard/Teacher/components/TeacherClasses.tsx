@@ -12,7 +12,7 @@ const TeacherClasses = () => {
   const { selectedClassroom, classrooms } = useTeacherClassroom();
 
   return (
-    <TeacherDashboard student={currentStudent} title="My Classes">
+    <TeacherDashboard student={currentStudent} title="Classroom">
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
