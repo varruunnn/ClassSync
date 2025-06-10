@@ -120,7 +120,6 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
 );
-
 export default App;
 
 const AppLayoutWrapper = () => (
