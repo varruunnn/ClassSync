@@ -17,14 +17,6 @@ import Calendar from "./components/Pages/Calender";
 import ParentPortal from "./components/Pages/ParentPortal";
 import TeacherDashboardPage from "./components/dashboard/Teacher/TeacherDashboard";
 
-import AdminLayout from "./components/dashboard/Admin/Layout";
-import AdminDashboard from "./components/dashboard/Admin/Page";
-import TeachersPage from "./components/dashboard/Admin/teachers/Page";
-import StudentsPage from "./components/dashboard/Admin/students/Page";
-import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
-import NoticesPage from "./components/dashboard/Admin/notices/Page";
-
-
 import TeacherClasses from "./components/dashboard/Teacher/components/TeacherClasses";
 import TeacherSubjects from "./components/dashboard/Teacher/components/TeacherSubjects";
 import TeacherAssignments from "./components/dashboard/Teacher/components/TeacherAssignments";
@@ -35,6 +27,13 @@ import TeacherCalendar from "./components/dashboard/Teacher/components/TeacherCa
 import TeacherSettings from "./components/dashboard/Teacher/components/TeacherSettings";
 import { TeacherClassroomProvider } from "./components/contexts/TeacherClassroomContext";
 
+import AdminLayout from "./components/dashboard/Admin/Layout";
+import AdminDashboard from "./components/dashboard/Admin/Page";
+import TeachersPage from "./components/dashboard/Admin/teachers/Page";
+import StudentsPage from "./components/dashboard/Admin/students/Page";
+import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
+import NoticesPage from "./components/dashboard/Admin/notices/Page";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -42,68 +41,88 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Student Dashboard */}
-          <Route
-            element={
-              <SidebarProvider>
-                <AppLayoutWrapper />
-              </SidebarProvider>
-            }
-          >
-            <Route path="/student" element={<Index />} />
-            <Route path="/student/subjects" element={<Subjects />} />
-            <Route path="/student/assessment" element={<Assessments />} />
-            <Route path="/student/calendar" element={<Calendar />} />
-            <Route path="/student/parent" element={<ParentPortal />} />
-          </Route>
-
-          {/* Teacher Dashboard */}
-          <Route
-            path="/teacher"
-            element={
-              <SidebarProvider>
+      <SidebarProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayoutWrapper />}>
+              <Route path="/student" element={<Index />} />
+              <Route path="/student/subjects" element={<Subjects />} />
+              <Route path="/student/assessment" element={<Assessments />} />
+              <Route path="/student/calendar" element={<Calendar />} />
+              <Route path="/student/parent" element={<ParentPortal />} />
+            </Route>
+            <Route
+              path="/teacher"
+              element={
                 <TeacherClassroomProvider>
-                  <AppLayoutWrapper />
+                  <Outlet />
                 </TeacherClassroomProvider>
-              </SidebarProvider>
-            }
-          >
-            <Route index element={<TeacherDashboardPage />} />
-            <Route path="classes" element={<TeacherClasses />} />
-            <Route path="subjects" element={<TeacherSubjects />} />
-            <Route path="assignments" element={<TeacherAssignments />} />
-            <Route path="gradebook" element={<TeacherGradebook />} />
-            <Route path="analytics" element={<TeacherAnalytics />} />
-            <Route path="messages" element={<TeacherMessages />} />
-            <Route path="calendar" element={<TeacherCalendar />} />
-            <Route path="settings" element={<TeacherSettings />} />
-          </Route>
-
-          {/* Admin Dashboard */}
-          <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-          <Route path="/admin/teachers" element={<AdminLayout><TeachersPage /></AdminLayout>} />
-          <Route path="/admin/students" element={<AdminLayout><StudentsPage /></AdminLayout>} />
-          <Route path="/admin/assign" element={<AdminLayout><AssignTeacherPage /></AdminLayout>} />
-          <Route path="/admin/notices" element={<AdminLayout><NoticesPage /></AdminLayout>} />
-
-
-          {/* Other Routes */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/test" element={<Test />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+              }
+            >
+              <Route index element={<TeacherDashboardPage />} />
+              <Route path="classes" element={<TeacherClasses />} />
+              <Route path="subjects" element={<TeacherSubjects />} />
+              <Route path="assignments" element={<TeacherAssignments />} />
+              <Route path="gradebook" element={<TeacherGradebook />} />
+              <Route path="analytics" element={<TeacherAnalytics />} />
+              <Route path="messages" element={<TeacherMessages />} />
+              <Route path="calendar" element={<TeacherCalendar />} />
+              <Route path="settings" element={<TeacherSettings />} />
+            </Route>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/test" element={<Test />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/teachers"
+              element={
+                <AdminLayout>
+                  <TeachersPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/students"
+              element={
+                <AdminLayout>
+                  <StudentsPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/assign"
+              element={
+                <AdminLayout>
+                  <AssignTeacherPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/notices"
+              element={
+                <AdminLayout>
+                  <NoticesPage />
+                </AdminLayout>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </SidebarProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
 
-// This wraps child routes with AppLayout and lets <Outlet /> render them inside it
 const AppLayoutWrapper = () => (
   <AppLayout>
     <Outlet />
