@@ -8,7 +8,7 @@ import {
   LayoutDashboard,
   FilePlus2,
   Calendar,
-
+  Brain,
   UserCircle,
 } from 'lucide-react';
 import { useSidebar } from '../contexts/SidebarContext';
@@ -20,6 +20,7 @@ const navigation = [
   { name: 'Assignments', href: '/student/assessment', icon: FilePlus2 },
   { name: 'Parent Portal', href: '/student/parent', icon: UserCircle },
   { name: 'Calendar', href: '/student/calendar', icon: Calendar },
+  { name: 'Chat with pdf' , href: '/student/chat-with-pdf', icon: Brain}
 ];
 
 const Sidebar = () => {

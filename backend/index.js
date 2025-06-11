@@ -9,6 +9,7 @@ import adminRoutes from './src/routes/adminRoutes.js';
 import noticeRoutes from './src/routes/noticeRoutes.js';
 import adminStudentRoutes from './src/routes/studentRoutes.js';
 import teacherRoutes from './src/routes/teacherRoutes.js';
+import pdfRoutes from './src/routes/pdfRoutes.js';
 
 const app = express();
 
@@ -31,7 +32,7 @@ app.use("/api/admin", adminRoutes);
 app.use('/api/admin', adminStudentRoutes);
 app.use('/api/notices', noticeRoutes);
 app.use('/api/admin', teacherRoutes)
-
+app.use('/api/pdf', pdfRoutes);
 
 const PORT = process.env.PORT || 3001;
 

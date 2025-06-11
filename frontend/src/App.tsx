@@ -33,6 +33,7 @@ import TeachersPage from "./components/dashboard/Admin/teachers/Page";
 import StudentsPage from "./components/dashboard/Admin/students/Page";
 import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
 import NoticesPage from "./components/dashboard/Admin/notices/Page";
+import ChatPdf from "./components/Pages/ChatPdf";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/student/assessment" element={<Assessments />} />
               <Route path="/student/calendar" element={<Calendar />} />
               <Route path="/student/parent" element={<ParentPortal />} />
+              <Route path="/student/chat-with-pdf" element={<ChatPdf />} />
             </Route>
             <Route
               path="/teacher"
