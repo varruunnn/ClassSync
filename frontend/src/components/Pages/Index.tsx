@@ -1,6 +1,6 @@
+import { useEffect, useState } from "react";
 import {
   currentStudent,
-  subjects,
   recentTests,
   performanceStats,
   performanceHistory,
@@ -16,14 +16,53 @@ import { Progress } from "@/components/ui/progress";
 import { AlertCircle, BookOpen, Clock, FileText } from "lucide-react";
 
 const Index = () => {
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [subjectError, setSubjectError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3001/api/students/subjects/me",
+          {
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!res.ok) {
+          throw new Error(`Error ${res.status}: ${res.statusText}`);
+        }
+        const data: { subjects: string[] } = await res.json();
+        setSubjects(data.subjects || []);
+      } catch (err: any) {
+        console.error("Failed to load subjects:", err);
+        setSubjectError(err.message);
+      } finally {
+        setLoadingSubjects(false);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
+
   return (
-    <div className=" px-8 space-y-6">
+    <div className="px-8 space-y-6">
       <div className="flex flex-col md:flex-row gap-6">
         <div className="md:w-2/3">
           <h2 className="text-2xl font-bold mb-4">
             Welcome back, {currentStudent.name}!
           </h2>
-          <SubjectCards subjects={subjects} />
+
+          {loadingSubjects ? (
+            <p>Loading subjects...</p>
+          ) : subjectError ? (
+            <p className="text-red-600">{subjectError}</p>
+          ) : (
+            <SubjectCards subjects={subjects} />
+          )}
         </div>
         <div className="md:w-1/3">
           <PerformanceOverview stats={performanceStats} />
