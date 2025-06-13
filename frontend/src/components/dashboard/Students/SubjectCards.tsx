@@ -1,37 +1,50 @@
 import { Card, CardContent } from "@/components/ui/card";
-import type { Subject } from "@/types";
 
 interface SubjectCardsProps {
-  subjects: Subject[];
+  subjects: string[];
 }
 
 export default function SubjectCards({ subjects }: SubjectCardsProps) {
-
-  const getColorForType = (type: string): string => {
-    const colorMap: Record<string, string> = {
-      math: '#3b82f6',      // blue-500
-      science: '#10b981',   // green-500
-      english: '#f59e0b',   // amber-500
-      history: '#ef4444',   // red-500
-      art: '#eab308',       // yellow-500
-      default: '#9ca3af'    // gray-400
-    };
-  
-    return colorMap[type.toLowerCase()] || colorMap.default;
-  };
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3  gap-4">
-      {subjects.map((subject) => (
-        <Card 
-        key={subject.id} 
-        style={{ borderLeftColor: getColorForType(subject.type) }}
-        className={`border-l-4 border-${subject.type} hover:shadow-md transition-all duration-300`}>
-          <CardContent className="p-4">
-            <h3 className="font-medium">{subject.name}</h3>
-            <p className="text-sm text-muted-foreground">{subject.teacher}</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+      {subjects.map((name) => (
+        <Card
+          key={name}
+          className="
+            relative 
+            overflow-hidden 
+            group 
+            hover:shadow-xl 
+            hover:scale-[1.02] 
+            transition-all 
+            duration-300 
+            ease-in-out 
+            border 
+            border-gray-900 
+            dark:border-gray-700 
+            rounded-lg
+          "
+        >
+          {" "}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <CardContent className="p-6 flex items-center justify-center h-full relative z-10">
+            <h3
+              className="
+              font-semibold 
+              text-xl 
+              text-gray-800 
+              dark:text-gray-100 
+              group-hover:text-blue-600 
+              dark:group-hover:text-blue-400 
+              transition-colors 
+              duration-300
+            "
+            >
+              {name}
+            </h3>
           </CardContent>
         </Card>
       ))}
-    </div>  
+    </div>
   );
 }
