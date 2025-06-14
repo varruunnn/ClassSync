@@ -68,8 +68,6 @@ const Index = () => {
           <PerformanceOverview stats={performanceStats} />
         </div>
       </div>
-
-      {/* Quick Actions Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
