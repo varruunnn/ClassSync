@@ -7,10 +7,10 @@ import authRoutes from './src/routes/auth.js';
 import dataRoutes from './src/routes/dataRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
 import noticeRoutes from './src/routes/noticeRoutes.js';
-import adminStudentRoutes from './src/routes/studentRoutes.js';
+import adminStudentRoutes from './src/routes/adminstudentRoutes.js';
 import teacherRoutes from './src/routes/teacherRoutes.js';
 import pdfRoutes from './src/routes/pdfRoutes.js';
-import subjectRoutes from './src/routes/subjectRoutes.js';
+import subjectRoutes from './src/routes/studentRoutes.js';
 
 const app = express();
 
@@ -35,6 +35,7 @@ app.use('/api/notices', noticeRoutes);
 app.use('/api/admin', teacherRoutes)
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/students/subjects', subjectRoutes);
+app.use('/api/students/', subjectRoutes);
 
 const PORT = process.env.PORT || 3001;
 

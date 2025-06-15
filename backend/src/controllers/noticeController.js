@@ -37,6 +37,8 @@ export const createNotice = async (req, res) => {
     return res.status(500).json({ error: 'Server error while creating notice.' });
   }
 };
+// controllers/noticeController.js
+
 export const listNoticesBySchool = async (req, res) => {
   try {
     const numericSid = Number(req.params.schoolId);
@@ -44,17 +46,27 @@ export const listNoticesBySchool = async (req, res) => {
       return res.status(400).json({ error: 'Invalid schoolId parameter.' });
     }
 
-    const { status, type, targetAudience } = req.query;
+    // pull the new `audience` param
+    const { status, type, audience } = req.query;
     const filter = { schoolId: numericSid };
 
+    // existing filters
     if (status && ['draft', 'published'].includes(status)) {
       filter.status = status;
     }
     if (type && ['info', 'warning', 'success'].includes(type)) {
       filter.type = type;
     }
-    if (targetAudience && ['all', 'teachers', 'students', 'parents'].includes(targetAudience)) {
-      filter.targetAudience = targetAudience;
+
+    // if `audience` is provided, match either exactly or “all”
+    if (audience) {
+      const aud = String(audience);
+      if (['all','teachers','students','parents'].includes(aud)) {
+        // match docs whose targetAudience is either “all” or exactly the requested audience
+        filter.targetAudience = { $in: ['all', aud] };
+      } else {
+        return res.status(400).json({ error: 'Invalid audience parameter.' });
+      }
     }
 
     const notices = await Notice.find(filter)
