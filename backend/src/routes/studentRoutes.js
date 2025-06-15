@@ -1,12 +1,10 @@
 import express from 'express';
-import { getStudentsBySchool, deleteStudent } from '../controllers/studentController.js';
-import protect from '../middlewares/auth.js';
-import isAdmin from '../middlewares/isAdmin.js';
+import { getMyInfo, getMySubjects } from '../controllers/studentController.js';
+import  protect  from '../middlewares/auth.js';
 
 const router = express.Router();
+router.get('/me', protect, getMySubjects);
+router.get('/myinfo',protect,getMyInfo);
 
-router.get('/:schoolId/students', protect, isAdmin, getStudentsBySchool);
-
-router.delete('/:schoolId/students/:id', protect, isAdmin, deleteStudent);
 
 export default router;

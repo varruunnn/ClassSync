@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { 
@@ -12,15 +12,14 @@ import {
   UserCircle,
 } from 'lucide-react';
 import { useSidebar } from '../contexts/SidebarContext';
- 
 
 const navigation = [
   { name: 'Dashboard', href: '/student', icon: LayoutDashboard },
   { name: 'Subjects', href: '/student/subjects', icon: FileText },
   { name: 'Assignments', href: '/student/assessment', icon: FilePlus2 },
   { name: 'Parent Portal', href: '/student/parent', icon: UserCircle },
-  { name: 'Calendar', href: '/student/calendar', icon: Calendar },
-  { name: 'Chat with pdf' , href: '/student/chat-with-pdf', icon: Brain}
+  { name: 'Notices', href: '/student/calendar', icon: Calendar },
+  { name: 'Chat with pdf', href: '/student/chat-with-pdf', icon: Brain }
 ];
 
 const Sidebar = () => {
@@ -28,9 +27,30 @@ const Sidebar = () => {
   const { isOpen, isMobile, toggleSidebar } = useSidebar();
   const location = useLocation();
 
+  const [user, setUser] = useState<{ name?: string; email?: string }>({});
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const res = await fetch('http://localhost:3001/api/students/myinfo', {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setUser(data.data); 
+        } else {
+          console.error('Failed to fetch user info:', data.message);
+        }
+      } catch (err) {
+        console.error('Error fetching user info:', err);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
     <>
-      {/* Overlay for mobile */}
       {isMobile && isOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
@@ -38,7 +58,6 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Sidebar */}
       <div className={cn(
         "fixed inset-y-0 left-0 z-40 bg-white text-black transition-all duration-300 ease-in-out",
         collapsed ? "w-20" : "w-50",
@@ -46,7 +65,6 @@ const Sidebar = () => {
         "md:relative"
       )}>
         <div className="flex flex-col h-full">
-          {/* Logo */}
           <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <span className={cn("text-xl font-bold", collapsed && "hidden")}>logo</span>
@@ -63,38 +81,34 @@ const Sidebar = () => {
             </button>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-4">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => isMobile && toggleSidebar()}
-                className={cn(
-                  "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
-                  isActive
-                    ? "bg-gray-200 text-primary-foreground"
-                    : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
-                )}
-              >
-                <item.icon className={cn("w-7 h-7 text-blue-900 transition-all duration-300", !collapsed && "mr-3")} />
-                <span
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => isMobile && toggleSidebar()}
                   className={cn(
-                    "text-black font-normal transition-all duration-300 overflow-hidden whitespace-nowrap",
-                    collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-[200px]"
+                    "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    isActive
+                      ? "bg-gray-200 text-primary-foreground"
+                      : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
                   )}
                 >
-                  {item.name}
-                </span>
-              </Link>
-              
+                  <item.icon className={cn("w-7 h-7 text-blue-900 transition-all duration-300", !collapsed && "mr-3")} />
+                  <span
+                    className={cn(
+                      "text-black font-normal transition-all duration-300 overflow-hidden whitespace-nowrap",
+                      collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-[200px]"
+                    )}
+                  >
+                    {item.name}
+                  </span>
+                </Link>
               );
             })}
           </nav>
-
-          {/* User Info */}
           <div className="p-4 border-t border-gray-400">
             <div className="flex items-center space-x-3">
               <img 
@@ -104,8 +118,8 @@ const Sidebar = () => {
               />
               {!collapsed && (
                 <div>
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-sm text-gray-400">john@example.com</p>
+                  <p className="text-sm font-medium">{user.name || 'Loading...'}</p>
+                  <p className="text-sm tracking-tighter break-all text-gray-400">{user.email || ''}</p>
                 </div>
               )}
             </div>

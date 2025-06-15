@@ -14,11 +14,15 @@ import SubjectCards from "@/components/dashboard/Students/SubjectCards";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { AlertCircle, BookOpen, Clock, FileText } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const { isAuthenticated, userRole, schoolId: ctxSchoolId, loading } = useAuth();
   const [subjectError, setSubjectError] = useState<string | null>(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchSubjects = async () => {
@@ -47,6 +51,14 @@ const Index = () => {
 
     fetchSubjects();
   }, []);
+
+    useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated || userRole !== "student") {
+        navigate("/login");
+      }
+    }
+  }, [isAuthenticated, userRole, loading]);
 
   return (
     <div className="px-8 space-y-6">
