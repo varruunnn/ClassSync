@@ -30,7 +30,7 @@ const Navbar = () => {
       
       <div className="flex items-center space-x-4">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger>
             <Button variant="ghost" className="flex items-center gap-2">
               <User size={18} />
               <span>User</span>
