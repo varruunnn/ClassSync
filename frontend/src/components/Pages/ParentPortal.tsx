@@ -12,12 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Users,
   Mail,
   MessageSquare,
   Phone,
-  Calendar,
-  FileText,
   AlertCircle,
   User,
   GraduationCap,
