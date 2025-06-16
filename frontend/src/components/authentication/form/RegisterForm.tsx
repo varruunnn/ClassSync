@@ -147,17 +147,17 @@ const RegisterForm: React.FC = () => {
       <div className="space-y-2">
         <Label
           htmlFor="fullName"
-          className="text-sm font-medium text-slate-200"
+          className="text-sm font-medium text-black-200"
         >
           Full Name
         </Label>
         <div className="relative">
-          <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <User className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="fullName"
             type="text"
             placeholder="Enter your full name"
-            className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.fullName ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={fullName}
@@ -171,16 +171,16 @@ const RegisterForm: React.FC = () => {
       </div>
       {/* Email */}
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium text-slate-200">
+        <Label htmlFor="email" className="text-sm font-medium text-black-200">
           Email
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.email ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={email}
@@ -196,7 +196,7 @@ const RegisterForm: React.FC = () => {
       <div className="space-y-2">
         <Label
           htmlFor="schoolId"
-          className="text-sm font-medium text-slate-200"
+          className="text-sm font-medium text-black-200"
         >
           School ID
         </Label>
@@ -205,7 +205,7 @@ const RegisterForm: React.FC = () => {
             id="schoolId"
             type="text"
             placeholder="Enter your school ID"
-            className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.schoolId ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={schoolId}
@@ -221,7 +221,7 @@ const RegisterForm: React.FC = () => {
       <div className="space-y-2">
         <Label
           htmlFor="userType"
-          className="text-sm font-medium text-slate-200"
+          className="text-sm font-medium text-black-200"
         >
           I am a
         </Label>
@@ -232,22 +232,22 @@ const RegisterForm: React.FC = () => {
         >
           <SelectTrigger
             id="userType"
-            className={`bg-slate-800/50 border-slate-700 text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`bg-black-800/50 border-[1px] border-black text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.userType ? "border-red-500 focus:border-red-500" : ""
             }`}
           >
             <SelectValue placeholder="Select user type" />
           </SelectTrigger>
-          <SelectContent className="bg-slate-800 border-slate-700">
+          <SelectContent className="bg-black-800 border-black-700">
             <SelectItem
               value="student"
-              className="text-white hover:bg-slate-700"
+              className="text-white hover:bg-black-700"
             >
               Student
             </SelectItem>
             <SelectItem
               value="teacher"
-              className="text-white hover:bg-slate-700"
+              className="text-white hover:bg-black-700"
             >
               Teacher
             </SelectItem>
@@ -261,17 +261,17 @@ const RegisterForm: React.FC = () => {
       <div className="space-y-2">
         <Label
           htmlFor="register-password"
-          className="text-sm font-medium text-slate-200"
+          className="text-sm font-medium text-black-200"
         >
           Password
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="register-password"
             type={showPassword ? "text" : "password"}
             placeholder="Create a password"
-            className={`pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.password ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={password}
@@ -281,7 +281,7 @@ const RegisterForm: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+            className="absolute right-3 top-3 text-black-400 hover:text-black-200 transition-colors"
           >
             {showPassword ? (
               <EyeOffIcon className="h-5 w-5" />
@@ -298,17 +298,17 @@ const RegisterForm: React.FC = () => {
       <div className="space-y-2">
         <Label
           htmlFor="confirm-password"
-          className="text-sm font-medium text-slate-200"
+          className="text-sm font-medium text-black-200"
         >
           Confirm Password
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="confirm-password"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm your password"
-            className={`pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.confirmPassword
                 ? "border-red-500 focus:border-red-500"
                 : ""
@@ -320,7 +320,7 @@ const RegisterForm: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+            className="absolute right-3 top-3 text-black-400 hover:text-black-200 transition-colors"
           >
             {showConfirmPassword ? (
               <EyeOffIcon className="h-5 w-5" />
@@ -336,7 +336,7 @@ const RegisterForm: React.FC = () => {
 
       {userType === "student" && (
         <div className="space-y-2">
-          <Label htmlFor="class" className="text-sm font-medium text-slate-200">
+          <Label htmlFor="class" className="text-sm font-medium text-black-200">
             Select Class
           </Label>
           <div className="relative">
@@ -347,15 +347,15 @@ const RegisterForm: React.FC = () => {
             >
               <SelectTrigger
                 id="class"
-                className={`bg-slate-800/50 border-slate-700 text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
+                className={`bg-black-800/50 border-[1px] border-black text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
                   errors.class ? "border-red-500 focus:border-red-500" : ""
                 }`}
               >
                 <SelectValue placeholder="Select class" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-800 border-slate-700">
+              <SelectContent className="bg-black-800 border-black-700">
                 {Array.from({ length: 12 }, (_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-white hover:bg-slate-700">
+                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-white hover:bg-black-700">
                     {i + 1}
                   </SelectItem>
                 ))}
@@ -376,11 +376,11 @@ const RegisterForm: React.FC = () => {
             id="terms"
             checked={agreeToTerms}
             onChange={(e) => setAgreeToTerms(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900 mt-0.5"
+            className="h-4 w-4 rounded border-black-600 bg-black-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-black-900 mt-0.5"
           />
           <Label
             htmlFor="terms"
-            className="text-sm text-slate-300 cursor-pointer leading-relaxed"
+            className="text-sm text-black-300 cursor-pointer leading-relaxed"
           >
             I agree to the{" "}
             <a

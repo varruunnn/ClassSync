@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <School className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold">EduConnect</span>
+                <span className="text-lg font-semibold">EdConnect</span>
                 <span className="text-xs text-muted-foreground">School Management</span>
               </div>
             </div>
@@ -113,7 +113,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             ))}
           </SidebarContent>
 
-          <SidebarFooter className="border-t mx-[-20px]">
+          <SidebarFooter className="mx-[-20px]">
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" className="w-full justify-start gap-3 px-3">
