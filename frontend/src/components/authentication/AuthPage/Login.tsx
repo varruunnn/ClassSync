@@ -10,7 +10,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [gradientPosition, setGradientPosition] = useState({ x: 0, y: 0 });
 
-  // Redirect if already logged in
   useEffect(() => {
     if (isAuthenticated) {
       const getrole = localStorage.getItem('role');
@@ -39,7 +38,7 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-hidden">
+    <div className="min-h-screen bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100 text-black overflow-hidden">
       {/* Animated background */}
       <div
         className="fixed inset-0 opacity-20 pointer-events-none"
@@ -64,7 +63,7 @@ const Login = () => {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-black-300 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm">Back to Home</span>
@@ -83,21 +82,21 @@ const Login = () => {
                 EdConnect
               </span>
             </h2>
-            <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+            <p className="text-black-300 text-lg mb-8 leading-relaxed">
               Continue your educational journey. Connect with students, parents, and teachers on our comprehensive platform.
             </p>
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-                <span className="text-slate-300">Manage assignments and track progress</span>
+                <span className="text-black-300">Manage assignments and track progress</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                <span className="text-slate-300">View personalized timetables</span>
+                <span className="text-black-300">View personalized timetables</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-2 h-2 bg-indigo-400 rounded-full"></div>
-                <span className="text-slate-300">Facilitate transparent communication</span>
+                <span className="text-black-300">Facilitate transparent communication</span>
               </div>
             </div>
           </div>
@@ -105,20 +104,20 @@ const Login = () => {
 
         {/* Right Side - Login Form */}
         <div className="md:w-1/2 flex justify-center items-center">
-          <Card className="w-full max-w-md mx-auto bg-slate-900/50 backdrop-blur-md border-slate-700 shadow-2xl">
+          <Card className="w-full max-w-md mx-auto bg-black-900/50 backdrop-blur-md border-black-700 shadow-2xl">
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
                 Sign In
               </CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardDescription className="text-black-400">
                 Enter your credentials to access your account
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               <LoginForm />
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4 border-t border-slate-700 pt-6">
-              <div className="text-sm text-center text-slate-400">
+            <CardFooter className="flex flex-col space-y-4 border-t border-black-700 pt-6">
+              <div className="text-sm text-center text-black-400">
                 <p>
                   Don't have an account?{' '}
                   <Link 
@@ -135,8 +134,8 @@ const Login = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 px-6 border-t border-slate-800">
-        <div className="container max-w-7xl mx-auto text-center text-sm text-slate-400">
+      <footer className="relative z-10 py-6 px-6 border-t border-black-800">
+        <div className="container max-w-7xl mx-auto text-center text-sm text-black-400">
           <p>© {new Date().getFullYear()} EdConnect. All rights reserved.</p>
         </div>
       </footer>

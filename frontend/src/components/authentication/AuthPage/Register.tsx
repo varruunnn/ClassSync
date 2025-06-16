@@ -20,7 +20,7 @@ const Register = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white overflow-hidden">
+    <div className="min-h-screen bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100  text-black overflow-hidden">
       {/* Animated background */}
       <div
         className="fixed inset-0 opacity-20 pointer-events-none"
@@ -43,7 +43,7 @@ const Register = () => {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center space-x-2 text-slate-300 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-black-300 hover:text-white transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm">Back to Home</span>
@@ -63,7 +63,7 @@ const Register = () => {
               </span>{' '}
               today
             </h2>
-            <p className="text-slate-300 text-lg mb-8 leading-relaxed">
+            <p className="text-black-300 text-lg mb-8 leading-relaxed">
               Create your account and become part of our comprehensive educational platform. Connect, learn, and grow together.
             </p>
             
@@ -75,7 +75,7 @@ const Register = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Connect with Everyone</h3>
-                  <p className="text-slate-400 text-sm">Join students, teachers, and parents in one unified platform</p>
+                  <p className="text-black-400 text-sm">Join students, teachers, and parents in one unified platform</p>
                 </div>
               </div>
               
@@ -85,7 +85,7 @@ const Register = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Manage Assignments</h3>
-                  <p className="text-slate-400 text-sm">Track progress and stay organized with digital assignment management</p>
+                  <p className="text-black-400 text-sm">Track progress and stay organized with digital assignment management</p>
                 </div>
               </div>
               
@@ -95,7 +95,7 @@ const Register = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white mb-1">Transform Education</h3>
-                  <p className="text-slate-400 text-sm">Experience modern, digital education management</p>
+                  <p className="text-black-400 text-sm">Experience modern, digital education management</p>
                 </div>
               </div>
             </div>
@@ -104,20 +104,20 @@ const Register = () => {
 
         {/* Right Side - Register Form */}
         <div className="lg:w-1/2 flex justify-center items-center">
-          <Card className="w-full max-w-md mx-auto bg-slate-900/50 backdrop-blur-md border-slate-700 shadow-2xl">
+          <Card className="w-full max-w-md mx-auto bg-black-900/50 backdrop-blur-md border-black-700 shadow-2xl">
             <CardHeader className="space-y-1 text-center">
               <CardTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
                 Create Account
               </CardTitle>
-              <CardDescription className="text-slate-400">
+              <CardDescription className="text-black-400">
                 Register to access the platform and start your journey
               </CardDescription>
             </CardHeader>
             <CardContent className="p-6">
               <RegisterForm />
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4 border-t border-slate-700 pt-6">
-              <div className="text-sm text-center text-slate-400">
+            <CardFooter className="flex flex-col space-y-4 border-t border-black-700 pt-6">
+              <div className="text-sm text-center text-black-400">
                 <p>
                   Already have an account?{' '}
                   <Link 
@@ -134,8 +134,8 @@ const Register = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 px-6 border-t border-slate-800">
-        <div className="container max-w-7xl mx-auto text-center text-sm text-slate-400">
+      <footer className="relative z-10 py-6 px-6 border-t border-black-800">
+        <div className="container max-w-7xl mx-auto text-center text-sm text-black-400">
           <p>© {new Date().getFullYear()} EdConnect. All rights reserved.</p>
         </div>
       </footer>
@@ -143,7 +143,7 @@ const Register = () => {
       {/* Decorative elements */}
       <div className="absolute top-1/3 left-10 w-32 h-32 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
       <div className="absolute bottom-1/3 right-10 w-40 h-40 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '3s' }}></div>
+      <div className="absolute top-1/2 left-1/2 transform -tranblack-x-1/2 -tranblack-y-1/2 w-60 h-60 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse" style={{ animationDelay: '3s' }}></div>
     </div>
   );
 };

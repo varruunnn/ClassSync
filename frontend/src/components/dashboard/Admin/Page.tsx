@@ -175,8 +175,6 @@ export default function AdminDashboard() {
         setLoadingStats(false);
       }
     };
-
-    // Only fetch stats once the user is known to be an admin
     if (!loading && isAuthenticated && userRole === "admin") {
       fetchStats();
     }

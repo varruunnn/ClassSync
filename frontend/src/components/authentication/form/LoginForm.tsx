@@ -89,16 +89,16 @@ const LoginForm: React.FC = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium text-slate-200">
+        <Label htmlFor="email" className="text-sm font-medium text-black-200">
           Email
         </Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <Mail className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.email ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={email}
@@ -112,16 +112,16 @@ const LoginForm: React.FC = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-sm font-medium text-slate-200">
+        <Label htmlFor="password" className="text-sm font-medium text-black-200">
           Password
         </Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
+          <Lock className="absolute left-3 top-3 h-5 w-5 text-black-400" />
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
-            className={`pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.password ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={password}
@@ -131,7 +131,7 @@ const LoginForm: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 transition-colors"
+            className="absolute right-3 top-3 text-black-400 hover:text-black-200 transition-colors"
           >
             {showPassword ? (
               <EyeOffIcon className="h-5 w-5" />
@@ -150,11 +150,11 @@ const LoginForm: React.FC = () => {
           <input
             type="checkbox"
             id="remember"
-            className="h-4 w-4 rounded border-slate-600 bg-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900"
+            className="h-4 w-4 rounded border-black-600 bg-black-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-black-900"
           />
           <Label
             htmlFor="remember"
-            className="text-sm text-slate-300 cursor-pointer"
+            className="text-sm text-black-300 cursor-pointer"
           >
             Remember me
           </Label>
