@@ -12,6 +12,9 @@ import teacherRoutes from './src/routes/teacherRoutes.js';
 import pdfRoutes from './src/routes/pdfRoutes.js';
 import subjectRoutes from './src/routes/studentRoutes.js';
 
+import teacherDashboardRoutes from "./src/routes/teacherDashboard.js";
+
+
 const app = express();
 
 // Connect to MongoDB
@@ -36,6 +39,8 @@ app.use('/api/admin', teacherRoutes)
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/students/subjects', subjectRoutes);
 app.use('/api/students/', subjectRoutes);
+
+app.use("/api/teacher", teacherDashboardRoutes);
 
 const PORT = process.env.PORT || 3001;
 

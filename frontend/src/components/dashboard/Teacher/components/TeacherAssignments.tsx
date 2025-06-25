@@ -1,4 +1,4 @@
-import TeacherDashboard from "@/components/layout/teacher/TeacherDashboard";
+import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Calendar, Users, Clock, Plus, Search, Filter } from "lucide-react";

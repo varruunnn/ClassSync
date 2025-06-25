@@ -1,4 +1,4 @@
-import TeacherDashboard from "@/components/layout/teacher/TeacherDashboard";
+import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
