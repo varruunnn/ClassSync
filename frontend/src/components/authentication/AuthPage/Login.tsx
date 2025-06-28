@@ -136,7 +136,7 @@ const Login = () => {
       {/* Footer */}
       <footer className="relative z-10 py-6 px-6 border-t border-black-800">
         <div className="container max-w-7xl mx-auto text-center text-sm text-black-400">
-          <p>© {new Date().getFullYear()} EdConnect. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Classync. All rights reserved.</p>
         </div>
       </footer>
 

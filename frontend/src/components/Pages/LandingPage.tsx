@@ -65,7 +65,7 @@ const LandingPage: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <BookOpen className="h-8 w-8 text-blue-600" />
+                <img src="/logo.png" alt="logo" className="w-14 h-14 " />
                 <span className="ml-2 text-2xl font-bold text-gray-900">
                   Classync 
                 </span>
@@ -500,7 +500,7 @@ const TestimonialsSection = () => {
   const testimonials = [
     {
       quote:
-        "EdConnect has transformed how we manage assignments and communicate with parents. The platform is intuitive and saves us hours of administrative work.",
+        "Classync has transformed how we manage assignments and communicate with parents. The platform is intuitive and saves us hours of administrative work.",
       name: "John Davis",
       role: "Principal, Lincoln High School",
       rating: 5,
@@ -587,7 +587,7 @@ const CTASection = () => {
             Ready to get started?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join thousands of schools already using EdConnect to streamline education management.
+            Join thousands of schools already using Classync to streamline education management.
           </p>
           <a
             href="/signup"
@@ -610,7 +610,7 @@ const FooterSection = () => {
           <div>
             <div className="flex items-center mb-4">
               <BookOpen className="h-8 w-8 text-blue-400" />
-              <span className="ml-2 text-2xl font-bold">EdConnect</span>
+              <span className="ml-2 text-2xl font-bold">Classync</span>
             </div>
             <p className="text-gray-400">
               Transforming education management with innovative digital solutions.
@@ -639,7 +639,7 @@ const FooterSection = () => {
             <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Contact</h3>
             <ul className="space-y-2 text-gray-400">
               <li>Mon-Fri: 9AM - 5PM</li>
-              <li>info@edconnect.com</li>
+              <li>info@Classync.com</li>
               <li>1-800-EDU-CONN</li>
             </ul>
           </div>
@@ -647,7 +647,7 @@ const FooterSection = () => {
 
         <div className="mt-12 border-t border-gray-800 pt-8">
           <p className="text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} EdConnect. All rights reserved.
+            &copy; {new Date().getFullYear()} Classync. All rights reserved.
           </p>
         </div>
       </div>
