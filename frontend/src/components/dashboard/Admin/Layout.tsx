@@ -1,4 +1,4 @@
-import type React from "react"
+import type React from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +13,16 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   BarChart3,
   Users,
@@ -25,12 +30,11 @@ import {
   UserCheck,
   Bell,
   School,
-  Settings,
   LogOut,
-  User,
   ChevronDown,
-} from "lucide-react"
-import { Link, useLocation } from "react-router-dom" 
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const navigation = [
   {
@@ -49,25 +53,56 @@ const navigation = [
     title: "Communication",
     items: [{ title: "Notice Board", href: "/admin/notices", icon: Bell }],
   },
-]
+];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const location = useLocation()
-  const pathname = location.pathname
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  type UserData = {
+    name?: string;
+    email?: string;
+  };
+  const [userdata, setuserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<unknown>(null);
+  const location = useLocation();
+  const pathname = location.pathname;
 
   const handleLogout = async (): Promise<void> => {
     try {
-      await fetch('http://localhost:3001/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include', 
-      })
-      localStorage.removeItem('schoolId')
-      localStorage.removeItem('role')
-      window.location.reload()
+      await fetch("http://localhost:3001/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      localStorage.removeItem("schoolId");
+      localStorage.removeItem("role");
+      window.location.reload();
     } catch (err) {
-      console.error('Logout failed:', err)
+      console.error("Logout failed:", err);
     }
-  }
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/auth/me", {
+          credentials: "include",
+        });
+        if (!res.ok) {
+          throw new Error(`Profile Fetching Failed ${res.status}`);
+        }
+        const data = await res.json();
+        setuserData(data);
+      } catch (err) {
+        setError(err);
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <SidebarProvider>
@@ -79,8 +114,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <School className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold">EdConnect</span>
-                <span className="text-xs text-muted-foreground">School Management</span>
+                <span className="text-lg font-semibold">Classync</span>
+                <span className="text-xs text-muted-foreground">
+                  School Management
+                </span>
               </div>
             </div>
           </SidebarHeader>
@@ -94,56 +131,59 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <SidebarGroupContent>
                   <SidebarMenu>
                     {group.items.map((item) => {
-                      const Icon = item.icon
-                      const isActive = pathname === item.href
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
                       return (
                         <SidebarMenuItem key={item.href}>
                           <SidebarMenuButton asChild isActive={isActive}>
-                            <Link to={item.href} className="flex items-center gap-3">
+                            <Link
+                              to={item.href}
+                              className="flex items-center gap-3"
+                            >
                               <Icon className="h-4 w-4" />
                               <span>{item.title}</span>
                             </Link>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-                      )
+                      );
                     })}
                   </SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
             ))}
           </SidebarContent>
-
-          <SidebarFooter className="mx-[-20px]">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="ghost" className="w-full justify-start gap-3 px-3">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder-user.jpg" />
-                    <AvatarFallback>AD</AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">Admin User</span>
-                    <span className="text-xs text-muted-foreground">admin@school.edu</span>
-                  </div>
-                  <ChevronDown className="ml-auto h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarFooter>
+          {loading ? (
+            "loading....."
+          ) : (
+            <SidebarFooter className="mx-[-20px]">
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-3 px-3"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src="/placeholder-user.jpg" />
+                      <AvatarFallback>AD</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start text-sm">
+                      <span className="font-medium">{userdata?.name ?? ""}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {userdata?.email ?? ""}
+                      </span>
+                    </div>
+                    <ChevronDown className="ml-auto h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarFooter>
+          )}
         </Sidebar>
 
         <SidebarInset className="flex-1">
@@ -155,7 +195,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {pathname && pathname !== "/admin" && (
                 <>
                   <span className="mx-2 text-muted-foreground">/</span>
-                  <span className="capitalize">{pathname.split("/").pop()}</span>
+                  <span className="capitalize">
+                    {pathname.split("/").pop()}
+                  </span>
                 </>
               )}
             </div>
@@ -165,5 +207,5 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </SidebarInset>
       </div>
     </SidebarProvider>
-  )
+  );
 }

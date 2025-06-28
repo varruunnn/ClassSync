@@ -38,7 +38,7 @@ const Register = () => {
           <div className="flex items-center space-x-2">
             <BookOpen className="h-8 w-8 text-indigo-400" />
             <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-              EdConnect
+              Classync 
             </h1>
           </div>
           <button
@@ -59,7 +59,7 @@ const Register = () => {
             <h2 className="text-4xl font-bold mb-4">
               Join{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
-                EdConnect
+                Classync 
               </span>{' '}
               today
             </h2>
@@ -136,7 +136,7 @@ const Register = () => {
       {/* Footer */}
       <footer className="relative z-10 py-6 px-6 border-t border-black-800">
         <div className="container max-w-7xl mx-auto text-center text-sm text-black-400">
-          <p>© {new Date().getFullYear()} EdConnect. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Classync. All rights reserved.</p>
         </div>
       </footer>
 

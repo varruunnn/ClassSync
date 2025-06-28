@@ -137,6 +137,8 @@ export const login = async (req, res) => {
     });
     return res.json({
       message: 'Login successful!',
+      name: user.name,
+      email: user.email,
       role: user.role,
       schoolId: user.schoolId,
     });
@@ -157,8 +159,11 @@ export const logout = (req, res) => {
 };
 export const me = (req, res) => {
   return res.json({
+    name: req.user.name,
     role: req.role,
     schoolId: req.schoolId,
-    teacherId: req.user?._id  
+    email: req.user.email,
+    Id: req.user._id
   });
 };
+

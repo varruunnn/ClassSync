@@ -67,7 +67,7 @@ const Sidebar = () => {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <span className={cn("text-xl font-bold", collapsed && "hidden")}>EdConnect</span>
+              <span className={cn("text-xl font-bold", collapsed && "hidden")}>Classync</span>
             </Link>
             <button
               onClick={() => setCollapsed(!collapsed)}
