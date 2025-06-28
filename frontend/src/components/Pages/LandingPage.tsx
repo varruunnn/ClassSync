@@ -67,7 +67,7 @@ const LandingPage: React.FC = () => {
               <div className="flex-shrink-0 flex items-center">
                 <BookOpen className="h-8 w-8 text-blue-600" />
                 <span className="ml-2 text-2xl font-bold text-gray-900">
-                  EdConnect
+                  Classync 
                 </span>
               </div>
             </div>
@@ -270,7 +270,7 @@ const FeaturesSection = () => {
             Everything you need in one place
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            EdConnect brings together all essential educational management tools on a single, intuitive platform.
+            Classync brings together all essential educational management tools on a single, intuitive platform.
           </p>
         </motion.div>
 
@@ -471,7 +471,7 @@ const StatisticsSection = () => {
             Trusted by schools across the country
           </h2>
           <p className="text-xl text-blue-100">
-            Join thousands of students, parents, and teachers already using EdConnect
+            Join thousands of students, parents, and teachers already using Classync 
           </p>
         </motion.div>
 

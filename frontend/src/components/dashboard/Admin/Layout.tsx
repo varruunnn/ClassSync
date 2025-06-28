@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <School className="h-4 w-4 text-primary-foreground" />
               </div>
               <div className="flex flex-col">
-                <span className="text-lg font-semibold">EdConnect</span>
+                <span className="text-lg font-semibold">Classync</span>
                 <span className="text-xs text-muted-foreground">School Management</span>
               </div>
             </div>

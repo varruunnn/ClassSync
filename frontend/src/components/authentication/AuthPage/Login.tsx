@@ -57,7 +57,7 @@ const Login = () => {
             <div className="flex items-center space-x-2">
               <BookOpen className="h-8 w-8 text-indigo-400" />
               <h1 className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-                EdConnect
+                Classync 
               </h1>
             </div>
           </div>
@@ -79,7 +79,7 @@ const Login = () => {
             <h2 className="text-4xl font-bold mb-4">
               Welcome back to{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
-                EdConnect
+                Classync 
               </span>
             </h2>
             <p className="text-black-300 text-lg mb-8 leading-relaxed">

@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules index.js",
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "seed": "node src/seed/seedClassSubjects.js"
   },
   "keywords": [],
