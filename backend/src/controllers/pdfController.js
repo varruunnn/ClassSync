@@ -119,7 +119,7 @@ Instructions:
 - Be helpful, accurate, and concise
 - If asked to summarize, provide a structured summary
 - For specific questions, quote relevant parts when helpful`;
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const result = await model.generateContent(context);
     const response = await result.response;
     const answer = response.text();

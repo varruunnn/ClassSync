@@ -98,7 +98,7 @@ const LoginForm: React.FC = () => {
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.email ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={email}
@@ -121,7 +121,7 @@ const LoginForm: React.FC = () => {
             id="password"
             type={showPassword ? "text" : "password"}
             placeholder="Enter your password"
-            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.password ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={password}
@@ -169,7 +169,7 @@ const LoginForm: React.FC = () => {
 
       <button
         type="submit"
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
+        className={`w-full py-3 px-4 rounded-lg font-semibold text-black bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
           isLoading
             ? "opacity-70 cursor-not-allowed"
             : "hover:shadow-indigo-600/30 hover:scale-[1.02]"

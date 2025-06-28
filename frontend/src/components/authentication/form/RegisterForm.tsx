@@ -127,8 +127,8 @@ const RegisterForm: React.FC = () => {
         email,
         password,
         role: userType,
-        schoolId, // Send schoolId
-        class: userType === 'student' ? studentClass : undefined, // Send class only if the user is a student
+        schoolId,
+        class: userType === 'student' ? studentClass : undefined, 
       });
 
       toast.success(res.data.message || "Registration successful!");
@@ -157,7 +157,7 @@ const RegisterForm: React.FC = () => {
             id="fullName"
             type="text"
             placeholder="Enter your full name"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.fullName ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={fullName}
@@ -180,7 +180,7 @@ const RegisterForm: React.FC = () => {
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.email ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={email}
@@ -205,7 +205,7 @@ const RegisterForm: React.FC = () => {
             id="schoolId"
             type="text"
             placeholder="Enter your school ID"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.schoolId ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={schoolId}
@@ -232,7 +232,7 @@ const RegisterForm: React.FC = () => {
         >
           <SelectTrigger
             id="userType"
-            className={`bg-black-800/50 border-[1px] border-black text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`bg-black-800/50 border-[1px] border-black text-black focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.userType ? "border-red-500 focus:border-red-500" : ""
             }`}
           >
@@ -241,13 +241,13 @@ const RegisterForm: React.FC = () => {
           <SelectContent className="bg-black-800 border-black-700">
             <SelectItem
               value="student"
-              className="text-white hover:bg-black-700"
+              className="text-black hover:bg-black-700"
             >
               Student
             </SelectItem>
             <SelectItem
               value="teacher"
-              className="text-white hover:bg-black-700"
+              className="text-black hover:bg-black-700"
             >
               Teacher
             </SelectItem>
@@ -271,7 +271,7 @@ const RegisterForm: React.FC = () => {
             id="register-password"
             type={showPassword ? "text" : "password"}
             placeholder="Create a password"
-            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.password ? "border-red-500 focus:border-red-500" : ""
             }`}
             value={password}
@@ -308,7 +308,7 @@ const RegisterForm: React.FC = () => {
             id="confirm-password"
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm your password"
-            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-white placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
+            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
               errors.confirmPassword
                 ? "border-red-500 focus:border-red-500"
                 : ""
@@ -347,7 +347,7 @@ const RegisterForm: React.FC = () => {
             >
               <SelectTrigger
                 id="class"
-                className={`bg-black-800/50 border-[1px] border-black text-white focus:border-indigo-500 focus:ring-indigo-500/20 ${
+                className={`bg-black-800/50 border-[1px] border-black text-black focus:border-indigo-500 focus:ring-indigo-500/20 ${
                   errors.class ? "border-red-500 focus:border-red-500" : ""
                 }`}
               >
@@ -355,7 +355,7 @@ const RegisterForm: React.FC = () => {
               </SelectTrigger>
               <SelectContent className="bg-black-800 border-black-700">
                 {Array.from({ length: 12 }, (_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-white hover:bg-black-700">
+                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-black hover:bg-black-700">
                     {i + 1}
                   </SelectItem>
                 ))}
@@ -406,7 +406,7 @@ const RegisterForm: React.FC = () => {
       {/* Submit Button */}
       <button
         type="submit"
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
+        className={`w-full py-3 px-4 rounded-lg font-semibold text-black bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
           isLoading
             ? "opacity-70 cursor-not-allowed"
             : "hover:shadow-indigo-600/30 hover:scale-[1.02]"
