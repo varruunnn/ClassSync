@@ -9,12 +9,12 @@ const router = express.Router();
 // GET classroom by ID
 router.get("/classroom/:id", async (req, res) => {
   const classroom = await Classroom.findById(req.params.id);
-  res.json(Classroom);
+  res.json(classroom);
 });
 
-// GET all recent classes (mock for now)
+// GET all recent classes 
 router.get("/classes", async (req, res) => {
-  const classes = await Classroom.find().limit(3);
+  const classes = await Classroom.find();
   res.json(classes);
 });
 
