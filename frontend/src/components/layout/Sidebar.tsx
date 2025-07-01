@@ -1,25 +1,27 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { cn } from '@/lib/utils';
-import { 
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import {
   FileText,
   ChevronLeft,
   ChevronRight,
   LayoutDashboard,
   FilePlus2,
   Calendar,
+  BookCheck,
   Brain,
   UserCircle,
-} from 'lucide-react';
-import { useSidebar } from '../contexts/SidebarContext';
+} from "lucide-react";
+import { useSidebar } from "../contexts/SidebarContext";
 
 const navigation = [
-  { name: 'Dashboard', href: '/student', icon: LayoutDashboard },
-  { name: 'Subjects', href: '/student/subjects', icon: FileText },
-  { name: 'Assignments', href: '/student/assessment', icon: FilePlus2 },
-  { name: 'Parent Portal', href: '/student/parent', icon: UserCircle },
-  { name: 'Notices', href: '/student/calendar', icon: Calendar },
-  { name: 'Chat with pdf', href: '/student/chat-with-pdf', icon: Brain }
+  { name: "Dashboard", href: "/student", icon: LayoutDashboard },
+  { name: "Subjects", href: "/student/subjects", icon: FileText },
+  { name: "Assignments", href: "/student/assessment", icon: FilePlus2 },
+  { name: "Discussion", href: "/student/tests", icon: BookCheck  },
+  { name: "Parent Portal", href: "/student/parent", icon: UserCircle },
+  { name: "Notices", href: "/student/calendar", icon: Calendar },
+  { name: "Chat with pdf", href: "/student/chat-with-pdf", icon: Brain },
 ];
 
 const Sidebar = () => {
@@ -32,17 +34,17 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch('http://localhost:3001/api/students/myinfo', {
-          credentials: 'include',
+        const res = await fetch("http://localhost:3001/api/students/myinfo", {
+          credentials: "include",
         });
         const data = await res.json();
         if (res.ok) {
-          setUser(data.data); 
+          setUser(data.data);
         } else {
-          console.error('Failed to fetch user info:', data.message);
+          console.error("Failed to fetch user info:", data.message);
         }
       } catch (err) {
-        console.error('Error fetching user info:', err);
+        console.error("Error fetching user info:", err);
       }
     };
 
@@ -58,16 +60,24 @@ const Sidebar = () => {
         />
       )}
 
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-40 bg-white text-black transition-all duration-300 ease-in-out",
-        collapsed ? "w-20" : "w-50",
-        isMobile ? (isOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0",
-        "md:relative"
-      )}>
+      <div
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 bg-white text-black transition-all duration-300 ease-in-out",
+          collapsed ? "w-20" : "w-50",
+          isMobile
+            ? isOpen
+              ? "translate-x-0"
+              : "-translate-x-full"
+            : "translate-x-0",
+          "md:relative"
+        )}
+      >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
             <Link to="/dashboard" className="flex items-center space-x-2">
-              <span className={cn("text-xl font-bold", collapsed && "hidden")}>Classync</span>
+              <span className={cn("text-xl font-bold", collapsed && "hidden")}>
+                Classync
+              </span>
             </Link>
             <button
               onClick={() => setCollapsed(!collapsed)}
@@ -96,11 +106,18 @@ const Sidebar = () => {
                       : "text-primary-foreground/70 hover:bg-slate-200 hover:text-primary-foreground"
                   )}
                 >
-                  <item.icon className={cn("w-7 h-7 text-blue-900 transition-all duration-300", !collapsed && "mr-3")} />
+                  <item.icon
+                    className={cn(
+                      "w-7 h-7 text-blue-900 transition-all duration-300",
+                      !collapsed && "mr-3"
+                    )}
+                  />
                   <span
                     className={cn(
                       "text-black font-normal transition-all duration-300 overflow-hidden whitespace-nowrap",
-                      collapsed ? "opacity-0 max-w-0" : "opacity-100 max-w-[200px]"
+                      collapsed
+                        ? "opacity-0 max-w-0"
+                        : "opacity-100 max-w-[200px]"
                     )}
                   >
                     {item.name}
@@ -111,15 +128,14 @@ const Sidebar = () => {
           </nav>
           <div className="p-4 border-t border-gray-400">
             <div className="flex items-center space-x-3">
-              <img 
-                src='https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740'
-                alt='user' 
-                className='w-8 h-auto rounded-full'
-              />
               {!collapsed && (
                 <div>
-                  <p className="text-sm font-medium">{user.name || 'Loading...'}</p>
-                  <p className="text-sm tracking-tighter break-all text-gray-400">{user.email || ''}</p>
+                  <p className="text-sm font-medium">
+                    {user.name || "Loading..."}
+                  </p>
+                  <p className="text-sm tracking-tighter break-all text-gray-400">
+                    {user.email || ""}
+                  </p>
                 </div>
               )}
             </div>

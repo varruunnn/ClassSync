@@ -11,6 +11,7 @@ export const register = async (req, res) => {
     role,
     schoolId,
     studentClass,
+    studentSection,
     rollNumber,
     parentContact,
     subject,
@@ -57,6 +58,7 @@ export const register = async (req, res) => {
 
     if (role === 'student') {
       newUserData.class = studentClass;
+      newUserData.section = studentSection;
       newUserData.rollNumber = rollNumber;
       newUserData.parentContact = parentContact;
     }
@@ -87,6 +89,7 @@ export const register = async (req, res) => {
         ...(user.role === 'student'
           ? {
               class: user.class,
+              section : user.section,
               rollNumber: user.rollNumber,
               parentContact: user.parentContact,
             }
