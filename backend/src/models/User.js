@@ -1,4 +1,3 @@
-// src/models/User.js
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
@@ -20,6 +19,12 @@ const UserSchema = new mongoose.Schema(
     },
     schoolId: { type: Number, required: true },
     class: {
+      type: String,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    section: {
       type: String,
       required: function () {
         return this.role === "student";

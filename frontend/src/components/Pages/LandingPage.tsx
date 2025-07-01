@@ -60,7 +60,7 @@ const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md shadow-md border-b-[2px] border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
@@ -73,7 +73,7 @@ const LandingPage: React.FC = () => {
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              {["features", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
+              {["features","for-admin", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item}`}
@@ -87,7 +87,8 @@ const LandingPage: React.FC = () => {
                   {item
                     .split("-")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")}
+                    .join(" ")  
+                  }
                 </a>
               ))}
               <button

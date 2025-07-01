@@ -9,18 +9,17 @@ export default async function protect(req, res, next) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // ✅ Fetch user from DB
     const user = await User.findById(decoded.userId).select('-password');
+
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // ✅ Attach to request
+    req.userId = user._id; 
     req.user = user;
     req.role = user.role;
     req.schoolId = user.schoolId;
-    
+
     next();
   } catch (err) {
     console.error("Auth Middleware Error:", err);

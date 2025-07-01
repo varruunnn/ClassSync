@@ -11,7 +11,7 @@ import adminStudentRoutes from './src/routes/adminstudentRoutes.js';
 import teacherRoutes from './src/routes/teacherRoutes.js';
 import pdfRoutes from './src/routes/pdfRoutes.js';
 import subjectRoutes from './src/routes/studentRoutes.js';
-
+import discussionRoutes from './src/routes/discussionRoutes.js';
 import teacherDashboardRoutes from "./src/routes/teacherDashboard.js";
 
 
@@ -38,8 +38,8 @@ app.use('/api/notices', noticeRoutes);
 app.use('/api/admin', teacherRoutes)
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/students/subjects', subjectRoutes);
-app.use('/api/students/', subjectRoutes);
-
+app.use('/api/students', subjectRoutes);
+app.use('/api/students', discussionRoutes);
 app.use("/api/teacher", teacherDashboardRoutes);
 
 const PORT = process.env.PORT || 3001;
