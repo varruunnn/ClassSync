@@ -23,7 +23,7 @@ const Navbar = () => {
         method: 'POST',
         credentials: 'include', 
       });
-      navigate('/login')
+      navigate('/')
       localStorage.removeItem('schoolId');
       localStorage.removeItem('role');
       window.location.reload();
