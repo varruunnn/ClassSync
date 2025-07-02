@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const discussionSchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   schoolId: {
@@ -16,9 +16,13 @@ const discussionSchema = new mongoose.Schema({
   },
   subject: {
     type: String,
-    required: true,    
+    required: true,
   },
   question: {
+    type: String,
+    required: true,
+  },
+  contactInfo: {
     type: String,
     required: true,
   },
@@ -28,4 +32,4 @@ const discussionSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model('Discussion', discussionSchema);
+export default mongoose.model("Discussion", discussionSchema);

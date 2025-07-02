@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-} from "react";
+import React, { useState, useEffect } from "react";
 import {
   MessageCircle,
   Send,
@@ -22,6 +19,7 @@ interface Discussion {
   question: string;
   subject: string;
   createdAt: string;
+  contactInfo?: string;
 }
 
 const StudentsDiscussionPage: React.FC = () => {
@@ -31,6 +29,7 @@ const StudentsDiscussionPage: React.FC = () => {
   const [list, setList] = useState<Discussion[]>([]);
   const [question, setQuestion] = useState("");
   const [error, setError] = useState("");
+  const [contact, setContact] = useState("");
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -76,7 +75,11 @@ const StudentsDiscussionPage: React.FC = () => {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, subject: selectedSubject }),
+      body: JSON.stringify({
+        question,
+        subject: selectedSubject,
+        contactInfo: contact,
+      }),
     });
 
     if (!res.ok) {
@@ -208,7 +211,18 @@ const StudentsDiscussionPage: React.FC = () => {
                   {question.length}/500
                 </div>
               </div>
-
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Your Contact Info
+                </label>
+                <input
+                  type="text"
+                  className="w-full border rounded-xl p-2 focus:ring-2 focus:ring-blue-500"
+                  placeholder="WhatsApp / Telegram / Email…"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                />
+              </div>
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 <div className="flex gap-3">
                   <button
@@ -305,6 +319,9 @@ const StudentsDiscussionPage: React.FC = () => {
                         <span className="font-semibold text-gray-800">
                           {item.author.name}
                         </span>
+                        <p className="mt-[0.7px] text-sm text-gray-600">
+                          <strong>Contact:</strong> {item.contactInfo}
+                        </p>
                         <span className="text-gray-400">•</span>
                         <div className="flex items-center gap-1 text-gray-500 text-sm">
                           <Clock className="w-4 h-4" />
