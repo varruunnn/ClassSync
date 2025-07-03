@@ -42,6 +42,7 @@ app.use('/api/students', subjectRoutes);
 app.use('/api/students', discussionRoutes);
 app.use("/api/teacher", teacherDashboardRoutes);
 
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {

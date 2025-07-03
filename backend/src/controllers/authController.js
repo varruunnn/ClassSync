@@ -170,3 +170,14 @@ export const me = (req, res) => {
   });
 };
 
+export const changePassword = async (req,res) =>{
+  const {currentPassword,newPassword} = req.body;
+  const user = await User.findById(req.user);
+  const match = await bcrypt.compare(currentPassword,user.password);
+  if(!match) return res.status(400).json({ error: 'Current password incorrect.' });
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(newPassword,salt);
+  await user.save();
+  res.json({message:'password changed'})
+}
+

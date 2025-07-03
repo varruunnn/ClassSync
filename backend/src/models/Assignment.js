@@ -1,44 +1,39 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+
 const assignmentSchema = new mongoose.Schema({
-  teacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Teacher',
-    required: true
-  },
-  class: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Class',
+  title: {
+    type: String,
     required: true
   },
   subject: {
     type: String,
     required: true
   },
-  assignmentType: {
-    type: String,
-    enum: ['class_teacher', 'subject_teacher'],
-    default: 'class_teacher'
-  },
-  assignedDate: {
+  description: String,
+  dueDate: {
     type: Date,
-    default: Date.now
+    required: true
   },
-  isActive: {
-    type: Boolean,
-    default: true
+  time: String,      
+  location: String,  
+  topics: [String],   
+  schoolId: {
+    type: Number,
+    required: true
   },
-  assignedBy: {
+  className: {
+    type: String,
+    required: true
+  },
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  schoolId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'School',
-    required: true
+  createdAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true
 });
 
-module.exports = mongoose.model('Assignment', assignmentSchema);
+export default mongoose.model('Assignment', assignmentSchema);

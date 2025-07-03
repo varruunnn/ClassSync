@@ -43,7 +43,7 @@ const Register = () => {
           </div>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center space-x-2 text-black-300 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-black-300 hover:text-black transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm">Back to Home</span>
@@ -74,7 +74,7 @@ const Register = () => {
                   <Users className="h-6 w-6 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Connect with Everyone</h3>
+                  <h3 className="font-semibold text-black mb-1">Connect with Everyone</h3>
                   <p className="text-black-400 text-sm">Join students, teachers, and parents in one unified platform</p>
                 </div>
               </div>
@@ -84,7 +84,7 @@ const Register = () => {
                   <BookMarked className="h-6 w-6 text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Manage Assignments</h3>
+                  <h3 className="font-semibold text-black mb-1">Manage Assignments</h3>
                   <p className="text-black-400 text-sm">Track progress and stay organized with digital assignment management</p>
                 </div>
               </div>
@@ -94,7 +94,7 @@ const Register = () => {
                   <GraduationCap className="h-6 w-6 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white mb-1">Transform Education</h3>
+                  <h3 className="font-semibold text-black mb-1">Transform Education</h3>
                   <p className="text-black-400 text-sm">Experience modern, digital education management</p>
                 </div>
               </div>

@@ -1,7 +1,21 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EyeIcon, EyeOffIcon, Mail, User, Lock } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Lock,
+  Phone,
+  BookOpen,
+  School,
+  Users,
+  Hash,
+  UserCheck,
+  GraduationCap,
+  Shield,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,410 +31,507 @@ interface RegisterResponse {
   message: string;
 }
 
-interface RegisterFormData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  userType: string;
-  terms: boolean;
-  class?: number; // Add class field, optional
-  schoolId: string; // Add schoolId field
-}
-
 const RegisterForm: React.FC = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [userType, setUserType] = useState("");
+  const [role, setRole] = useState<"student" | "teacher">("student");
+  const [schoolId, setSchoolId] = useState("");
+  const [studentClass, setStudentClass] = useState<number>();
+  const [section, setSection] = useState("");
+  const [rollNumber, setRollNumber] = useState("");
+  const [parentContact, setParentContact] = useState("");
+  const [subject, setSubject] = useState("");
+  const [phone, setPhone] = useState("");
+  const [classAssigned, setClassAssigned] = useState<number>();
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [studentClass, setStudentClass] = useState<number | undefined>(undefined);
-  const [schoolId, setSchoolId] = useState(""); // State for schoolId
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [errors, setErrors] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    userType: "",
-    terms: "",
-    class: "",
-    schoolId: "", // Add error field for schoolId
-  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const navigate = useNavigate();
 
-  // Validate form
   const validate = () => {
-    const newErrors = {
-      fullName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      userType: '',
-      terms: '',
-      class: '',
-      schoolId: '', // Validation for schoolId
-    };
-    let isValid = true;
+    const errs: Record<string, string> = {};
+    let valid = true;
 
     if (!fullName.trim()) {
-      newErrors.fullName = 'Full name is required';
-      isValid = false;
+      errs.fullName = "Full name is required";
+      valid = false;
     }
-
     if (!email) {
-      newErrors.email = 'Email is required';
-      isValid = false;
+      errs.email = "Email is required";
+      valid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-      isValid = false;
+      errs.email = "Email is invalid";
+      valid = false;
     }
-
     if (!password) {
-      newErrors.password = 'Password is required';
-      isValid = false;
+      errs.password = "Password is required";
+      valid = false;
     }
-
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-      isValid = false;
+      errs.confirmPassword = "Passwords do not match";
+      valid = false;
     }
-
-    if (!userType) {
-      newErrors.userType = 'User type is required';
-      isValid = false;
-    }
-
     if (!agreeToTerms) {
-      newErrors.terms = 'You must agree to the terms';
-      isValid = false;
+      errs.terms = "You must agree to the terms";
+      valid = false;
     }
-
-    if (userType === 'student' && !studentClass) {
-      newErrors.class = 'Class is required for students';
-      isValid = false;
-    }
-
     if (!schoolId.trim()) {
-      newErrors.schoolId = 'School ID is required';
-      isValid = false;
+      errs.schoolId = "School ID is required";
+      valid = false;
     }
 
-    setErrors(newErrors);
-    return isValid;
+    if (role === "student") {
+      if (!studentClass) {
+        errs.studentClass = "Class is required";
+        valid = false;
+      }
+      if (!section.trim()) {
+        errs.section = "Section is required";
+        valid = false;
+      }
+      if (!rollNumber.trim()) {
+        errs.rollNumber = "Roll number is required";
+        valid = false;
+      }
+      if (!parentContact.trim()) {
+        errs.parentContact = "Parent contact is required";
+        valid = false;
+      }
+    }
+
+    if (role === "teacher") {
+      if (!subject.trim()) {
+        errs.subject = "Subject is required";
+        valid = false;
+      }
+      if (!phone.trim()) {
+        errs.phone = "Phone is required";
+        valid = false;
+      }
+      if (!classAssigned) {
+        errs.classAssigned = "Assigned class is required";
+        valid = false;
+      }
+    }
+
+    setErrors(errs);
+    return valid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validate()) return;
 
     setIsLoading(true);
 
-    try {
-      const res = await axios.post<RegisterResponse>("http://localhost:3001/api/auth/register", {
-        name: fullName,
-        email,
-        password,
-        role: userType,
-        schoolId,
-        class: userType === 'student' ? studentClass : undefined, 
-      });
+    const payload: any = {
+      name: fullName,
+      email,
+      password,
+      role,
+      schoolId,
+    };
 
-      toast.success(res.data.message || "Registration successful!");
+    if (role === "student") {
+      payload.studentClass = studentClass;
+      payload.studentSection = section;
+      payload.rollNumber = rollNumber;
+      payload.parentContact = parentContact;
+    } else {
+      payload.subject = subject;
+      payload.phone = phone;
+      payload.classAssigned = classAssigned;
+    }
+
+    try {
+      const res = await axios.post<RegisterResponse>(
+        "http://localhost:3001/api/auth/register",
+        payload,
+        { withCredentials: true }
+      );
+      toast.success(res.data.message);
       navigate("/login");
-    } catch (error: any) {
-      console.error("Registration error:", error);
-      toast.error(error.response?.data?.message || "Registration failed");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Full Name */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="fullName"
-          className="text-sm font-medium text-black-200"
-        >
-          Full Name
-        </Label>
-        <div className="relative">
-          <User className="absolute left-3 top-3 h-5 w-5 text-black-400" />
-          <Input
-            id="fullName"
-            type="text"
-            placeholder="Enter your full name"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.fullName ? "border-red-500 focus:border-red-500" : ""
-            }`}
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.fullName && (
-          <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>
-        )}
-      </div>
-      {/* Email */}
-      <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium text-black-200">
-          Email
-        </Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-3 h-5 w-5 text-black-400" />
-          <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.email ? "border-red-500 focus:border-red-500" : ""
-            }`}
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.email && (
-          <p className="text-red-400 text-xs mt-1">{errors.email}</p>
-        )}
-      </div>
-      {/* School ID */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="schoolId"
-          className="text-sm font-medium text-black-200"
-        >
-          School ID
-        </Label>
-        <div className="relative">
-          <Input
-            id="schoolId"
-            type="text"
-            placeholder="Enter your school ID"
-            className={`pl-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.schoolId ? "border-red-500 focus:border-red-500" : ""
-            }`}
-            value={schoolId}
-            onChange={(e) => setSchoolId(e.target.value)}
-            disabled={isLoading}
-          />
-        </div>
-        {errors.schoolId && (
-          <p className="text-red-400 text-xs mt-1">{errors.schoolId}</p>
-        )}
-      </div>
-      {/* User Type */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="userType"
-          className="text-sm font-medium text-black-200"
-        >
-          I am a
-        </Label>
-        <Select
-          value={userType}
-          onValueChange={setUserType}
-          disabled={isLoading}
-        >
-          <SelectTrigger
-            id="userType"
-            className={`bg-black-800/50 border-[1px] border-black text-black focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.userType ? "border-red-500 focus:border-red-500" : ""
-            }`}
-          >
-            <SelectValue placeholder="Select user type" />
-          </SelectTrigger>
-          <SelectContent className="bg-black-800 border-black-700">
-            <SelectItem
-              value="student"
-              className="text-black hover:bg-black-700"
-            >
-              Student
-            </SelectItem>
-            <SelectItem
-              value="teacher"
-              className="text-black hover:bg-black-700"
-            >
-              Teacher
-            </SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.userType && (
-          <p className="text-red-400 text-xs mt-1">{errors.userType}</p>
-        )}
-      </div>
-      {/* Password */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="register-password"
-          className="text-sm font-medium text-black-200"
-        >
-          Password
-        </Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-black-400" />
-          <Input
-            id="register-password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Create a password"
-            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.password ? "border-red-500 focus:border-red-500" : ""
-            }`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-3 text-black-400 hover:text-black-200 transition-colors"
-          >
-            {showPassword ? (
-              <EyeOffIcon className="h-5 w-5" />
-            ) : (
-              <EyeIcon className="h-5 w-5" />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Basic Information */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <User className="h-5 w-5" /> Basic Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="fullName">Full Name</Label>
+            <div className="relative mt-1">
+              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="fullName"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
+                placeholder="Enter your full name"
+              />
+            </div>
+            {errors.fullName && (
+              <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
             )}
-          </button>
-        </div>
-        {errors.password && (
-          <p className="text-red-400 text-xs mt-1">{errors.password}</p>
-        )}
-      </div>
-      {/* Confirm Password */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="confirm-password"
-          className="text-sm font-medium text-black-200"
-        >
-          Confirm Password
-        </Label>
-        <div className="relative">
-          <Lock className="absolute left-3 top-3 h-5 w-5 text-black-400" />
-          <Input
-            id="confirm-password"
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirm your password"
-            className={`pl-10 pr-10 bg-black-800/50 border-[1px] border-black text-black placeholder:text-black-400 focus:border-indigo-500 focus:ring-indigo-500/20 ${
-              errors.confirmPassword
-                ? "border-red-500 focus:border-red-500"
-                : ""
-            }`}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            disabled={isLoading}
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-3 top-3 text-black-400 hover:text-black-200 transition-colors"
-          >
-            {showConfirmPassword ? (
-              <EyeOffIcon className="h-5 w-5" />
-            ) : (
-              <EyeIcon className="h-5 w-5" />
+          </div>
+
+          <div>
+            <Label htmlFor="email">Email Address</Label>
+            <div className="relative mt-1">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
+                placeholder="Enter your email"
+              />
+            </div>
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
             )}
-          </button>
+          </div>
         </div>
-        {errors.confirmPassword && (
-          <p className="text-red-400 text-xs mt-1">{errors.confirmPassword}</p>
-        )}
+
+        <div>
+          <Label htmlFor="schoolId">School ID</Label>
+          <div className="relative mt-1">
+            <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              id="schoolId"
+              value={schoolId}
+              onChange={e => setSchoolId(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 ${errors.schoolId ? "border-red-500" : ""}`}
+                placeholder="Enter your school ID"
+            />
+          </div>
+          {errors.schoolId && (
+            <p className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
+          )}
+        </div>
       </div>
 
-      {userType === "student" && (
-        <div className="space-y-2">
-          <Label htmlFor="class" className="text-sm font-medium text-black-200">
-            Select Class
-          </Label>
-          <div className="relative">
-            <Select
-              value={studentClass?.toString()} // Convert to string
-              onValueChange={(value) => setStudentClass(Number(value))}
-              disabled={isLoading}
+      {/* Role Selection */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <UserCheck className="h-5 w-5" /> Role Selection
+        </h3>
+        <div>
+          <Label htmlFor="role">I am a</Label>
+          <Select
+            value={role}
+            onValueChange={val => setRole(val as "student" | "teacher")}
+            disabled={isLoading}
+          >
+            <SelectTrigger
+              id="role"
+              className={`mt-1 ${errors.role ? "border-red-500" : ""}`}
             >
-              <SelectTrigger
-                id="class"
-                className={`bg-black-800/50 border-[1px] border-black text-black focus:border-indigo-500 focus:ring-indigo-500/20 ${
-                  errors.class ? "border-red-500 focus:border-red-500" : ""
-                }`}
+              <SelectValue placeholder="Select your role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="student">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4" /> Student
+                </div>
+              </SelectItem>
+              <SelectItem value="teacher">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" /> Teacher
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Student Info */}
+      {role === "student" && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <GraduationCap className="h-5 w-5" /> Student Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label htmlFor="studentClass">Class</Label>
+              <Select
+                value={studentClass?.toString() || ""}
+                onValueChange={v => setStudentClass(Number(v))}
+                disabled={isLoading}
               >
-                <SelectValue placeholder="Select class" />
-              </SelectTrigger>
-              <SelectContent className="bg-black-800 border-black-700">
-                {Array.from({ length: 12 }, (_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()} className="text-black hover:bg-black-700">
-                    {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.class && (
-              <p className="text-red-400 text-xs mt-1">{errors.class}</p>
+                <SelectTrigger
+                  id="studentClass"
+                  className={`mt-1 ${errors.studentClass ? "border-red-500" : ""}`}
+                >
+                  <SelectValue placeholder="Select class" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 12 }, (_, i) => (
+                    <SelectItem key={i + 1} value={(i + 1).toString()}>
+                      Class {i + 1}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.studentClass && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.studentClass}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="section">Section</Label>
+              <div className="relative mt-1">
+                <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="section"
+                  value={section}
+                  onChange={e => setSection(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.section ? "border-red-500" : ""}`}
+                  placeholder="e.g., A, B, C"
+                />
+              </div>
+              {errors.section && (
+                <p className="text-red-500 text-xs mt-1">{errors.section}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="rollNumber">Roll Number</Label>
+              <div className="relative mt-1">
+                <Hash className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="rollNumber"
+                  value={rollNumber}
+                  onChange={e => setRollNumber(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.rollNumber ? "border-red-500" : ""}`}
+                  placeholder="Enter roll number"
+                />
+              </div>
+              {errors.rollNumber && (
+                <p className="text-red-500 text-xs mt-1">{errors.rollNumber}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="parentContact">Parent Contact</Label>
+            <div className="relative mt-1">
+              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="parentContact"
+                value={parentContact}
+                onChange={e => setParentContact(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 ${
+                  errors.parentContact ? "border-red-500" : ""
+                }`}
+                placeholder="Enter parent's contact"
+              />
+            </div>
+            {errors.parentContact && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.parentContact}
+              </p>
             )}
           </div>
         </div>
       )}
 
-      {/* Terms */}
-      <div className="space-y-2">
-        <div className="flex items-start space-x-3">
-          <input
-            type="checkbox"
-            id="terms"
-            checked={agreeToTerms}
-            onChange={(e) => setAgreeToTerms(e.target.checked)}
-            className="h-4 w-4 rounded border-black-600 bg-black-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-black-900 mt-0.5"
-          />
-          <Label
-            htmlFor="terms"
-            className="text-sm text-black-300 cursor-pointer leading-relaxed"
-          >
-            I agree to the{" "}
-            <a
-              href="#"
-              className="text-indigo-400 hover:text-indigo-300 hover:underline"
+      {/* Teacher Info */}
+      {role === "teacher" && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <BookOpen className="h-5 w-5" /> Teacher Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="subject">Subject</Label>
+              <div className="relative mt-1">
+                <BookOpen className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="subject"
+                  value={subject}
+                  onChange={e => setSubject(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.subject ? "border-red-500" : ""}`}
+                  placeholder="Enter your subject"
+                />
+              </div>
+              {errors.subject && (
+                <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <div className="relative mt-1">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="phone"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
+                  placeholder="Enter your phone"
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="classAssigned">Assigned Class</Label>
+            <Select
+              value={classAssigned?.toString() || ""}
+              onValueChange={v => setClassAssigned(Number(v))}
+              disabled={isLoading}
             >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="#"
-              className="text-indigo-400 hover:text-indigo-300 hover:underline"
-            >
-              Privacy Policy
-            </a>
-          </Label>
+              <SelectTrigger
+                id="classAssigned"
+                className={`mt-1 ${
+                  errors.classAssigned ? "border-red-500" : ""
+                }`}
+              >
+                <SelectValue placeholder="Select assigned class" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <SelectItem key={i + 1} value={(i + 1).toString()}>
+                    Class {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.classAssigned && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.classAssigned}
+              </p>
+            )}
+          </div>
         </div>
-        {errors.terms && (
-          <p className="text-red-400 text-xs mt-1">{errors.terms}</p>
-        )}
+      )}
+
+      {/* Security */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <Shield className="h-5 w-5" /> Security
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 pr-10 ${
+                  errors.password ? "border-red-500" : ""
+                }`}
+                placeholder="Create a password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative mt-1">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 pr-10 ${
+                  errors.confirmPassword ? "border-red-500" : ""
+                }`}
+                placeholder="Confirm your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.confirmPassword}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Submit Button */}
+      {/* Terms */}
+      <div className="flex items-center space-x-2">
+        <input
+          id="terms"
+          type="checkbox"
+          checked={agreeToTerms}
+          onChange={e => setAgreeToTerms(e.target.checked)}
+          disabled={isLoading}
+          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+        />
+        <Label htmlFor="terms" className="text-sm text-gray-700">
+          I agree to the Terms of Service and Privacy Policy
+        </Label>
+      </div>
+      {errors.terms && (
+        <p className="text-red-500 text-xs">{errors.terms}</p>
+      )}
+
       <button
         type="submit"
-        className={`w-full py-3 px-4 rounded-lg font-semibold text-black bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 shadow-lg shadow-indigo-600/20 transition-all duration-200 ${
-          isLoading
-            ? "opacity-70 cursor-not-allowed"
-            : "hover:shadow-indigo-600/30 hover:scale-[1.02]"
-        }`}
         disabled={isLoading}
+        className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition"
       >
-        {isLoading ? (
-          <div className="flex items-center justify-center">
-            <span className="mr-2">Creating account</span>
-            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-          </div>
-        ) : (
-          "Create Account"
-        )}
+        {isLoading ? "Creating Account..." : "Create Account"}
       </button>
     </form>
   );
