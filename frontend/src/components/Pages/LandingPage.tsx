@@ -25,6 +25,18 @@ const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
+  const [gradientPosition, setGradientPosition] = useState({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = e.clientX / window.innerWidth;
+      const y = e.clientY / window.innerHeight;
+      setGradientPosition({ x, y });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,25 +60,34 @@ const LandingPage: React.FC = () => {
   const [title, setTitle] = useState("Login");
 
   useEffect(()=>{
-     const getrole = localStorage.getItem('role');
-     
-     if (getrole === null) {
-      setTitle("Login");
-     }else{
-      setTitle("Dashboard");
-     }
+     setTitle("Login");
   },[])
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-white text-gray-900 overflow-hidden">
+      <div
+        className="fixed inset-0 opacity-5 pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at ${gradientPosition.x * 100}% ${gradientPosition.y * 100}%, rgba(59, 130, 246, 0.3), transparent 40%)`,
+          backgroundSize: "100% 100%",
+          backgroundPosition: "center",
+          zIndex: 0,
+        }}
+      />
+
+      {/* Decorative elements */}
+      <div className="absolute top-1/3 left-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+      <div className="absolute bottom-1/3 right-10 w-40 h-40 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-slate-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '3s' }}></div>
+
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md shadow-md border-b-[2px] border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src="/logo.png" alt="logo" className="w-14 h-14 " />
-                <span className="ml-2 text-2xl font-bold text-gray-900">
+                <BookOpen className="h-8 w-8 text-blue-600" />
+                <span className="ml-2 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
                   Classync 
                 </span>
               </div>
@@ -92,7 +113,7 @@ const LandingPage: React.FC = () => {
                 </a>
               ))}
               <button
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg"
                 onClick={() => navigate("/login")}
               >
                {title}
@@ -112,13 +133,13 @@ const LandingPage: React.FC = () => {
         
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
+          <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
             <div className="px-4 py-2 space-y-1">
               {["features", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item}`}
-                  className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item
@@ -128,7 +149,7 @@ const LandingPage: React.FC = () => {
                 </a>
               ))}
               <button
-                className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full mt-4 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Login
@@ -155,7 +176,7 @@ const HeroSection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.3 })
 
   return (
-    <div id="hero" ref={ref} className="pt-20 pb-16 lg:pb-24">
+    <div id="hero" ref={ref} className="relative z-10 pt-20 pb-16 lg:pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
           <motion.div
@@ -165,7 +186,7 @@ const HeroSection = () => {
           >
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               <span className="block text-gray-900">Transform school</span>
-              <span className="block text-blue-600">management digitally</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">management digitally</span>
             </h1>
             <p className="mt-6 text-xl text-gray-600 max-w-2xl">
               Connect students, parents, and teachers on one comprehensive platform. Manage assignments, track
@@ -175,14 +196,14 @@ const HeroSection = () => {
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <a
                 href="/signup"
-                className="inline-flex items-center justify-center px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
               >
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
               <a
                 href="#learn-more"
-                className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors"
               >
                 Learn More
               </a>
@@ -196,13 +217,13 @@ const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl"></div>
-              <div className="relative bg-white rounded-xl shadow-xl p-6">
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl blur-lg"></div>
+              <div className="relative bg-white/80 backdrop-blur-md rounded-xl shadow-2xl p-6 border border-gray-200">
                 <div className="flex items-center space-x-4 mb-4">
                   <Calendar className="h-8 w-8 text-blue-600" />
                   <div>
                     <div className="font-semibold text-gray-900">Math Quiz</div>
-                    <div className="text-sm text-gray-600">Today, 2:00 PM</div>
+                    <div className="text-sm text-gray-500">Today, 2:00 PM</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -259,7 +280,7 @@ const FeaturesSection = () => {
   ]
 
   return (
-    <div id="features" ref={ref} className="py-20 bg-gray-50">
+    <div id="features" ref={ref} className="relative z-10 py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -292,12 +313,12 @@ const FeatureCard = ({ feature, index }: { feature: any; index: number }) => {
   return (
     <motion.div
       ref={ref}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+      className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-200"
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: 0.1 * index }}
     >
-      <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-blue-600 text-white mb-4">
+      <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white mb-4">
         {feature.icon}
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
@@ -311,7 +332,7 @@ const HowItWorksSection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.2 })
 
   return (
-    <div id="learn-more" ref={ref} className="py-20">
+    <div id="learn-more" ref={ref} className="relative z-10 py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -330,17 +351,17 @@ const HowItWorksSection = () => {
         <div className="space-y-20">
           <WorkflowItem
             id="for-admin"
-            title="For admin"
-            description="Monitor your child's performance, receive important notifications, and collaborate with teachers."
+            title="For Admin"
+            description="Monitor school operations, manage users, and oversee all educational activities from a centralized dashboard."
             image={adminDashboardImage}
             steps={[
-              "Receive an invitation from the school to create an account",
-              "Connect to your child's profile with the provided code",
-              "Monitor academic progress and receive notifications",
-              "Communicate directly with teachers when needed",
+              "Access comprehensive admin dashboard with full system control",
+              "Manage user accounts and permissions across all roles",
+              "Monitor school-wide performance metrics and analytics",
+              "Generate reports and maintain institutional records",
             ]}
             isReversed={true}
-            index={1}
+            index={0}
           />
           <WorkflowItem
             id="for-students"
@@ -354,7 +375,7 @@ const HowItWorksSection = () => {
               "Generate documents like admit cards and check results",
             ]}
             isReversed={false}
-            index={0}
+            index={1}
           />
 
           <WorkflowItem
@@ -369,7 +390,7 @@ const HowItWorksSection = () => {
               "Communicate directly with teachers when needed",
             ]}
             isReversed={true}
-            index={1}
+            index={2}
           />
 
           <WorkflowItem
@@ -384,7 +405,7 @@ const HowItWorksSection = () => {
               "View personal timetable and manage class schedules",
             ]}
             isReversed={false}
-            index={2}
+            index={3}
           />
         </div>
       </div>
@@ -431,17 +452,17 @@ const WorkflowItem = ({
         <ol className="space-y-4">
           {steps.map((step, i) => (
             <li key={i} className="flex items-start">
-              <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-blue-600 text-white font-medium text-sm mr-3">
+              <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-sm mr-3">
                 {i + 1}
               </span>
-              <span className="text-gray-700">{step}</span>
+              <span className="text-gray-600">{step}</span>
             </li>
           ))}
         </ol>
       </div>
       
       <div className={`mt-8 lg:mt-0 ${isReversed ? "lg:col-start-1" : ""}`}>
-        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg">
+        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-2xl border border-gray-200">
           <img src={image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
         </div>
       </div>
@@ -460,7 +481,7 @@ const StatisticsSection = () => {
   ]
 
   return (
-    <div ref={ref} className="py-20 bg-blue-600">
+    <div ref={ref} className="relative z-10 py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-12"
@@ -468,10 +489,10 @@ const StatisticsSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
             Trusted by schools across the country
           </h2>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-gray-600">
             Join thousands of students, parents, and teachers already using Classync 
           </p>
         </motion.div>
@@ -484,8 +505,8 @@ const StatisticsSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 * index }}
             >
-              <div className="text-4xl font-bold text-white mb-2">{stat.value}</div>
-              <div className="text-blue-100">{stat.label}</div>
+              <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">{stat.value}</div>
+              <div className="text-gray-600">{stat.label}</div>
             </motion.div>
           ))}
         </div>
@@ -523,7 +544,7 @@ const TestimonialsSection = () => {
   ]
 
   return (
-    <div ref={ref} className="py-20 bg-gray-50">
+    <div ref={ref} className="relative z-10 py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -553,7 +574,7 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: any; index: numb
   return (
     <motion.div
       ref={ref}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+      className="bg-white rounded-xl p-6 shadow-lg border border-gray-200"
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: 0.1 * index }}
@@ -563,10 +584,10 @@ const TestimonialCard = ({ testimonial, index }: { testimonial: any; index: numb
           <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
         ))}
       </div>
-      <p className="text-gray-700 mb-4 italic">"{testimonial.quote}"</p>
+      <p className="text-gray-600 mb-4 italic">"{testimonial.quote}"</p>
       <div>
         <div className="font-semibold text-gray-900">{testimonial.name}</div>
-        <div className="text-sm text-gray-600">{testimonial.role}</div>
+        <div className="text-sm text-gray-500">{testimonial.role}</div>
       </div>
     </motion.div>
   )
@@ -577,7 +598,7 @@ const CTASection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.5 })
 
   return (
-    <div ref={ref} className="py-20">
+    <div ref={ref} className="relative z-10 py-20 bg-white">
       <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -592,7 +613,7 @@ const CTASection = () => {
           </p>
           <a
             href="/signup"
-            className="inline-flex items-center px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
           >
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
