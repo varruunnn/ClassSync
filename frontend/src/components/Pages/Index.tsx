@@ -1,36 +1,52 @@
 import { useEffect, useState } from "react";
 import {
-  recentTests,
-  performanceStats,
-  performanceHistory,
-} from "@/data/mockData";
-import PerformanceOverview from "@/components/dashboard/Students/PerformanceOverview";
-import RecentTests from "@/components/dashboard/Students/RecentTests";
-import PerformanceChart from "@/components/dashboard/Students/PerformanceChart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import {
   AlertCircle,
   BookOpen,
   Calendar,
   User,
   GraduationCap,
-  ChevronRight,
+  TrendingUp,
+  Award,
+  Clock,
+  Target,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+  RefreshCw
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+
+const mockPerformanceHistory = [
+  { month: "Jan", score: 85 },
+  { month: "Feb", score: 88 },
+  { month: "Mar", score: 92 },
+  { month: "Apr", score: 87 },
+  { month: "May", score: 94 },
+  { month: "Jun", score: 91 }
+];
+
+const mockRecentTests = [
+  { id: 1, subject: "Mathematics", score: 94, date: "2024-06-15", type: "Quiz" },
+  { id: 2, subject: "Physics", score: 87, date: "2024-06-12", type: "Test" },
+  { id: 3, subject: "Chemistry", score: 91, date: "2024-06-10", type: "Assignment" }
+];
+
+// Interfaces
+interface ApiSubject {
+  _id: string;
+  name: string;
+  syllabusPdfUrl: string;
+}
 
 interface Subject {
   id: string;
   name: string;
   code: string;
-  teacher: string;
+  teacher?: string;
   grade?: string;
   completedAssignments?: number;
   totalAssignments?: number;
   nextTest?: string;
-  color?: string;
+  syllabusPdfUrl?: string;
 }
 
 interface StudentInfo {
@@ -48,393 +64,482 @@ interface AttendanceData {
   monthlyRecord: boolean[];
 }
 
-const Index = () => {
+interface PerformanceStats {
+  averageScore: number;
+  totalTests: number;
+  rank: number;
+  improvement: number;
+}
+
+const StudentDashboard = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [loadingAttendance, setLoadingAttendance] = useState(true);
-  const [loadingStudentInfo, setLoadingStudentInfo] = useState(true);
-
-  const {
-    isAuthenticated,
-    userRole,
-    schoolId: ctxSchoolId,
-    loading,
-  } = useAuth();
-  const [subjectError, setSubjectError] = useState<string | null>(null);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(
-    null
-  );
-  const navigate = useNavigate();
+  const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(null);
+  const [performanceStats, setPerformanceStats] = useState<PerformanceStats | null>(null);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [loadingStudentInfo, setLoadingStudentInfo] = useState(true);
+  const [loadingAttendance, setLoadingAttendance] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const subjectColors = [
-    "bg-blue-50 border-blue-200 text-blue-800",
-    "bg-green-50 border-green-200 text-green-800",
-    "bg-purple-50 border-purple-200 text-purple-800",
-    "bg-orange-50 border-orange-200 text-orange-800",
-    "bg-pink-50 border-pink-200 text-pink-800",
-    "bg-indigo-50 border-indigo-200 text-indigo-800",
-    "bg-yellow-50 border-yellow-200 text-yellow-800",
-    "bg-red-50 border-red-200 text-red-800",
-  ];
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoadingSubjects(true);
-        setLoadingStudentInfo(true);
-        setLoadingAttendance(true);
-        const res1 = await fetch(
-          "http://localhost:3001/api/students/subjects/me",
-          {
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        if (!res1.ok) throw new Error(`Subjects error ${res1.status}`);
-        const subjectsData = await res1.json();
-        const enhancedSubjects = (subjectsData.subjects || []).map(
-          (subjectName: string, index: number) => ({
-            id: `subject-${index}`,
-            name: subjectName,
-            code: `SUB-${String(index + 1).padStart(3, "0")}`,
-            color: subjectColors[index % subjectColors.length],
-            completedAssignments: Math.floor(Math.random() * 10) + 5,
-            totalAssignments: Math.floor(Math.random() * 5) + 15,
-            grade: ["A+", "A", "B+", "B", "C+"][Math.floor(Math.random() * 5)],
-            nextTest:
-              Math.random() > 0.5
-                ? `Test on ${new Date(
-                    Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000
-                  ).toLocaleDateString()}`
-                : null,
-          })
-        );
-
-        setSubjects(enhancedSubjects);
-        setLoadingSubjects(false);
-        const res2 = await fetch("http://localhost:3001/api/students/myinfo", {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res2.ok) throw new Error(`Info error ${res2.status}`);
-        const infoData = await res2.json();
-        setStudentInfo(infoData.data);
-        setLoadingStudentInfo(false);
-
-        try {
-          const res3 = await fetch(
-            "http://localhost:3001/api/students/attendance/me",
-            {
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-            }
-          );
-
-          if (res3.ok) {
-            const attendanceResult = await res3.json();
-            setAttendanceData(attendanceResult.data);
-          } else {
-            setAttendanceData({
-              presentDays: 18,
-              totalDays: 20,
-              attendancePercentage: 90,
-              monthlyRecord: Array.from(
-                { length: 20 },
-                (_, i) => i !== 7 && i !== 14
-              ),
-            });
-          }
-        } catch (attendanceError) {
-          setAttendanceData({
-            presentDays: 18,
-            totalDays: 20,
-            attendancePercentage: 90,
-            monthlyRecord: Array.from(
-              { length: 20 },
-              (_, i) => i !== 7 && i !== 14
-            ),
-          });
-        }
-        setLoadingAttendance(false);
-      } catch (err: any) {
-        console.error("Error fetching data:", err);
-        setSubjectError(err.message);
-        setLoadingSubjects(false);
-        setLoadingStudentInfo(false);
-        setLoadingAttendance(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      if (!isAuthenticated || userRole !== "student") {
-        navigate("/login");
-      }
+  // API Functions
+  const fetchSubjects = async () => {
+    try {
+      setLoadingSubjects(true);
+      const response = await fetch("http://localhost:3001/api/students/subjects/me", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!response.ok) throw new Error(`Failed to fetch subjects: ${response.status}`);
+      
+      const data = await response.json();
+      const enhancedSubjects = (data.subjects || []).map((apiSubject: ApiSubject, index: number) => ({
+        id: apiSubject._id,
+        name: apiSubject.name,
+        code: `SUB-${String(index + 1).padStart(3, "0")}`,
+        syllabusPdfUrl: apiSubject.syllabusPdfUrl,
+        completedAssignments: Math.floor(Math.random() * 10) + 5,
+        totalAssignments: Math.floor(Math.random() * 5) + 15,
+        grade: ["A+", "A", "B+", "B", "C+"][Math.floor(Math.random() * 5)],
+        teacher: `Dr. ${["Smith", "Johnson", "Williams", "Brown", "Jones"][Math.floor(Math.random() * 5)]}`,
+      }));
+      
+      setSubjects(enhancedSubjects);
+    } catch (err: any) {
+      setError(err.message);
+      console.error("Error fetching subjects:", err);
+    } finally {
+      setLoadingSubjects(false);
     }
-  }, [isAuthenticated, userRole, loading]);
+  };
 
-  const EnhancedSubjectCards = ({ subjects }: { subjects: Subject[] }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {subjects.map((subject, index) => (
-        <Card
-          key={subject.id || index}
-          className="hover:shadow-md transition-shadow duration-200 cursor-pointer group"
-        >
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div
-                  className={`p-2 rounded-lg ${
-                    subject.color || subjectColors[index % subjectColors.length]
-                  }`}
-                >
-                  <BookOpen className="h-5 w-5" />
+  const fetchStudentInfo = async () => {
+    try {
+      setLoadingStudentInfo(true);
+      const response = await fetch("http://localhost:3001/api/students/myinfo", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!response.ok) throw new Error(`Failed to fetch student info: ${response.status}`);
+      
+      const data = await response.json();
+      setStudentInfo(data.data);
+    } catch (err: any) {
+      console.error("Error fetching student info:", err);
+      // Fallback data for demo
+      setStudentInfo({
+        name: "John Doe",
+        class: "12th",
+        section: "A",
+        rollNumber: "2024001",
+        email: "john.doe@school.edu"
+      });
+    } finally {
+      setLoadingStudentInfo(false);
+    }
+  };
+
+  const fetchAttendance = async () => {
+    try {
+      setLoadingAttendance(true);
+      const response = await fetch("http://localhost:3001/api/students/attendance/me", {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAttendanceData(data.data);
+      } else {
+        // Fallback data
+        setAttendanceData({
+          presentDays: 18,
+          totalDays: 20,
+          attendancePercentage: 90,
+          monthlyRecord: Array.from({ length: 20 }, (_, i) => i !== 7 && i !== 14)
+        });
+      }
+    } catch (err: any) {
+      console.error("Error fetching attendance:", err);
+      // Fallback data
+      setAttendanceData({
+        presentDays: 18,
+        totalDays: 20,
+        attendancePercentage: 90,
+        monthlyRecord: Array.from({ length: 20 }, (_, i) => i !== 7 && i !== 14)
+      });
+    } finally {
+      setLoadingAttendance(false);
+    }
+  };
+
+  // Initialize data on component mount
+  useEffect(() => {
+    const initializeData = async () => {
+      await Promise.all([
+        fetchSubjects(),
+        fetchStudentInfo(),
+        fetchAttendance()
+      ]);
+      
+      // Set mock performance stats
+      setPerformanceStats({
+        averageScore: 89.5,
+        totalTests: 24,
+        rank: 5,
+        improvement: 12
+      });
+    };
+    
+    initializeData();
+  }, []);
+  const refreshData = () => {
+    fetchSubjects();
+    fetchStudentInfo();
+    fetchAttendance();
+  };
+
+  // Loading Component
+  const LoadingCard = ({ message }: { message: string }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center space-x-3">
+        <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
+        <span className="text-gray-600">{message}</span>
+      </div>
+    </div>
+  );
+
+  // Error Component
+  const ErrorCard = ({ message }: { message: string }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-red-200 p-6">
+      <div className="flex items-center space-x-3 text-red-600">
+        <AlertCircle className="h-5 w-5" />
+        <span>Error: {message}</span>
+      </div>
+    </div>
+  );
+
+  // Student Info Card
+  const StudentInfoCard = ({ studentInfo }: { studentInfo: StudentInfo }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <div className="flex items-center space-x-3 mb-4">
+        <User className="h-6 w-6 text-blue-500" />
+        <h2 className="text-xl font-semibold text-gray-900">Student Profile</h2>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <p className="text-sm font-medium text-gray-500">Name</p>
+          <p className="text-lg font-semibold text-gray-900">{studentInfo.name}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-500">Class</p>
+          <p className="text-lg font-semibold text-gray-900">{studentInfo.class}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-500">Section</p>
+          <p className="text-lg font-semibold text-gray-900">{studentInfo.section}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-gray-500">Roll Number</p>
+          <p className="text-lg font-semibold text-gray-900">{studentInfo.rollNumber}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Performance Stats Cards
+  const PerformanceStatsCards = ({ stats }: { stats: PerformanceStats }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <TrendingUp className="h-6 w-6 text-blue-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Average Score</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.averageScore}%</p>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <Target className="h-6 w-6 text-green-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Total Tests</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.totalTests}</p>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <Award className="h-6 w-6 text-purple-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Class Rank</p>
+            <p className="text-2xl font-bold text-gray-900">#{stats.rank}</p>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <BarChart3 className="h-6 w-6 text-orange-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">Improvement</p>
+            <p className="text-2xl font-bold text-gray-900">+{stats.improvement}%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Subject Cards
+  const SubjectCards = ({ subjects }: { subjects: Subject[] }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {subjects.map((subject) => (
+        <div key={subject.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <BookOpen className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{subject.name}</h3>
+                <p className="text-sm text-gray-500">{subject.code}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            {subject.grade && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-600">Current Grade</span>
+                <span className="px-2 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded">
+                  {subject.grade}
+                </span>
+              </div>
+            )}
+            
+            {subject.teacher && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-600">Teacher</span>
+                <span className="text-sm text-gray-900">{subject.teacher}</span>
+              </div>
+            )}
+            
+            {subject.completedAssignments && subject.totalAssignments && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-600">Assignments</span>
+                  <span className="text-sm text-gray-900">
+                    {subject.completedAssignments}/{subject.totalAssignments}
+                  </span>
                 </div>
-                <div>
-                  <CardTitle className="text-lg font-semibold">
-                    {subject.name}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    {subject.code || `SUB-${index + 1}`}
-                  </p>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(subject.completedAssignments / subject.totalAssignments) * 100}%` }}
+                  ></div>
                 </div>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="space-y-3">
-              {subject.grade && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Current Grade</span>
-                  <Badge variant="secondary" className="font-semibold">
-                    {subject.grade}
-                  </Badge>
-                </div>
-              )}
-
-              {subject.completedAssignments && subject.totalAssignments && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Assignments</span>
-                    <span className="text-sm text-muted-foreground">
-                      {subject.completedAssignments}/{subject.totalAssignments}
-                    </span>
-                  </div>
-                  <Progress
-                    value={
-                      (subject.completedAssignments /
-                        subject.totalAssignments) *
-                      100
-                    }
-                    className="h-2"
-                  />
-                </div>
-              )}
-
-              {subject.nextTest && (
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground bg-yellow-50 p-2 rounded-md">
-                  <Calendar className="h-4 w-4" />
-                  <span>{subject.nextTest}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+            )}
+            
+            {subject.nextTest && (
+              <div className="flex items-center space-x-2 text-sm text-gray-600 bg-yellow-50 p-2 rounded-lg border border-yellow-200">
+                <Calendar className="h-4 w-4" />
+                <span>{subject.nextTest}</span>
+              </div>
+            )}
+          </div>
+        </div>
       ))}
     </div>
   );
 
-  const StudentInfoCard = ({ studentInfo }: { studentInfo: StudentInfo }) => (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <User className="h-5 w-5" />
-          <span>Student Profile</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Class</p>
-            <p className="font-semibold">{studentInfo.class || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Section</p>
-            <p className="font-semibold">{studentInfo.section || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">
-              Roll Number
-            </p>
-            <p className="font-semibold">{studentInfo.rollNumber || "N/A"}</p>
-          </div>
-          <div className="md:col-span-2">
-            <p className="text-sm font-medium text-muted-foreground">Email</p>
-            <p className="font-semibold">{studentInfo.email || "N/A"}</p>
-          </div>
+  // Attendance Card
+  const AttendanceCard = ({ attendanceData }: { attendanceData: AttendanceData }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <Calendar className="h-6 w-6 text-blue-500" />
+          <h2 className="text-xl font-semibold text-gray-900">Monthly Attendance</h2>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm font-medium text-gray-600">
+            {attendanceData.presentDays}/{attendanceData.totalDays} days
+          </span>
+          <span className={`px-2 py-1 text-sm font-semibold rounded ${
+            attendanceData.attendancePercentage >= 90 
+              ? 'bg-green-100 text-green-800'
+              : attendanceData.attendancePercentage >= 75 
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {attendanceData.attendancePercentage}%
+          </span>
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div 
+            className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+            style={{ width: `${attendanceData.attendancePercentage}%` }}
+          ></div>
+        </div>
+        
+        <div className="flex flex-wrap gap-2">
+          {attendanceData.monthlyRecord.map((isPresent, i) => (
+            <div
+              key={i}
+              className={`w-10 h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all hover:scale-105 ${
+                isPresent
+                  ? "bg-green-100 text-green-700 border-2 border-green-200"
+                  : "bg-red-100 text-red-700 border-2 border-red-200"
+              }`}
+            >
+              {isPresent ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+            </div>
+          ))}
+        </div>
+        
+        {attendanceData.attendancePercentage < 75 && (
+          <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+            <div className="flex items-center space-x-2 text-sm text-red-800">
+              <AlertCircle className="h-4 w-4" />
+              <span className="font-medium">
+                ⚠️ Attendance below 75% may affect academic standing
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Performance Chart
+  const PerformanceChart = () => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center space-x-3 mb-4">
+        <BarChart3 className="h-6 w-6 text-blue-500" />
+        <h2 className="text-xl font-semibold text-gray-900">Performance Trend</h2>
+      </div>
+      <div className="h-64 flex items-end justify-between space-x-2">
+        {mockPerformanceHistory.map((data, index) => (
+          <div key={index} className="flex-1 flex flex-col items-center">
+            <div 
+              className="w-full bg-blue-500 rounded-t-lg transition-all duration-300 hover:bg-blue-600"
+              style={{ height: `${(data.score / 100) * 200}px` }}
+            ></div>
+            <span className="text-xs text-gray-600 mt-2">{data.month}</span>
+            <span className="text-xs font-semibold text-gray-900">{data.score}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const RecentTests = () => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="flex items-center space-x-3 mb-4">
+        <Clock className="h-6 w-6 text-blue-500" />
+        <h2 className="text-xl font-semibold text-gray-900">Recent Tests</h2>
+      </div>
+      <div className="space-y-3">
+        {mockRecentTests.map((test) => (
+          <div key={test.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+              <p className="font-medium text-gray-900">{test.subject}</p>
+              <p className="text-sm text-gray-500">{test.type} • {test.date}</p>
+            </div>
+            <span className={`px-3 py-1 text-sm font-semibold rounded ${
+              test.score >= 90 
+                ? 'bg-green-100 text-green-800'
+                : test.score >= 75 
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {test.score}%
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 
   return (
-    <div className="px-8 space-y-6">
-      {/* Welcome Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome back{studentInfo?.name ? `, ${studentInfo.name}` : ""}!
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Here's what's happening with your studies today.
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <GraduationCap className="h-8 w-8 text-primary" />
-        </div>
-      </div>
-
-      {/* Student Info Card */}
-      {loadingStudentInfo ? (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-              <span>Loading student information...</span>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        studentInfo && <StudentInfoCard studentInfo={studentInfo} />
-      )}
-
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-2/3">
-          <h2 className="text-2xl font-bold mb-4 flex items-center space-x-2">
-            <BookOpen className="h-6 w-6" />
-            <span>My Subjects</span>
-          </h2>
-
-          {loadingSubjects ? (
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                  <span>Loading subjects...</span>
-                </div>
-              </CardContent>
-            </Card>
-          ) : subjectError ? (
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2 text-red-600">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>Error: {subjectError}</span>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <EnhancedSubjectCards subjects={subjects} />
-          )}
-        </div>
-
-        <div className="lg:w-1/3">
-          <PerformanceOverview stats={performanceStats} />
-        </div>
-      </div>
-
-      {/* Enhanced Attendance Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5" />
-            <span>Monthly Attendance</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loadingAttendance ? (
-            <div className="flex items-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-              <span>Loading attendance data...</span>
-            </div>
-          ) : attendanceData ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Present Days</span>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">
-                    {attendanceData.presentDays}/{attendanceData.totalDays} days
-                  </span>
-                  <Badge
-                    variant={
-                      attendanceData.attendancePercentage >= 90
-                        ? "default"
-                        : attendanceData.attendancePercentage >= 75
-                        ? "secondary"
-                        : "destructive"
-                    }
-                  >
-                    {attendanceData.attendancePercentage}%
-                  </Badge>
-                </div>
-              </div>
-              <Progress
-                value={attendanceData.attendancePercentage}
-                className="h-3"
-              />
-
-              <div className="flex flex-wrap gap-2 mt-4">
-                {attendanceData.monthlyRecord.map((isPresent, i) => (
-                  <div
-                    key={i}
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all hover:scale-105 ${
-                      isPresent
-                        ? "bg-green-100 text-green-700 border-2 border-green-200 shadow-sm"
-                        : "bg-red-100 text-red-700 border-2 border-red-200 shadow-sm"
-                    }`}
-                  >
-                    {i + 1}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 p-3 bg-orange-50 rounded-lg border border-orange-200">
-                <div className="flex items-center gap-2 text-sm text-orange-800">
-                  <AlertCircle className="h-4 w-4" />
-                  <span className="font-medium">
-                    {attendanceData.totalDays - attendanceData.presentDays}{" "}
-                    absences this month
-                  </span>
-                </div>
-                {attendanceData.attendancePercentage < 75 && (
-                  <p className="text-xs text-orange-700 mt-1">
-                    ⚠️ Attendance below 75% may affect academic standing
-                  </p>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p className="text-muted-foreground">
-              No attendance data available
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back{studentInfo?.name ? `, ${studentInfo.name}` : ""}!
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Here's what's happening with your studies today.
             </p>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={refreshData}
+              className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh</span>
+            </button>
+            <GraduationCap className="h-8 w-8 text-blue-500" />
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <PerformanceChart performanceData={performanceHistory} />
+        {/* Student Info */}
+        {loadingStudentInfo ? (
+          <LoadingCard message="Loading student information..." />
+        ) : (
+          studentInfo && <StudentInfoCard studentInfo={studentInfo} />
+        )}
+
+        {/* Performance Stats */}
+        {performanceStats && <PerformanceStatsCards stats={performanceStats} />}
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Subjects */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center space-x-3 mb-4">
+              <BookOpen className="h-6 w-6 text-blue-500" />
+              <h2 className="text-2xl font-semibold text-gray-900">My Subjects</h2>
+            </div>
+            {loadingSubjects ? (
+              <LoadingCard message="Loading subjects..." />
+            ) : error ? (
+              <ErrorCard message={error} />
+            ) : (
+              <SubjectCards subjects={subjects} />
+            )}
+          </div>
+
+          {/* Attendance */}
+          <div>
+            {loadingAttendance ? (
+              <LoadingCard message="Loading attendance data..." />
+            ) : (
+              attendanceData && <AttendanceCard attendanceData={attendanceData} />
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <PerformanceChart />
+          <RecentTests />
         </div>
       </div>
-
-      <RecentTests tests={recentTests} />
     </div>
   );
 };
 
-export default Index;
+export default StudentDashboard;
