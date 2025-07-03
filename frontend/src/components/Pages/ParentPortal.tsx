@@ -8,12 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Mail,
-  MessageSquare,
   Phone,
   AlertCircle,
   User,
@@ -39,35 +36,6 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 const ParentPortal = () => {
-  const communications = [
-    {
-      id: "1",
-      from: "Ms. Johnson",
-      subject: "Math Performance Update",
-      message:
-        "Your child has shown great improvement in algebra this month. We're focusing on geometry next.",
-      date: "2025-05-15T14:30:00",
-      read: true,
-    },
-    {
-      id: "2",
-      from: "Principal Williams",
-      subject: "Upcoming Parent-Teacher Conference",
-      message:
-        "Please join us for the quarterly parent-teacher conference scheduled for May 26th.",
-      date: "2025-05-12T09:15:00",
-      read: false,
-    },
-    {
-      id: "3",
-      from: "Coach Davis",
-      subject: "Sports Day Participation",
-      message:
-        "We encourage all students to participate in the upcoming Sports Day event on June 5th.",
-      date: "2025-05-10T16:45:00",
-      read: true,
-    },
-  ];
   const { schoolId, loading: authLoading } = useAuth();
   type StudentData = {
     name?: string;
@@ -239,7 +207,6 @@ const ParentPortal = () => {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="communications">Communications</TabsTrigger>
           <TabsTrigger value="contacts">School Contacts</TabsTrigger>
         </TabsList>
 
@@ -502,83 +469,6 @@ const ParentPortal = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="communications">
-          <div className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  <span>Messages</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {communications.map((comm) => (
-                    <Card
-                      key={comm.id}
-                      className={`${!comm.read ? "bg-blue-50" : ""}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between">
-                          <h3 className="font-medium">{comm.subject}</h3>
-                          <Badge variant={comm.read ? "outline" : "default"}>
-                            {comm.read ? "Read" : "New"}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          From: {comm.from}
-                        </p>
-                        <p className="text-sm mt-2">{comm.message}</p>
-                        <div className="flex justify-between items-center mt-3">
-                          <span className="text-xs text-muted-foreground">
-                            {new Date(comm.date).toLocaleString()}
-                          </span>
-                          <Button variant="outline" size="sm">
-                            Reply
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-
-                <div className="mt-6">
-                  <h3 className="font-medium mb-2">Send Message</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">Recipient</label>
-                      <select className="w-full rounded-md border mt-1 p-2">
-                        <option value="">Select recipient...</option>
-                        {Array.isArray(studentData?.parentContact) &&
-                          studentData?.parentContact.map((contact) => (
-                            <option key={contact.email} value={contact.email}>
-                              {contact.name} ({contact.role})
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Subject</label>
-                      <input
-                        type="text"
-                        className="w-full rounded-md border mt-1 p-2"
-                        placeholder="Message subject"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Message</label>
-                      <Textarea
-                        placeholder="Type your message here..."
-                        className="mt-1"
-                      />
-                    </div>
-                    <Button>Send Message</Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         <TabsContent value="contacts">
           <div className="mt-4">

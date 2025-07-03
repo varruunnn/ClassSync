@@ -70,17 +70,17 @@ export default function AdminLayout({
   const location = useLocation();
   const pathname = location.pathname;
 
-  const handleLogout = async (): Promise<void> => {
+
+  const handleLogout = async () => {
     try {
       await fetch("http://localhost:3001/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
-      localStorage.removeItem("schoolId");
-      localStorage.removeItem("role");
-      window.location.reload();
-    } catch (err) {
-      console.error("Logout failed:", err);
+      localStorage.clear();
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed", error);
     }
   };
   useEffect(() => {
