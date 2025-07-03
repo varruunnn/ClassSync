@@ -2,28 +2,28 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
-  FileText,
   ChevronLeft,
   ChevronRight,
-  LayoutDashboard,
-  FilePlus2,
-  Calendar,
-  BookCheck,
-  Brain,
-  UserCircle,
 } from "lucide-react";
 import { useSidebar } from "../contexts/SidebarContext";
-
+import {
+  HomeIcon,
+  BookOpenIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  ClipboardDocumentCheckIcon,
+  ChatBubbleBottomCenterTextIcon,
+  ChatBubbleOvalLeftEllipsisIcon 
+} from "@heroicons/react/24/outline";
 const navigation = [
-  { name: "Dashboard", href: "/student", icon: LayoutDashboard },
-  { name: "Subjects", href: "/student/subjects", icon: FileText },
-  { name: "Assignments", href: "/student/assessment", icon: FilePlus2 },
-  { name: "Discussion", href: "/student/tests", icon: BookCheck  },
-  { name: "Parent Portal", href: "/student/parent", icon: UserCircle },
-  { name: "Notices", href: "/student/calendar", icon: Calendar },
-  { name: "Chat with pdf", href: "/student/chat-with-pdf", icon: Brain },
+  { name: "Dashboard",       href: "/student",           icon: HomeIcon },
+  { name: "Subjects",        href: "/student/subjects",  icon: BookOpenIcon },
+  { name: "Assignments",     href: "/student/assessment",icon:  ClipboardDocumentCheckIcon },
+  { name: "Discussion",      href: "/student/tests",     icon: ChatBubbleBottomCenterTextIcon },
+  { name: "Parent Portal",   href: "/student/parent",    icon: UserGroupIcon },
+  { name: "Notices",         href: "/student/calendar",  icon: CalendarIcon },
+  { name: "Chat with PDF",   href: "/student/chat-with-pdf", icon: ChatBubbleOvalLeftEllipsisIcon  },
 ];
-
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { isOpen, isMobile, toggleSidebar } = useSidebar();
