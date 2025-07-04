@@ -573,7 +573,7 @@ const TeacherAssignments = () => {
                       <File className="h-4 w-4 text-red-500" />
                       <span className="text-sm font-medium">Assignment File</span>
                       <a
-                        href={assignment.fileUrl}
+                        href={`http://localhost:3001${assignment.fileUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline text-sm ml-auto"
