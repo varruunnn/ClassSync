@@ -13,7 +13,7 @@ import pdfRoutes from './src/routes/pdfRoutes.js';
 import subjectRoutes from './src/routes/studentRoutes.js';
 import discussionRoutes from './src/routes/discussionRoutes.js';
 import teacherDashboardRoutes from "./src/routes/teacherDashboard.js";
-
+import assignmentRoutes from './src/routes/assignmentRoutes.js';
 
 const app = express();
 
@@ -28,7 +28,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-
+app.use('/uploads', express.static('uploads'));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use("/api/data", dataRoutes);
@@ -41,7 +41,7 @@ app.use('/api/students/subjects', subjectRoutes);
 app.use('/api/students', subjectRoutes);
 app.use('/api/students', discussionRoutes);
 app.use("/api/teacher", teacherDashboardRoutes);
-
+app.use('/api/assignments', assignmentRoutes);
 
 const PORT = process.env.PORT || 3001;
 

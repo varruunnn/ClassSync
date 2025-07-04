@@ -1,87 +1,282 @@
-
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
-import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   FileText,
   Calendar,
-  Users,
   Clock,
   Plus,
   Search,
   Filter,
-  Eye
+  Upload,
+  X,
+  File,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+type Assignment = {
+  _id: string;
+  title: string;
+  subject: string;
+  className: string;
+  topics: string[];
+  sec?: string;
+  description?: string;
+  fileUrl?: string;
+  dueDate: string;
+  schoolId: number;
+  createdBy: string;
+};
 
 const TeacherAssignments = () => {
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showNewAssignmentDialog, setShowNewAssignmentDialog] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newAssignment, setNewAssignment] = useState({
+    title: "",
+    subject: "",
+    className: "",
+    sec: "",
+    description: "",
+    dueDate: "",
+    topics: "",
+    schoolId: 1,
+    createdBy: "6847354b34eb2262bfabd594", // You might want to get this from user context
+  });
 
-  const assignments = [
-    {
-      id: 1,
-      title: "Algebra Quiz Chapter 5",
-      subject: "Mathematics",
-      class: "Grade 10",
-      dueDate: "2025-05-28",
-      submissions: 18,
-      totalStudents: 25,
-      status: "active",
-      priority: "high",
-      fileUrl: "/Applied-ML.pdf"
-    },
-    {
-      id: 2,
-      title: "Physics Lab Report - Momentum",
-      subject: "Physics",
-      class: "Grade 11",
-      dueDate: "2025-05-30",
-      submissions: 15,
-      totalStudents: 22,
-      status: "active",
-      priority: "medium",
-      fileUrl: "/sample-pdfs/physics-lab.pdf"
-    },
-    {
-      id: 3,
-      title: "Geometry Problem Set",
-      subject: "Mathematics",
-      class: "Grade 9",
-      dueDate: "2025-06-02",
-      submissions: 22,
-      totalStudents: 28,
-      status: "draft",
-      priority: "low",
-      fileUrl: "/sample-pdfs/geometry-problems.pdf"
-    }
-  ];
+  // Fetch assignments from API
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-500';
-      case 'draft': return 'bg-yellow-500';
-      case 'completed': return 'bg-blue-500';
-      default: return 'bg-gray-500';
+  const fetchAssignments = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:3001/api/assignments", {
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch assignments");
+      }
+      const data = await response.json();
+      setAssignments(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'destructive';
-      case 'medium': return 'default';
-      case 'low': return 'secondary';
-      default: return 'outline';
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check if file is PDF
+      if (file.type !== "application/pdf") {
+        alert("Please select a PDF file only");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        alert("File size must be less than 10MB");
+        return;
+      }
+      
+      setSelectedFile(file);
     }
   };
+
+  const removeSelectedFile = () => {
+    setSelectedFile(null);
+    const fileInput = document.getElementById("assignment-file") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
+    }
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "assignment");
+
+    const response = await fetch("http://localhost:3001/api/assignments", {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to upload file");
+    }
+
+    const data = await response.json();
+    return data.fileUrl;
+  };
+
+  const handleCreateAssignment = async () => {
+    try {
+      setIsCreating(true);
+      if (!newAssignment.title.trim()) {
+        alert("Title is required");
+        return;
+      }
+      if (!newAssignment.subject.trim()) {
+        alert("Subject is required");
+        return;
+      }
+      if (!newAssignment.className.trim()) {
+        alert("Class name is required");
+        return;
+      }
+      if (!newAssignment.dueDate) {
+        alert("Due date is required");
+        return;
+      }
+
+      let fileUrl = "";
+      if (selectedFile) {
+        fileUrl = await uploadFile(selectedFile);
+      }
+
+      const assignmentData = {
+        ...newAssignment,
+        topics: newAssignment.topics
+          .split(",")
+          .map((topic: string) => topic.trim())
+          .filter((topic: string) => topic),
+        dueDate: new Date(newAssignment.dueDate).toISOString(),
+        fileUrl: fileUrl || undefined,
+      };
+
+      const response = await fetch("http://localhost:3001/api/assignments", {
+        credentials: "include",
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(assignmentData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create assignment");
+      }
+
+      const createdAssignment = await response.json();
+      setAssignments((prev) => [...prev, createdAssignment]);
+      setShowNewAssignmentDialog(false);
+      
+      // Reset form
+      setNewAssignment({
+        title: "",
+        subject: "",
+        className: "",
+        sec: "",
+        description: "",
+        dueDate: "",
+        topics: "",
+        schoolId: 1,
+        createdBy: "6847354b34eb2262bfabd594",
+      });
+      setSelectedFile(null);
+      
+    } catch (err) {
+      alert("Error creating assignment: " + (err instanceof Error ? err.message : "Unknown error"));
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const getStatusColor = (assignment: Assignment) => {
+    const now = new Date();
+    const dueDate = new Date(assignment.dueDate);
+
+    if (dueDate < now) {
+      return "bg-red-500"; // overdue
+    } else if (dueDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) {
+      return "bg-yellow-500"; // due soon
+    } else {
+      return "bg-green-500"; // active
+    }
+  };
+
+  const getStatus = (assignment: Assignment) => {
+    const now = new Date();
+    const dueDate = new Date(assignment.dueDate);
+
+    if (dueDate < now) {
+      return "overdue";
+    } else if (dueDate.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) {
+      return "due soon";
+    } else {
+      return "active";
+    }
+  };
+
+  const getPriorityColor = (assignment: Assignment) => {
+    const now = new Date();
+    const dueDate = new Date(assignment.dueDate);
+    const daysUntilDue = Math.ceil(
+      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysUntilDue < 3) return "destructive";
+    if (daysUntilDue < 7) return "default";
+    return "secondary";
+  };
+
+  const getPriority = (assignment: Assignment) => {
+    const now = new Date();
+    const dueDate = new Date(assignment.dueDate);
+    const daysUntilDue = Math.ceil(
+      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysUntilDue < 3) return "high";
+    if (daysUntilDue < 7) return "medium";
+    return "low";
+  };
+
+  const calculateDaysLeft = (dueDate: string | Date) => {
+    const now = new Date();
+    const due = new Date(dueDate);
+    const daysLeft = Math.ceil(
+      (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return Math.max(0, daysLeft);
+  };
+
+  if (loading) {
+    return (
+      <TeacherDashboard student={currentStudent} title="Assignments">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading assignments...</div>
+        </div>
+      </TeacherDashboard>
+    );
+  }
+
+  if (error) {
+    return (
+      <TeacherDashboard student={currentStudent} title="Assignments">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-red-500">Error: {error}</div>
+        </div>
+      </TeacherDashboard>
+    );
+  }
 
   return (
     <TeacherDashboard student={currentStudent} title="Assignments">
@@ -89,7 +284,9 @@ const TeacherAssignments = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold">Assignments</h1>
-            <p className="text-muted-foreground">Create and manage student assignments</p>
+            <p className="text-muted-foreground">
+              Create and manage student assignments
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline">
@@ -100,17 +297,211 @@ const TeacherAssignments = () => {
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Assignment
-            </Button>
+            <Dialog
+              open={showNewAssignmentDialog}
+              onOpenChange={setShowNewAssignmentDialog}
+            >
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Assignment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Create New Assignment</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="title">Title *</Label>
+                      <Input
+                        id="title"
+                        value={newAssignment.title}
+                        onChange={(e) =>
+                          setNewAssignment((prev) => ({
+                            ...prev,
+                            title: e.target.value,
+                          }))
+                        }
+                        placeholder="Assignment title"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="subject">Subject *</Label>
+                      <Input
+                        id="subject"
+                        value={newAssignment.subject}
+                        onChange={(e) =>
+                          setNewAssignment((prev) => ({
+                            ...prev,
+                            subject: e.target.value,
+                          }))
+                        }
+                        placeholder="Subject"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="className">Class *</Label>
+                      <Input
+                        id="className"
+                        value={newAssignment.className}
+                        onChange={(e) =>
+                          setNewAssignment((prev) => ({
+                            ...prev,
+                            className: e.target.value,
+                          }))
+                        }
+                        placeholder="Class name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sec">Section</Label>
+                      <Input
+                        id="sec"
+                        value={newAssignment.sec}
+                        onChange={(e) =>
+                          setNewAssignment((prev) => ({
+                            ...prev,
+                            sec: e.target.value,
+                          }))
+                        }
+                        placeholder="Section (optional)"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={newAssignment.description}
+                      onChange={(e) =>
+                        setNewAssignment((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Assignment description"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="dueDate">Due Date *</Label>
+                    <Input
+                      id="dueDate"
+                      type="date"
+                      value={newAssignment.dueDate}
+                      onChange={(e) =>
+                        setNewAssignment((prev) => ({
+                          ...prev,
+                          dueDate: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="topics">Topics (comma-separated)</Label>
+                    <Input
+                      id="topics"
+                      value={newAssignment.topics}
+                      onChange={(e) =>
+                        setNewAssignment((prev) => ({
+                          ...prev,
+                          topics: e.target.value,
+                        }))
+                      }
+                      placeholder="Topic1, Topic2, Topic3"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="assignment-file">Assignment File (PDF)</Label>
+                    <div className="mt-2">
+                      {!selectedFile ? (
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                          <p className="text-sm text-gray-600 mb-2">
+                            Upload assignment file (PDF only)
+                          </p>
+                          <Input
+                            id="assignment-file"
+                            type="file"
+                            accept=".pdf"
+                            onChange={handleFileSelect}
+                            className="hidden"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() =>
+                              document.getElementById("assignment-file")?.click()
+                            }
+                          >
+                            Choose File
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="border rounded-lg p-4 bg-gray-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <File className="h-8 w-8 text-red-500" />
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {selectedFile.name}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={removeSelectedFile}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowNewAssignmentDialog(false);
+                        setSelectedFile(null);
+                      }}
+                      disabled={isCreating}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleCreateAssignment}
+                      disabled={isCreating}
+                    >
+                      {isCreating ? "Creating..." : "Create Assignment"}
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {assignments.map((assignment) => (
             <Card
-              key={assignment.id}
+              key={assignment._id}
               className="hover:shadow-xl hover:scale-[1.01] transition-all duration-200"
             >
               <CardHeader>
@@ -122,18 +513,32 @@ const TeacherAssignments = () => {
                     <div>
                       <CardTitle className="flex items-center gap-2">
                         {assignment.title}
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(assignment.status)}`} />
+                        <div
+                          className={`w-2 h-2 rounded-full ${getStatusColor(
+                            assignment
+                          )}`}
+                        />
                       </CardTitle>
                       <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground flex-wrap">
                         <span>{assignment.subject}</span>
                         <span>•</span>
-                        <span>{assignment.class}</span>
+                        <span>Class {assignment.className}</span>
+                        {assignment.sec && (
+                          <>
+                            <span>•</span>
+                            <span>Sec {assignment.sec}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="flex gap-2 flex-wrap">
-                    <Badge variant={getPriorityColor(assignment.priority)}>{assignment.priority}</Badge>
-                    <Badge variant="outline" className="capitalize">{assignment.status}</Badge>
+                    <Badge variant={getPriorityColor(assignment)}>
+                      {getPriority(assignment)}
+                    </Badge>
+                    <Badge variant="outline" className="capitalize">
+                      {getStatus(assignment)}
+                    </Badge>
                   </div>
                 </div>
               </CardHeader>
@@ -142,56 +547,88 @@ const TeacherAssignments = () => {
                 <div className="grid grid-cols-1 gap-4 text-sm mb-4">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span>Due: {new Date(assignment.dueDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <span>{assignment.totalStudents} students</span>
+                    <span>
+                      Due: {new Date(assignment.dueDate).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span>{Math.max(0, Math.ceil((new Date(assignment.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)))} days left</span>
+                    <span>
+                      {calculateDaysLeft(assignment.dueDate)} days left
+                    </span>
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Submissions</span>
-                    <span>{assignment.submissions}/{assignment.totalStudents}</span>
+                {assignment.description && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground">
+                      {assignment.description}
+                    </p>
                   </div>
-                  <Progress value={(assignment.submissions / assignment.totalStudents) * 100} className="h-2" />
-                </div>
+                )}
+
+                {assignment.fileUrl && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
+                      <File className="h-4 w-4 text-red-500" />
+                      <span className="text-sm font-medium">Assignment File</span>
+                      <a
+                        href={assignment.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm ml-auto"
+                      >
+                        View PDF
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {assignment.topics && assignment.topics.length > 0 && (
+                  <div className="mb-4">
+                    <div className="flex flex-wrap gap-1">
+                      {assignment.topics.map((topic, index) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="text-xs"
+                        >
+                          {topic}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex flex-wrap gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button size="sm" onClick={() => setSelectedFile(assignment.fileUrl)}>
-                        <Eye className="h-4 w-4 mr-1" />
-                        View File
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="w-full max-w-3xl h-[80vh]">
-                      <DialogHeader>
-                        <DialogTitle>{assignment.title} – File Preview</DialogTitle>
-                      </DialogHeader>
-                      <iframe
-                        src={selectedFile || ""}
-                        className="w-full h-full border rounded"
-                        title="Assignment File"
-                      />
-                    </DialogContent>
-                  </Dialog>
-
-                  <Button size="sm" variant="outline">Edit</Button>
-                  <Button size="sm" variant="outline">Grade</Button>
-                  {assignment.status === 'draft' && (
-                    <Button size="sm" variant="outline">Publish</Button>
-                  )}
+                  <Button size="sm" variant="outline">
+                    Edit
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    Grade
+                  </Button>
+                  <Button size="sm" variant="outline">
+                    View Details
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {assignments.length === 0 && (
+          <div className="text-center py-12">
+            <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No assignments yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Get started by creating your first assignment
+            </p>
+            <Button onClick={() => setShowNewAssignmentDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Create Assignment
+            </Button>
+          </div>
+        )}
       </div>
     </TeacherDashboard>
   );
