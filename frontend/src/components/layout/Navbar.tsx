@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,

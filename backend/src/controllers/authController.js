@@ -166,7 +166,9 @@ export const me = (req, res) => {
     role: req.role,
     schoolId: req.schoolId,
     email: req.user.email,
-    Id: req.user._id
+    Id: req.user._id,
+    subject: req.user.subject,
+    classAssigned: req.user.classAssigned,
   });
 };
 
