@@ -1,4 +1,3 @@
-// src/routes/assignmentRoutes.js
 import express from 'express';
 import protect from '../middlewares/auth.js';
 import authorizeTeacher from '../middlewares/authorizeTeacher.js';
