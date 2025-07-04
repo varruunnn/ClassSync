@@ -1,14 +1,39 @@
-// models/ClassAssignment.js
 import mongoose from "mongoose";
 const AssignmentSchema = new mongoose.Schema({
-    assignment: String,
-    subject: String,
-    submissions: Number,
-    total: Number,
-    dueDate: Date,
-    priority: String,
-    classroomId: { type: mongoose.Schema.Types.ObjectId, ref: "Classroom" },
-  });
-  
-  export default mongoose.model("ClassAssignment", AssignmentSchema);
-  
+  title: {
+    type: String,
+    required: true,
+  },
+  subject: {
+    type: String,
+    required: true,
+  },
+  className: {
+    type: String,
+    required: true,
+  },
+  topics:{
+    type:Array,
+  },
+  sec:{
+    type:String,
+  },
+  description: String,
+  fileUrl: String,
+  dueDate: Date,
+  schoolId: {
+    type: Number,
+    required: true,
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export default mongoose.model("ClassAssignment", AssignmentSchema);

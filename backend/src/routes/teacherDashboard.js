@@ -1,4 +1,3 @@
-// routes/teacherDashboard.js
 import express from "express";
 import ClassAssignment from "../models/ClassAssignment.js";
 import StudentPerformance from "../models/StudentPerformance.js";
