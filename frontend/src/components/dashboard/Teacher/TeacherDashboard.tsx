@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,9 +21,21 @@ import { Progress } from "@/components/ui/progress";
 import { useTeacherClassroom } from "@/components/contexts/TeacherClassroomContext";
 import { useNavigate } from "react-router-dom";
 
+interface teacherInfo {
+  name: string;
+  classAssigned: string;
+  schoolId: Number;
+  email: string;
+  role:string;
+  id:string;
+  subject:string;
+}
+
 const TeacherDashboardPage = () => {
   const { selectedClassroom } = useTeacherClassroom();
-  const navigate = useNavigate()
+  const [teacherInfo, setTeacherInfo] = useState<teacherInfo | null>(null);
+  const [loadingTeacherInfo, setLoadingTeacherInfo] = useState(true);
+  const navigate = useNavigate();
   const {
     isAuthenticated,
     userRole,
@@ -37,6 +49,37 @@ const TeacherDashboardPage = () => {
       }
     }
   }, [isAuthenticated, userRole, loading, navigate]);
+
+  const fetchTeacherInfo = async () => {
+    try {
+      setLoadingTeacherInfo(true);
+      const response = await fetch(
+        "http://localhost:3001/api/auth/me",
+        {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Failed to fetch student info: ${response.status}`);
+
+      const data = await response.json();
+      setTeacherInfo(data);
+    } catch (err: any) {
+      console.error("Error fetching student info:", err);
+    } finally {
+      setLoadingTeacherInfo(false);
+    }
+  };
+  useEffect(() => {
+    const initializeData = async () => {
+      await Promise.all([
+        fetchTeacherInfo(),
+      ]);
+    };
+    initializeData();
+  }, []);
 
   const teacherStats = {
     totalStudents: selectedClassroom?.students || 0,
@@ -155,12 +198,10 @@ const TeacherDashboardPage = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold mb-2">
-                Good Morning, Prof. Johnson! 👋
+                Good Morning, {teacherInfo?.name} 👋
               </h1>
               <p className="text-blue-100">
-                {selectedClassroom
-                  ? `Teaching ${selectedClassroom.name} - ${selectedClassroom.students} students in Room ${selectedClassroom.room}`
-                  : "Select a classroom to view specific data"}
+                ClassTeacher of {teacherInfo?.classAssigned} 
               </p>
             </div>
             <div className="hidden md:block">

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, type ReactNode} from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 
 interface Classroom {
   id: number;
@@ -19,69 +25,76 @@ interface TeacherClassroomContextType {
   classrooms: Classroom[];
 }
 
-const TeacherClassroomContext = createContext<TeacherClassroomContextType | undefined>(undefined);
+const TeacherClassroomContext = createContext<
+  TeacherClassroomContextType | undefined
+>(undefined);
 
 export const useTeacherClassroom = () => {
   const context = useContext(TeacherClassroomContext);
   if (context === undefined) {
-    throw new Error('useTeacherClassroom must be used within a TeacherClassroomProvider');
+    throw new Error(
+      "useTeacherClassroom must be used within a TeacherClassroomProvider"
+    );
   }
   return context;
 };
-
-const mockClassrooms: Classroom[] = [
-  {
-    id: 1,
-    name: "Mathematics Grade 10",
-    students: 25,
-    room: "101",
-    schedule: "Mon, Wed, Fri - 9:00 AM",
-    averageGrade: 85,
-    attendance: 92,
-    nextClass: "Today 9:00 AM",
-    subject: "Mathematics",
-    grade: "Grade 10"
-  },
-  {
-    id: 2,
-    name: "Physics Grade 11", 
-    students: 22,
-    room: "Lab 1",
-    schedule: "Tue, Thu - 11:00 AM",
-    averageGrade: 78,
-    attendance: 88,
-    nextClass: "Tomorrow 11:00 AM",
-    subject: "Physics",
-    grade: "Grade 11"
-  },
-  {
-    id: 3,
-    name: "Mathematics Grade 9",
-    students: 28,
-    room: "102", 
-    schedule: "Mon, Wed, Fri - 2:00 PM",
-    averageGrade: 90,
-    attendance: 95,
-    nextClass: "Today 2:00 PM",
-    subject: "Mathematics",
-    grade: "Grade 9"
-  }
-];
 
 interface TeacherClassroomProviderProps {
   children: ReactNode;
 }
 
-export const TeacherClassroomProvider: React.FC<TeacherClassroomProviderProps> = ({ children }) => {
-  const [selectedClassroom, setSelectedClassroom] = useState<Classroom | null>(mockClassrooms[0]);
-  
+export const TeacherClassroomProvider: React.FC<
+  TeacherClassroomProviderProps
+> = ({ children }) => {
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [selected, setSelected] = useState<Classroom | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchMe = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("http://localhost:3001/api/auth/me", {
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+        const data = (await res.json()) as {
+          classAssigned?: string;
+          classes?: string[];
+        };
+        const head = data.classAssigned ? [data.classAssigned] : [];
+        const teach = Array.isArray(data.classes) ? data.classes : [];
+        const combined = Array.from(new Set([...head, ...teach]));
+
+        const list = combined.map((cls, idx) => ({
+          id: Number(cls) || idx,
+          name: `Class ${cls}`,
+          students: 0,
+          room: "",
+          schedule: "",
+          averageGrade: 0,
+          attendance: 0,
+          nextClass: "",
+          subject: "",
+          grade: "",
+        }));
+
+        setClassrooms(list);
+        setSelected(list[0] || null);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMe();
+  }, []);
+
   return (
-    <TeacherClassroomContext.Provider 
-      value={{ 
-        selectedClassroom, 
-        setSelectedClassroom, 
-        classrooms: mockClassrooms 
-      }}
+    <TeacherClassroomContext.Provider
+      value={{ classrooms, selectedClassroom: selected, setSelectedClassroom: setSelected }}
     >
       {children}
     </TeacherClassroomContext.Provider>

@@ -35,6 +35,7 @@ import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
 import NoticesPage from "./components/dashboard/Admin/notices/Page";
 import ChatPdf from "./components/Pages/ChatPdf";
 import StudentsTestPage from "./components/Pages/StudentsDiscussionPage";
+import AssginClass from "./components/dashboard/Admin/assignClass/Page";
 
 const queryClient = new QueryClient();
 
@@ -103,10 +104,18 @@ const App = () => (
               }
             />
             <Route
-              path="/admin/assign"
+              path="/admin/assignct"
               element={
                 <AdminLayout>
                   <AssignTeacherPage />
+                </AdminLayout>
+              }
+            />
+            <Route
+              path="/admin/assign"
+              element={
+                <AdminLayout>
+                  <AssginClass />
                 </AdminLayout>
               }
             />

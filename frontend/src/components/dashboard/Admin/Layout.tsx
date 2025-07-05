@@ -48,6 +48,7 @@ const navigation = [
     items: [
       { title: "Teachers", href: "/admin/teachers", icon: Users },
       { title: "Students", href: "/admin/students", icon: GraduationCap },
+      { title: "Assign Class Teacher", href: "/admin/assignct", icon: UserCheck },
       { title: "Assign Teacher", href: "/admin/assign", icon: UserCheck },
     ],
   },

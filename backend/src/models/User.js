@@ -58,6 +58,14 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    classes: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (arr) => Array.isArray(arr),
+        message: "classes must be an array of class names",
+      },
+    },
   },
   { timestamps: true }
 );
