@@ -89,18 +89,17 @@ const quickActions = [
 ];
 
 export default function AdminDashboard() {
-   const { isAuthenticated, userRole, schoolId: ctxSchoolId, loading } = useAuth();
+  const {
+    isAuthenticated,
+    userRole,
+    schoolId: ctxSchoolId,
+    loading,
+  } = useAuth();
   const [stats, setStats] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-    useEffect(() => {
-    if (!loading) {
-      if (!isAuthenticated || userRole !== "admin") {
-        navigate("/login");
-      }
-    }
-  }, [isAuthenticated, userRole, loading, navigate]);
+
   useEffect(() => {
     const fetchStats = async () => {
       const storedSchoolId = localStorage.getItem("schoolId");
@@ -179,6 +178,13 @@ export default function AdminDashboard() {
       fetchStats();
     }
   }, [isAuthenticated, userRole, loading]);
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated || userRole !== "admin") {
+        navigate("/login");
+      }
+    }
+  }, [isAuthenticated, userRole, loading, navigate]);
 
   if (loading || loadingStats) {
     return (

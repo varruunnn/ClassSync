@@ -37,9 +37,6 @@ export const ClassroomSelector = () => {
             >
               <div className="flex flex-col">
                 <span className="font-medium">{classroom.name}</span>
-                <span className="text-xs text-gray-500">
-                  Room {classroom.room} • {classroom.students} students
-                </span>
               </div>
             </SelectItem>
           ))}

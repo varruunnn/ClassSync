@@ -10,6 +10,7 @@ type Assignment = {
   subject: string;
   className?: string;
   description?: string;
+  fileUrl?:string;
   dueDate: string;
   topics?: string[];
 };
@@ -213,11 +214,22 @@ const Assignments = () => {
                       </div>
                     </div>
                   )}
-
+                {assignment.fileUrl && (
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
+                      <span className="text-sm font-medium">Assignment File</span>
+                      <a
+                        href={`http://localhost:3001${assignment.fileUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-sm ml-auto"
+                      >
+                        View PDF
+                      </a>
+                    </div>
+                  </div>
+                )}
                   <div className="flex gap-2">
-                    <Button variant="outline" className="flex-1" size="sm">
-                      View Details
-                    </Button>
                     <Button
                       variant={overdue ? "destructive" : "default"}
                       className="flex-1"

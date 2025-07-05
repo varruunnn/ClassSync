@@ -23,7 +23,6 @@ export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: 
       <div className="flex items-center gap-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          <p className="text-sm text-gray-500">Welcome back, Prof. Johnson</p>
         </div>
       </div>
       
@@ -50,11 +49,6 @@ export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: 
             </Badge>
           </Button>
         </div>
-        
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={student.avatar} />
-          <AvatarFallback>{getInitials(student.name)}</AvatarFallback>
-        </Avatar>
       </div>
     </header>
   );
