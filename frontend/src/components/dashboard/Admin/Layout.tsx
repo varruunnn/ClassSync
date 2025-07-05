@@ -14,6 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -66,10 +68,18 @@ export default function AdminLayout({
   };
   const [userdata, setuserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
+   const { isAuthenticated, userRole, schoolId: ctxSchoolId } = useAuth();
   const [error, setError] = useState<unknown>(null);
   const location = useLocation();
   const pathname = location.pathname;
-
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!loading) {
+      if (!isAuthenticated || userRole !== "admin") {
+        navigate("/login");
+      }
+    }
+  }, [isAuthenticated, userRole, loading, navigate]);
 
   const handleLogout = async () => {
     try {
@@ -96,7 +106,7 @@ export default function AdminLayout({
         setuserData(data);
       } catch (err) {
         setError(err);
-        alert(error)
+        alert(error);
       } finally {
         setLoading(false);
       }
@@ -167,7 +177,9 @@ export default function AdminLayout({
                       <AvatarFallback>AD</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col items-start text-sm">
-                      <span className="font-medium">{userdata?.name ?? ""}</span>
+                      <span className="font-medium">
+                        {userdata?.name ?? ""}
+                      </span>
                       <span className="text-xs text-muted-foreground">
                         {userdata?.email ?? ""}
                       </span>

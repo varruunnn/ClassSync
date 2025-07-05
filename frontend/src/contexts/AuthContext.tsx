@@ -17,13 +17,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [schoolId, setSchoolId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // On mount, ask the server “Hey, do I have a valid cookie?”
   useEffect(() => {
     axios
       .get("http://localhost:3001/api/auth/me", { withCredentials: true })
       .then((res) => {
-        // If the cookie is valid, response should be { role: "...", schoolId: 1 }
         setIsAuthenticated(true);
         setUserRole(res.data.role);
         setSchoolId(res.data.schoolId);
@@ -38,7 +35,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
   }, []);
 
-  // Called after successful login / signup:
   const login = (role: string, sid: number) => {
     setIsAuthenticated(true);
     setUserRole(role);
@@ -48,7 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    // Hit the logout endpoint to clear the cookie
     axios
       .post(
         "http://localhost:3001/api/auth/logout",
