@@ -3,18 +3,32 @@ export const getStudentsBySchool = async (req, res) => {
   try {
     const paramSid = Number(req.params.schoolId);
     if (isNaN(paramSid)) {
-      return res.status(400).json({ error: 'Invalid schoolId parameter.' });
+      return res
+        .status(400)
+        .json({ error: "Invalid schoolId parameter." });
     }
     if (req.schoolId !== paramSid) {
-      return res.status(403).json({ error: 'Forbidden: wrong school.' });
+      return res.status(403).json({ error: "Forbidden: wrong school." });
     }
-    const students = await User.find({ schoolId: paramSid, role: 'student' }).select(
-      'name email class rollNumber parentContact'
+
+    // build base filter
+    const filter = { schoolId: paramSid, role: "student" };
+
+    // optional query filters
+    const { class: cls, section } = req.query;
+    if (cls) filter.class = cls;
+    if (section) filter.section = section;
+
+    const students = await User.find(filter).select(
+      "name email class rollNumber parentContact section"
     );
+
     return res.json({ students });
   } catch (err) {
-    console.error('getStudentsBySchool error:', err);
-    return res.status(500).json({ error: 'Server error while fetching students.' });
+    console.error("getStudentsBySchool error:", err);
+    return res
+      .status(500)
+      .json({ error: "Server error while fetching students." });
   }
 };
 export const deleteStudent = async (req, res) => {

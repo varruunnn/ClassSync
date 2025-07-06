@@ -18,6 +18,8 @@ import {
   BookOpen,
   TrendingUp,
   Award,
+  MessageSquare,
+  Clock,
 } from "lucide-react";
 import {
   LineChart,
@@ -48,12 +50,29 @@ const ParentPortal = () => {
     // add other fields as needed
   };
 
+  type Message = {
+    _id: string;
+    teacherId: {
+      _id: string;
+      name: string;
+      email: string;
+    };
+    studentId: string;
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loadingStudent, setLoadingStudent] = useState(true);
   const [studentError, setStudentError] = useState<string | null>(null);
   const [contacts, setContacts] = useState<Array<any>>([]);
   const [loadingContacts, setLoadingContacts] = useState(true);
   const [contactError, setContactError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [messageError, setMessageError] = useState<string | null>(null);
 
   const performanceData = {
     unitTests: [
@@ -125,6 +144,44 @@ const ParentPortal = () => {
       })
       .finally(() => setLoadingStudent(false));
   }, []);
+
+  useEffect(() => {
+    if (authLoading || !schoolId) return;
+    fetch(`http://localhost:3001/api/admin/${schoolId}/teachers`, {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        return res.json();
+      })
+      .then((data) => {
+        setContacts(data.teachers || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load contacts:", err);
+        setContactError(err.message);
+      })
+      .finally(() => setLoadingContacts(false));
+  }, [authLoading, schoolId]);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/api/messages", {
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+        return res.json();
+      })
+      .then((data) => {
+        setMessages(data || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load messages:", err);
+        setMessageError(err.message);
+      })
+      .finally(() => setLoadingMessages(false));
+  }, []);
+
   const getGradeColor = (grade: string) => {
     switch (grade) {
       case "A+":
@@ -145,24 +202,18 @@ const ParentPortal = () => {
     const scores = performanceData[examType].map((subject) => subject.score);
     return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
   };
-  useEffect(() => {
-    if (authLoading || !schoolId) return;
-    fetch(`http://localhost:3001/api/admin/${schoolId}/teachers`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        return res.json();
-      })
-      .then((data) => {
-        setContacts(data.teachers || []);
-      })
-      .catch((err) => {
-        console.error("Failed to load contacts:", err);
-        setContactError(err.message);
-      })
-      .finally(() => setLoadingContacts(false));
-  }, [authLoading, schoolId]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (loadingStudent) {
     return (
       <div className="px-8 py-12 flex items-center justify-center">
@@ -207,6 +258,7 @@ const ParentPortal = () => {
       <Tabs defaultValue="overview">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
           <TabsTrigger value="contacts">School Contacts</TabsTrigger>
         </TabsList>
 
@@ -469,48 +521,158 @@ const ParentPortal = () => {
           </Card>
         </TabsContent>
 
-
-        <TabsContent value="contacts">
-          <div className="mt-4">
-            {loadingContacts ? (
-              <p>Loading contacts...</p>
-            ) : contactError ? (
-              <p className="text-red-600">{contactError}</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {contacts.map((contact: any) => (
-                  <Card key={contact._id}>
-                    <CardContent className="p-4">
-                      <h3 className="font-medium">{contact.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {contact.role}
-                      </p>
-                      <div className="mt-3 space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-4 w-4 text-muted-foreground" />
-                          <a
-                            href={`mailto:${contact.email}`}
-                            className="text-sm hover:underline"
-                          >
-                            {contact.email}
-                          </a>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-4 w-4 text-muted-foreground" />
-                          <a
-                            href={`tel:${contact.phone}`}
-                            className="text-sm hover:underline"
-                          >
-                            {contact.phone}
-                          </a>
+        <TabsContent value="messages">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Messages from Teachers
+              </CardTitle>
+              <CardDescription>
+                View important messages and updates from your child's teachers
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingMessages ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+                  <p className="text-muted-foreground">Loading messages...</p>
+                </div>
+              ) : messageError ? (
+                <div className="text-center py-8">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-red-600 mb-1">Failed to load messages</p>
+                  <p className="text-sm text-muted-foreground">{messageError}</p>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-2">No messages yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Messages from teachers will appear here
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message._id}
+                      className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src="" />
+                          <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
+                            {message.teacherId.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <h4 className="font-medium text-gray-900">
+                                {message.teacherId.name}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {message.teacherId.email}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatDate(message.createdAt)}
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-100 rounded-md p-3">
+                            <p className="text-gray-800 leading-relaxed">
+                              {message.content}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Phone className="h-5 w-5" />
+                School Contacts
+              </CardTitle>
+              <CardDescription>
+                Contact information for teachers and staff
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingContacts ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
+                  <p className="text-muted-foreground">Loading contacts...</p>
+                </div>
+              ) : contactError ? (
+                <div className="text-center py-8">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-red-600 mb-1">Failed to load contacts</p>
+                  <p className="text-sm text-muted-foreground">{contactError}</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {contacts.map((contact: any) => (
+                    <Card key={contact._id} className="border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src="" />
+                            <AvatarFallback className="bg-green-100 text-green-600">
+                              {contact.name
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">
+                              {contact.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {contact.role}
+                            </p>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Mail className="h-4 w-4 text-muted-foreground" />
+                                <a
+                                  href={`mailto:${contact.email}`}
+                                  className="text-sm hover:underline text-blue-600"
+                                >
+                                  {contact.email}
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-4 w-4 text-muted-foreground" />
+                                <a
+                                  href={`tel:${contact.phone}`}
+                                  className="text-sm hover:underline text-blue-600"
+                                >
+                                  {contact.phone}
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
