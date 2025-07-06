@@ -42,6 +42,7 @@ const UserSchema = new mongoose.Schema(
         return this.role === "student";
       },
     },
+    // Teacher-specific fields
     subject: {
       type: String,
       required: function () {
@@ -64,6 +65,34 @@ const UserSchema = new mongoose.Schema(
       validate: {
         validator: (arr) => Array.isArray(arr),
         message: "classes must be an array of class names",
+      },
+    },
+    attendance: {
+      type: Number,
+      default: 0,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    unitTestAvg: {
+      type: Number,
+      default: 0,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    halfYearlyAvg: {
+      type: Number,
+      default: 0,
+      required: function () {
+        return this.role === "student";
+      },
+    },
+    yearlyAvg: {
+      type: Number,
+      default: 0,
+      required: function () {
+        return this.role === "student";
       },
     },
   },

@@ -1,225 +1,267 @@
+import { useEffect, useState, type ChangeEvent } from "react";
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
-import { currentStudent } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Download, Upload, Search, Filter, MoreHorizontal } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const TeacherGradebook = () => {
-  const students = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      class: "Grade 10",
-      assignments: { quiz1: 95, quiz2: 88, midterm: 92, project: 96 },
-      average: 92.8,
-      attendance: 98
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      class: "Grade 10", 
-      assignments: { quiz1: 87, quiz2: 91, midterm: 85, project: 89 },
-      average: 88.0,
-      attendance: 95
-    },
-    {
-      id: 3,
-      name: "Emma Davis",
-      class: "Grade 10",
-      assignments: { quiz1: 92, quiz2: 94, midterm: 89, project: 93 },
-      average: 92.0,
-      attendance: 97
-    },
-    {
-      id: 4,
-      name: "James Wilson",
-      class: "Grade 10",
-      assignments: { quiz1: 78, quiz2: 82, midterm: 76, project: 84 },
-      average: 80.0,
-      attendance: 92
+interface TeacherProfile {
+  name: string;
+  role: string;
+  schoolId: number;
+  classAssigned: string;
+}
+
+interface Student {
+  _id: string;
+  name: string;
+  rollNumber: string;
+  unitTestAvg?: number;
+  halfYearlyAvg?: number;
+  yearlyAvg?: number;
+}
+
+export default function TeacherGradebook() {
+  const [profile, setProfile] = useState<TeacherProfile | null>(null);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [grades, setGrades] = useState<Record<string, { unitTestAvg: number; halfYearlyAvg: number; yearlyAvg: number }>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("http://localhost:3001/api/auth/me", { credentials: "include" })
+      .then(res => res.json())
+      .then((data: TeacherProfile) => {
+        setProfile(data);
+        return data;
+      })
+      .then(data => {
+        return fetch(
+          `http://localhost:3001/api/admin/${data.schoolId}/students?class=${data.classAssigned}`,
+          { credentials: "include" }
+        );
+      })
+      .then(res => res.json())
+      .then(data => {
+        setStudents(data.students || []);
+        // initialize grades state
+        const initialGrades: typeof grades = {};
+        (data.students || []).forEach((s: Student) => {
+          initialGrades[s._id] = {
+            unitTestAvg: s.unitTestAvg || 0,
+            halfYearlyAvg: s.halfYearlyAvg || 0,
+            yearlyAvg: s.yearlyAvg || 0,
+          };
+        });
+        setGrades(initialGrades);
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleChange = (
+    studentId: string,
+    field: keyof (typeof grades)[string],
+    value: number
+  ) => {
+    setGrades(prev => ({
+      ...prev,
+      [studentId]: { ...prev[studentId], [field]: value }
+    }));
+  };
+
+  const saveGrades = async () => {
+    if (!profile) return;
+    setSaving(true);
+    try {
+      const payload = Object.entries(grades).map(([studentId, vals]) => ({
+        studentId,
+        ...vals
+      }));
+      await fetch("http://localhost:3001/api/grades/bulk-update", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class: profile.classAssigned,
+          grades: payload
+        })
+      });
+      alert("Grades updated successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save grades");
+    } finally {
+      setSaving(false);
     }
-  ];
-
-  const getGradeColor = (grade: number) => {
-    if (grade >= 90) return 'text-green-600';
-    if (grade >= 80) return 'text-yellow-600';
-    return 'text-red-600';
   };
 
-  const getGradeBadge = (average: number) => {
-    if (average >= 90) return { variant: 'default' as const, label: 'A' };
-    if (average >= 80) return { variant: 'secondary' as const, label: 'B' };
-    if (average >= 70) return { variant: 'outline' as const, label: 'C' };
-    return { variant: 'destructive' as const, label: 'D' };
-  };
-
-  return (
-    <TeacherDashboard student={currentStudent} title="Gradebook">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">Gradebook</h1>
-            <p className="text-muted-foreground">Track and manage student grades</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
-            <Button variant="outline">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
+  if (loading) {
+    return (
+      <TeacherDashboard student={null as any} title="Gradebook">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-3">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="text-gray-600 text-lg">Loading gradebook...</p>
           </div>
         </div>
+      </TeacherDashboard>
+    );
+  }
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Mathematics Grade 10 - Gradebook</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-3 font-medium">Student</th>
-                    <th className="text-center p-3 font-medium">Quiz 1</th>
-                    <th className="text-center p-3 font-medium">Quiz 2</th>
-                    <th className="text-center p-3 font-medium">Midterm</th>
-                    <th className="text-center p-3 font-medium">Project</th>
-                    <th className="text-center p-3 font-medium">Average</th>
-                    <th className="text-center p-3 font-medium">Grade</th>
-                    <th className="text-center p-3 font-medium">Attendance</th>
-                    <th className="text-center p-3 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {students.map((student) => {
-                    const gradeBadge = getGradeBadge(student.average);
-                    return (
-                      <tr key={student.id} className="border-b hover:bg-gray-50">
-                        <td className="p-3">
-                          <div>
-                            <div className="font-medium">{student.name}</div>
-                            <div className="text-sm text-muted-foreground">{student.class}</div>
-                          </div>
-                        </td>
-                        <td className={`text-center p-3 font-medium ${getGradeColor(student.assignments.quiz1)}`}>
-                          {student.assignments.quiz1}%
-                        </td>
-                        <td className={`text-center p-3 font-medium ${getGradeColor(student.assignments.quiz2)}`}>
-                          {student.assignments.quiz2}%
-                        </td>
-                        <td className={`text-center p-3 font-medium ${getGradeColor(student.assignments.midterm)}`}>
-                          {student.assignments.midterm}%
-                        </td>
-                        <td className={`text-center p-3 font-medium ${getGradeColor(student.assignments.project)}`}>
-                          {student.assignments.project}%
-                        </td>
-                        <td className={`text-center p-3 font-bold ${getGradeColor(student.average)}`}>
-                          {student.average}%
-                        </td>
-                        <td className="text-center p-3">
-                          <Badge variant={gradeBadge.variant}>{gradeBadge.label}</Badge>
-                        </td>
-                        <td className="text-center p-3">
-                          <span className={student.attendance >= 95 ? 'text-green-600' : student.attendance >= 90 ? 'text-yellow-600' : 'text-red-600'}>
-                            {student.attendance}%
-                          </span>
-                        </td>
-                        <td className="text-center p-3">
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+  return (
+    <TeacherDashboard student={null as any} title="Gradebook">
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-lg shadow-lg p-6 text-white">
+              <h1 className="text-3xl font-bold mb-2">
+                📚 Gradebook Management
+              </h1>
+              <p className="text-blue-100 text-lg">
+                Class {profile?.classAssigned} • {students.length} Students
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Class Statistics</CardTitle>
+          {/* Main Content Card */}
+          <Card className="shadow-xl border-0 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+              <CardTitle className="flex items-center gap-3 text-xl text-gray-800">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">📊</span>
+                </div>
+                Enter Student Grades
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Class Average:</span>
-                  <span className="font-bold text-green-600">88.2%</span>
+            <CardContent className="p-0">
+              {/* Table Header */}
+              <div className="bg-gray-800 text-white px-6 py-4">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 font-semibold">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-300">👤</span>
+                    <span>Student Information</span>
+                  </div>
+                  <div className="text-center flex items-center justify-center gap-2">
+                    <span className="text-blue-300">📝</span>
+                    <span>Unit Test %</span>
+                  </div>
+                  <div className="text-center flex items-center justify-center gap-2">
+                    <span className="text-green-300">📋</span>
+                    <span>Half-Yearly %</span>
+                  </div>
+                  <div className="text-center flex items-center justify-center gap-2">
+                    <span className="text-purple-300">🎯</span>
+                    <span>Yearly %</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>Highest Grade:</span>
-                  <span className="font-bold">92.8%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Lowest Grade:</span>
-                  <span className="font-bold">80.0%</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Passing Rate:</span>
-                  <span className="font-bold text-green-600">100%</span>
+              </div>
+
+              {/* Student Rows */}
+              <div className="divide-y divide-gray-200">
+                {students.map((student, index) => (
+                  <div 
+                    key={student._id} 
+                    className={`px-6 py-4 hover:bg-gray-50 transition-colors duration-200 ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
+                      {/* Student Info */}
+                      <div className="space-y-1">
+                        <div className="font-semibold text-gray-900 text-lg">
+                          {student.name}
+                        </div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
+                            Roll #{student.rollNumber}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Unit Test Input */}
+                      <div className="space-y-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={grades[student._id]?.unitTestAvg || ''}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleChange(student._id, "unitTestAvg", Number(e.target.value))
+                          }
+                          className="text-center font-medium border-blue-200 focus:border-blue-500 focus:ring-blue-500"
+                          placeholder="0-100"
+                        />
+                      </div>
+
+                      {/* Half-Yearly Input */}
+                      <div className="space-y-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={grades[student._id]?.halfYearlyAvg || ''}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleChange(student._id, "halfYearlyAvg", Number(e.target.value))
+                          }
+                          className="text-center font-medium border-green-200 focus:border-green-500 focus:ring-green-500"
+                          placeholder="0-100"
+                        />
+                      </div>
+
+                      {/* Yearly Input */}
+                      <div className="space-y-1">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={grades[student._id]?.yearlyAvg || ''}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            handleChange(student._id, "yearlyAvg", Number(e.target.value))
+                          }
+                          className="text-center font-medium border-purple-200 focus:border-purple-500 focus:ring-purple-500"
+                          placeholder="0-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Save Button Section */}
+              <div className="bg-gray-50 px-6 py-6 border-t border-gray-200">
+                <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                  <div className="text-sm text-gray-600">
+                    📝 {students.length} students • Remember to save your changes
+                  </div>
+                  <Button 
+                    onClick={saveGrades} 
+                    disabled={saving}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {saving ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <span>💾</span>
+                        <span>Save All Grades</span>
+                      </div>
+                    )}
+                  </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Grade Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>A (90-100%):</span>
-                  <span className="font-bold">2 students</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>B (80-89%):</span>
-                  <span className="font-bold">2 students</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>C (70-79%):</span>
-                  <span className="font-bold">0 students</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>D (60-69%):</span>
-                  <span className="font-bold">0 students</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Button className="w-full" size="sm">Add New Assignment</Button>
-                <Button className="w-full" variant="outline" size="sm">Generate Report</Button>
-                <Button className="w-full" variant="outline" size="sm">Send Progress Updates</Button>
-                <Button className="w-full" variant="outline" size="sm">Schedule Parent Meeting</Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Footer Info */}
+          <div className="mt-8 text-center text-sm text-gray-500">
+            <p>💡 Tip: Grades are automatically validated (0-100). Changes are saved to the database when you click "Save All Grades".</p>
+          </div>
         </div>
       </div>
     </TeacherDashboard>
   );
-};
-
-export default TeacherGradebook;
+}

@@ -19,7 +19,7 @@ const navigation = [
   { name: "Dashboard",       href: "/student",           icon: HomeIcon },
   { name: "Subjects",        href: "/student/subjects",  icon: BookOpenIcon },
   { name: "Assignments",     href: "/student/assessment",icon:  ClipboardDocumentCheckIcon },
-  { name: "Discussion",      href: "/student/tests",     icon: ChatBubbleBottomCenterTextIcon },
+  { name: "Discussion",      href: "/student/discussion",     icon: ChatBubbleBottomCenterTextIcon },
   { name: "Parent Portal",   href: "/student/parent",    icon: UserGroupIcon },
   { name: "Notices",         href: "/student/calendar",  icon: CalendarIcon },
   { name: "Chat with PDF",   href: "/student/chat-with-pdf", icon: ChatBubbleOvalLeftEllipsisIcon  },
