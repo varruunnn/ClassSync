@@ -30,16 +30,14 @@ import {
   Tooltip,
   ResponsiveContainer,
   BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
+  Bar
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ParentPortal = () => {
   const { schoolId, loading: authLoading } = useAuth();
   type StudentData = {
+    _id: string;
     name?: string;
     class?: string;
     rollNumber?: string | number;
@@ -47,7 +45,9 @@ const ParentPortal = () => {
     schoolId?: string;
     parentContact?: string;
     createdAt?: string;
-    // add other fields as needed
+    unitTestAvg?: number;
+    halfYearlyAvg?: number;
+    yearlyAvg?: number;
   };
 
   type Message = {
@@ -63,6 +63,7 @@ const ParentPortal = () => {
     updatedAt: string;
     __v: number;
   };
+  type Subject = { name: string; _id: string; syllabusPdfUrl: string };
 
   const [studentData, setStudentData] = useState<StudentData | null>(null);
   const [loadingStudent, setLoadingStudent] = useState(true);
@@ -73,6 +74,9 @@ const ParentPortal = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [messageError, setMessageError] = useState<string | null>(null);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [subjectsError, setSubjectsError] = useState<string | null>(null);
 
   const performanceData = {
     unitTests: [
@@ -101,49 +105,94 @@ const ParentPortal = () => {
     ],
   };
 
-  const progressData = [
-    { name: "Unit Tests", average: 86.3 },
-    { name: "Half Yearly", average: 88.2 },
-    { name: "Yearly", average: 91.2 },
-  ];
+  const progressData = studentData
+    ? [
+        { name: "Unit Tests", average: studentData.unitTestAvg },
+        { name: "Half Yearly", average: studentData.halfYearlyAvg },
+        { name: "Yearly", average: studentData.yearlyAvg },
+      ]
+    : [];
 
-  const subjectProgressData = [
-    { subject: "Math", unit: 85, halfYearly: 87, yearly: 90 },
-    { subject: "Physics", unit: 92, halfYearly: 89, yearly: 93 },
-    { subject: "Chemistry", unit: 78, halfYearly: 82, yearly: 85 },
-    { subject: "Biology", unit: 88, halfYearly: 91, yearly: 94 },
-    { subject: "English", unit: 94, halfYearly: 96, yearly: 98 },
-    { subject: "History", unit: 81, halfYearly: 84, yearly: 87 },
-  ];
-
-  const gradeDistribution = [
-    { name: "A+", value: 2, color: "#10b981" },
-    { name: "A", value: 3, color: "#3b82f6" },
-    { name: "B+", value: 7, color: "#f59e0b" },
-    { name: "B", value: 6, color: "#ef4444" },
-  ];
+  const subjectProgressData = !loadingSubjects && !subjectsError
+    ? subjects.map((subj) => ({
+        subject: subj.name,
+        unit:
+          performanceData.unitTests.find((d) => d.subject === subj.name)
+            ?.score ?? 0,
+        halfYearly:
+          performanceData.halfYearly.find((d) => d.subject === subj.name)
+            ?.score ?? 0,
+        yearly:
+          performanceData.yearly.find((d) => d.subject === subj.name)
+            ?.score ?? 0,
+      }))
+    : [];
 
   useEffect(() => {
     fetch("http://localhost:3001/api/students/myinfo", {
       credentials: "include",
     })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-        return res.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          setStudentData(data.data);
-        } else {
-          throw new Error("Failed to fetch student data");
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load student data:", err);
-        setStudentError(err.message);
-      })
-      .finally(() => setLoadingStudent(false));
+      .then((res) => res.json())
+      .then((res: { success: boolean; data: StudentData }) => {
+        if (!res.success) throw new Error("Fetch failed");
+        setStudentData(res.data);
+      });
+    // …
   }, []);
+
+useEffect(() => {
+  let isMounted = true; 
+
+  const loadStudentAndSubjects = async () => {
+    try {
+      // 1) fetch student info
+      const resInfo = await fetch("http://localhost:3001/api/students/myinfo", {
+        credentials: "include",
+      });
+      if (!resInfo.ok) {
+        throw new Error(`Info Error ${resInfo.status}: ${resInfo.statusText}`);
+      }
+      const infoJson = await resInfo.json();
+      if (!infoJson.success) {
+        throw new Error("Student info fetch failed");
+      }
+
+      // 2) fetch subjects
+      const resSubs = await fetch("http://localhost:3001/api/students/subjects/me", {
+        credentials: "include",
+      });
+      if (!resSubs.ok) {
+        throw new Error(`Subjects Error ${resSubs.status}: ${resSubs.statusText}`);
+      }
+      const subsJson = await resSubs.json();
+      if (!Array.isArray(subsJson.subjects)) {
+        throw new Error("Subjects response malformed");
+      }
+      if (isMounted) {
+        setStudentData(infoJson.data);
+        setSubjects(subsJson.subjects);
+      }
+    } catch (err: any) {
+      console.error("Failed to load data:", err);
+      if (isMounted) {
+        setStudentError(err.message);
+        setSubjectsError(err.message);
+      }
+    } finally {
+      if (isMounted) {
+        setLoadingStudent(false);
+        setLoadingSubjects(false);
+      }
+    }
+  };
+
+  loadStudentAndSubjects();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
+
 
   useEffect(() => {
     if (authLoading || !schoolId) return;
@@ -181,21 +230,6 @@ const ParentPortal = () => {
       })
       .finally(() => setLoadingMessages(false));
   }, []);
-
-  const getGradeColor = (grade: string) => {
-    switch (grade) {
-      case "A+":
-        return "bg-green-100 text-green-800";
-      case "A":
-        return "bg-blue-100 text-blue-800";
-      case "B+":
-        return "bg-yellow-100 text-yellow-800";
-      case "B":
-        return "bg-orange-100 text-orange-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   type ExamType = "unitTests" | "halfYearly" | "yearly";
   const calculateOverallAverage = (examType: ExamType) => {
@@ -322,8 +356,6 @@ const ParentPortal = () => {
               </div>
             </CardContent>
           </Card>
-
-          {/* Performance Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
               <CardHeader className="pb-2">
@@ -334,7 +366,11 @@ const ParentPortal = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">
-                  {calculateOverallAverage("unitTests")}%
+                  {loadingStudent
+                    ? "…"
+                    : studentData?.unitTestAvg != null
+                    ? `${studentData.unitTestAvg.toFixed(1)}%`
+                    : "N/A"}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Latest assessment
@@ -351,7 +387,11 @@ const ParentPortal = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  {calculateOverallAverage("halfYearly")}%
+                  {loadingStudent
+                    ? "…"
+                    : studentData?.halfYearlyAvg != null
+                    ? `${studentData.halfYearlyAvg.toFixed(1)}%`
+                    : "N/A"}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Mid-term performance
@@ -368,7 +408,11 @@ const ParentPortal = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-600">
-                  {calculateOverallAverage("yearly")}%
+                  {loadingStudent
+                    ? "…"
+                    : studentData?.yearlyAvg != null
+                    ? `${studentData.yearlyAvg.toFixed(1)}%`
+                    : "N/A"}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Annual performance
@@ -378,122 +422,60 @@ const ParentPortal = () => {
           </div>
 
           {/* Performance Trends */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Performance Progress
-              </CardTitle>
-              <CardDescription>
-                Academic performance across different assessments
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={subjectProgressData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="subject" />
-                    <YAxis domain={[70, 100]} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="unit"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      name="Unit Tests"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="halfYearly"
-                      stroke="#10b981"
-                      strokeWidth={2}
-                      name="Half Yearly"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="yearly"
-                      stroke="#8b5cf6"
-                      strokeWidth={2}
-                      name="Yearly"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Subject-wise Performance */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Latest Exam Results (Yearly)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {performanceData.yearly.map((subject, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
-                    >
-                      <div>
-                        <p className="font-medium">{subject.subject}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {subject.score}/{subject.maxScore}
-                        </p>
-                      </div>
-                      <Badge className={getGradeColor(subject.grade)}>
-                        {subject.grade}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Grade Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-48 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={gradeDistribution}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={40}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {gradeDistribution.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="flex justify-center gap-4 mt-4">
-                  {gradeDistribution.map((entry, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: entry.color }}
-                      ></div>
-                      <span className="text-sm">
-                        {entry.name}: {entry.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Comparison Chart */}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5" />
+          Performance Progress
+        </CardTitle>
+        <CardDescription>
+          Academic performance across different assessments
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="h-64 w-full">
+          {loadingSubjects ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Loading subjects…
+            </div>
+          ) : subjectsError ? (
+            <div className="text-center py-8 text-red-600">
+              Error loading subjects: {subjectsError}
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={subjectProgressData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="subject" />
+                <YAxis domain={[70, 100]} />
+                <Tooltip formatter={(value: number) => `${value}%`} />
+                <Line
+                  type="monotone"
+                  dataKey="unit"
+                  name="Unit Tests"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="halfYearly"
+                  name="Half Yearly"
+                  stroke="#10b981"
+                  strokeWidth={2}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="yearly"
+                  name="Yearly"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </CardContent>
+    </Card>
           <Card>
             <CardHeader>
               <CardTitle>Assessment Comparison</CardTitle>
@@ -502,21 +484,29 @@ const ParentPortal = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={progressData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[80, 95]} />
-                    <Tooltip />
-                    <Bar
-                      dataKey="average"
-                      fill="#3b82f6"
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {!loadingStudent && progressData.length > 0 ? (
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={progressData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      {/* you can also let Recharts auto-scale, or do [0, 100] */}
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip formatter={(value: number) => `${value}%`} />
+                      <Bar
+                        dataKey="average"
+                        fill="#3b82f6"
+                        radius={[4, 4, 0, 0]}
+                        name="Average %"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  {loadingStudent ? "Loading chart…" : "No data available"}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -542,7 +532,9 @@ const ParentPortal = () => {
                 <div className="text-center py-8">
                   <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
                   <p className="text-red-600 mb-1">Failed to load messages</p>
-                  <p className="text-sm text-muted-foreground">{messageError}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {messageError}
+                  </p>
                 </div>
               ) : messages.length === 0 ? (
                 <div className="text-center py-8">
@@ -620,7 +612,9 @@ const ParentPortal = () => {
                 <div className="text-center py-8">
                   <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
                   <p className="text-red-600 mb-1">Failed to load contacts</p>
-                  <p className="text-sm text-muted-foreground">{contactError}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {contactError}
+                  </p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

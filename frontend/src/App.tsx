@@ -34,7 +34,7 @@ import StudentsPage from "./components/dashboard/Admin/students/Page";
 import AssignTeacherPage from "./components/dashboard/Admin/assign/Page";
 import NoticesPage from "./components/dashboard/Admin/notices/Page";
 import ChatPdf from "./components/Pages/ChatPdf";
-import StudentsTestPage from "./components/Pages/StudentsDiscussionPage";
+import StudentsDiscussionPage from "./components/Pages/StudentsDiscussionPage";
 import AssginClass from "./components/dashboard/Admin/assignClass/Page";
 
 const queryClient = new QueryClient();
@@ -54,7 +54,7 @@ const App = () => (
               <Route path="/student/calendar" element={<Calendar />} />
               <Route path="/student/parent" element={<ParentPortal />} />
               <Route path="/student/chat-with-pdf" element={<ChatPdf />} />
-              <Route path="/student/tests" element={<StudentsTestPage />} />
+              <Route path="/student/discussion" element={<StudentsDiscussionPage />} />
             </Route>
             <Route
               path="/teacher"
@@ -71,7 +71,7 @@ const App = () => (
               <Route path="gradebook" element={<TeacherGradebook />} />
               <Route path="analytics" element={<TeacherAnalytics />} />
               <Route path="messages" element={<TeacherMessages />} />
-              <Route path="calendar" element={<TeacherCalendar />} />
+              <Route path="notices" element={<TeacherCalendar />} />
               <Route path="settings" element={<TeacherSettings />} />
             </Route>
             <Route path="/" element={<LandingPage />} />
