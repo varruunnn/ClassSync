@@ -168,6 +168,7 @@ export const me = (req, res) => {
     email: req.user.email,
     Id: req.user._id,
     subject: req.user.subject,
+    phone:req.user.phone,
     classes: req.user.classes,
     classAssigned: req.user.classAssigned,
   });

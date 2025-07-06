@@ -23,13 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-interface RegisterResponse {
-  message: string;
-}
 
 const RegisterForm: React.FC = () => {
   const [fullName, setFullName] = useState("");
@@ -50,8 +44,46 @@ const RegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  type PasswordRequirements = {
+    length: boolean;
+    uppercase: boolean;
+    lowercase: boolean;
+    number: boolean;
+    special: boolean;
+  };
 
-  const navigate = useNavigate();
+  type PasswordStrength = {
+    requirements: PasswordRequirements;
+    score: number;
+    isStrong: boolean;
+  };
+
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
+    requirements: {
+      length: false,
+      uppercase: false,
+      lowercase: false,
+      number: false,
+      special: false,
+    },
+    score: 0,
+    isStrong: false,
+  });
+
+  const validatePasswordStrength = (password: string): PasswordStrength => {
+    const requirements: PasswordRequirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+
+    const score = Object.values(requirements).filter(Boolean).length;
+    const isStrong = score >= 4 && requirements.length;
+
+    return { requirements, score, isStrong };
+  };
 
   const validate = () => {
     const errs: Record<string, string> = {};
@@ -70,6 +102,9 @@ const RegisterForm: React.FC = () => {
     }
     if (!password) {
       errs.password = "Password is required";
+      valid = false;
+    } else if (!passwordStrength.isStrong) {
+      errs.password = "Password does not meet strength requirements";
       valid = false;
     }
     if (password !== confirmPassword) {
@@ -149,138 +184,277 @@ const RegisterForm: React.FC = () => {
     }
 
     try {
-      const res = await axios.post<RegisterResponse>(
-        "http://localhost:3001/api/auth/register",
-        payload,
-        { withCredentials: true }
-      );
-      toast.success(res.data.message);
-      navigate("/login");
+      // Simulated API call - replace with actual axios call
+      console.log("Registration payload:", payload);
+      setTimeout(() => {
+        alert("Registration successful! (This is a demo)");
+        setIsLoading(false);
+      }, 1000);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || "Registration failed");
-    } finally {
+      console.error("Registration failed:", err);
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Basic Information */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <User className="h-5 w-5" /> Basic Information
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="fullName">Full Name</Label>
-            <div className="relative mt-1">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="fullName"
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
-                placeholder="Enter your full name"
-              />
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h2>
+        <p className="text-gray-600">Join our educational platform today</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <User className="h-5 w-5" /> Basic Information
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="fullName">Full Name</Label>
+              <div className="relative mt-1">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="fullName"
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {errors.fullName && (
+                <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+              )}
             </div>
-            {errors.fullName && (
-              <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
-            )}
+
+            <div>
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative mt-1">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
+                  placeholder="Enter your email"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
           </div>
 
           <div>
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="schoolId">School ID</Label>
             <div className="relative mt-1">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
-                placeholder="Enter your email"
-              />
-            </div>
-            {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="schoolId">School ID</Label>
-          <div className="relative mt-1">
-            <School className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              id="schoolId"
-              value={schoolId}
-              onChange={e => setSchoolId(e.target.value)}
+                id="schoolId"
+                value={schoolId}
+                onChange={e => setSchoolId(e.target.value)}
                 disabled={isLoading}
                 className={`pl-10 ${errors.schoolId ? "border-red-500" : ""}`}
                 placeholder="Enter your school ID"
-            />
+              />
+            </div>
+            {errors.schoolId && (
+              <p className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
+            )}
           </div>
-          {errors.schoolId && (
-            <p className="text-red-500 text-xs mt-1">{errors.schoolId}</p>
-          )}
         </div>
-      </div>
 
-      {/* Role Selection */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <UserCheck className="h-5 w-5" /> Role Selection
-        </h3>
-        <div>
-          <Label htmlFor="role">I am a</Label>
-          <Select
-            value={role}
-            onValueChange={val => setRole(val as "student" | "teacher")}
-            disabled={isLoading}
-          >
-            <SelectTrigger
-              id="role"
-              className={`mt-1 ${errors.role ? "border-red-500" : ""}`}
-            >
-              <SelectValue placeholder="Select your role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="student">
-                <div className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4" /> Student
-                </div>
-              </SelectItem>
-              <SelectItem value="teacher">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" /> Teacher
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Student Info */}
-      {role === "student" && (
+        {/* Role Selection */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <GraduationCap className="h-5 w-5" /> Student Information
+            <UserCheck className="h-5 w-5" /> Role Selection
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="role">I am a</Label>
+            <Select
+              value={role}
+              onValueChange={val => setRole(val as "student" | "teacher")}
+              disabled={isLoading}
+            >
+              <SelectTrigger
+                id="role"
+                className={`mt-1 ${errors.role ? "border-red-500" : ""}`}
+              >
+                <SelectValue placeholder="Select your role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="student">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4" /> Student
+                  </div>
+                </SelectItem>
+                <SelectItem value="teacher">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" /> Teacher
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Student Info */}
+        {role === "student" && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <GraduationCap className="h-5 w-5" /> Student Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="studentClass">Class</Label>
+                <Select
+                  value={studentClass?.toString() || ""}
+                  onValueChange={v => setStudentClass(Number(v))}
+                  disabled={isLoading}
+                >
+                  <SelectTrigger
+                    id="studentClass"
+                    className={`mt-1 ${errors.studentClass ? "border-red-500" : ""}`}
+                  >
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <SelectItem key={i + 1} value={(i + 1).toString()}>
+                        Class {i + 1}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.studentClass && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.studentClass}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="section">Section</Label>
+                <div className="relative mt-1">
+                  <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="section"
+                    value={section}
+                    onChange={e => setSection(e.target.value)}
+                    disabled={isLoading}
+                    className={`pl-10 ${errors.section ? "border-red-500" : ""}`}
+                    placeholder="e.g., A, B, C"
+                  />
+                </div>
+                {errors.section && (
+                  <p className="text-red-500 text-xs mt-1">{errors.section}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="rollNumber">Roll Number</Label>
+                <div className="relative mt-1">
+                  <Hash className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="rollNumber"
+                    value={rollNumber}
+                    onChange={e => setRollNumber(e.target.value)}
+                    disabled={isLoading}
+                    className={`pl-10 ${errors.rollNumber ? "border-red-500" : ""}`}
+                    placeholder="Enter roll number"
+                  />
+                </div>
+                {errors.rollNumber && (
+                  <p className="text-red-500 text-xs mt-1">{errors.rollNumber}</p>
+                )}
+              </div>
+            </div>
+
             <div>
-              <Label htmlFor="studentClass">Class</Label>
+              <Label htmlFor="parentContact">Parent Contact</Label>
+              <div className="relative mt-1">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="parentContact"
+                  value={parentContact}
+                  onChange={e => setParentContact(e.target.value)}
+                  disabled={isLoading}
+                  className={`pl-10 ${
+                    errors.parentContact ? "border-red-500" : ""
+                  }`}
+                  placeholder="Enter parent's contact"
+                />
+              </div>
+              {errors.parentContact && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.parentContact}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Teacher Info */}
+        {role === "teacher" && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <BookOpen className="h-5 w-5" /> Teacher Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="subject">Subject</Label>
+                <div className="relative mt-1">
+                  <BookOpen className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="subject"
+                    value={subject}
+                    onChange={e => setSubject(e.target.value)}
+                    disabled={isLoading}
+                    className={`pl-10 ${errors.subject ? "border-red-500" : ""}`}
+                    placeholder="Enter your subject"
+                  />
+                </div>
+                {errors.subject && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="relative mt-1">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Input
+                    id="phone"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    disabled={isLoading}
+                    className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
+                    placeholder="Enter your phone"
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="classAssigned">Assigned Class</Label>
               <Select
-                value={studentClass?.toString() || ""}
-                onValueChange={v => setStudentClass(Number(v))}
+                value={classAssigned?.toString() || ""}
+                onValueChange={v => setClassAssigned(Number(v))}
                 disabled={isLoading}
               >
                 <SelectTrigger
-                  id="studentClass"
-                  className={`mt-1 ${errors.studentClass ? "border-red-500" : ""}`}
+                  id="classAssigned"
+                  className={`mt-1 ${
+                    errors.classAssigned ? "border-red-500" : ""
+                  }`}
                 >
-                  <SelectValue placeholder="Select class" />
+                  <SelectValue placeholder="Select assigned class" />
                 </SelectTrigger>
                 <SelectContent>
                   {Array.from({ length: 12 }, (_, i) => (
@@ -290,250 +464,171 @@ const RegisterForm: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
-              {errors.studentClass && (
+              {errors.classAssigned && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.studentClass}
+                  {errors.classAssigned}
                 </p>
               )}
             </div>
-
-            <div>
-              <Label htmlFor="section">Section</Label>
-              <div className="relative mt-1">
-                <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="section"
-                  value={section}
-                  onChange={e => setSection(e.target.value)}
-                  disabled={isLoading}
-                  className={`pl-10 ${errors.section ? "border-red-500" : ""}`}
-                  placeholder="e.g., A, B, C"
-                />
-              </div>
-              {errors.section && (
-                <p className="text-red-500 text-xs mt-1">{errors.section}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="rollNumber">Roll Number</Label>
-              <div className="relative mt-1">
-                <Hash className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  id="rollNumber"
-                  value={rollNumber}
-                  onChange={e => setRollNumber(e.target.value)}
-                  disabled={isLoading}
-                  className={`pl-10 ${errors.rollNumber ? "border-red-500" : ""}`}
-                  placeholder="Enter roll number"
-                />
-              </div>
-              {errors.rollNumber && (
-                <p className="text-red-500 text-xs mt-1">{errors.rollNumber}</p>
-              )}
-            </div>
           </div>
+        )}
 
-          <div>
-            <Label htmlFor="parentContact">Parent Contact</Label>
-            <div className="relative mt-1">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="parentContact"
-                value={parentContact}
-                onChange={e => setParentContact(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 ${
-                  errors.parentContact ? "border-red-500" : ""
-                }`}
-                placeholder="Enter parent's contact"
-              />
-            </div>
-            {errors.parentContact && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.parentContact}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Teacher Info */}
-      {role === "teacher" && (
+        {/* Security */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <BookOpen className="h-5 w-5" /> Teacher Information
+            <Shield className="h-5 w-5" /> Security
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="subject">Subject</Label>
+              <Label htmlFor="password">Password</Label>
               <div className="relative mt-1">
-                <BookOpen className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="subject"
-                  value={subject}
-                  onChange={e => setSubject(e.target.value)}
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={e => {
+                    const newPassword = e.target.value;
+                    setPassword(newPassword);
+                    setPasswordStrength(validatePasswordStrength(newPassword));
+                  }}
                   disabled={isLoading}
-                  className={`pl-10 ${errors.subject ? "border-red-500" : ""}`}
-                  placeholder="Enter your subject"
+                  className={`pl-10 pr-10 ${
+                    errors.password ? "border-red-500" : ""
+                  }`}
+                  placeholder="Create a password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              {errors.subject && (
-                <p className="text-red-500 text-xs mt-1">{errors.subject}</p>
+              
+              {/* Password Strength Indicator */}
+              {password && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all ${
+                          passwordStrength.score <= 2 ? 'bg-red-500' : 
+                          passwordStrength.score === 3 ? 'bg-yellow-500' : 
+                          passwordStrength.score === 4 ? 'bg-blue-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs font-medium ${
+                      passwordStrength.score <= 2 ? 'text-red-600' : 
+                      passwordStrength.score === 3 ? 'text-yellow-600' : 
+                      passwordStrength.score === 4 ? 'text-blue-600' : 'text-green-600'
+                    }`}>
+                      {passwordStrength.score <= 2 ? 'Weak' : 
+                       passwordStrength.score === 3 ? 'Fair' : 
+                       passwordStrength.score === 4 ? 'Good' : 'Strong'}
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs space-y-1">
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.length === true ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      At least 8 characters
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.uppercase ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One uppercase letter
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.lowercase ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One lowercase letter
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.number ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One number
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.special ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One special character
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
               )}
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <div className="relative mt-1">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  id="phone"
-                  value={phone}
-                  onChange={e => setPhone(e.target.value)}
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
-                  className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
-                  placeholder="Enter your phone"
+                  className={`pl-10 pr-10 ${
+                    errors.confirmPassword ? "border-red-500" : ""
+                  }`}
+                  placeholder="Confirm your password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              {errors.phone && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
           </div>
-
-          <div>
-            <Label htmlFor="classAssigned">Assigned Class</Label>
-            <Select
-              value={classAssigned?.toString() || ""}
-              onValueChange={v => setClassAssigned(Number(v))}
-              disabled={isLoading}
-            >
-              <SelectTrigger
-                id="classAssigned"
-                className={`mt-1 ${
-                  errors.classAssigned ? "border-red-500" : ""
-                }`}
-              >
-                <SelectValue placeholder="Select assigned class" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <SelectItem key={i + 1} value={(i + 1).toString()}>
-                    Class {i + 1}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.classAssigned && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.classAssigned}
-              </p>
-            )}
-          </div>
         </div>
-      )}
 
-      {/* Security */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Shield className="h-5 w-5" /> Security
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <div className="relative mt-1">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 pr-10 ${
-                  errors.password ? "border-red-500" : ""
-                }`}
-                placeholder="Create a password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative mt-1">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 pr-10 ${
-                  errors.confirmPassword ? "border-red-500" : ""
-                }`}
-                placeholder="Confirm your password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
-              >
-                {showConfirmPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.confirmPassword}
-              </p>
-            )}
-          </div>
+        {/* Terms */}
+        <div className="flex items-center space-x-2">
+          <input
+            id="terms"
+            type="checkbox"
+            checked={agreeToTerms}
+            onChange={e => setAgreeToTerms(e.target.checked)}
+            disabled={isLoading}
+            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+          />
+          <Label htmlFor="terms" className="text-sm text-gray-700">
+            I agree to the Terms of Service and Privacy Policy
+          </Label>
         </div>
-      </div>
+        {errors.terms && (
+          <p className="text-red-500 text-xs">{errors.terms}</p>
+        )}
 
-      {/* Terms */}
-      <div className="flex items-center space-x-2">
-        <input
-          id="terms"
-          type="checkbox"
-          checked={agreeToTerms}
-          onChange={e => setAgreeToTerms(e.target.checked)}
+        <button
+          type="submit"
           disabled={isLoading}
-          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-        />
-        <Label htmlFor="terms" className="text-sm text-gray-700">
-          I agree to the Terms of Service and Privacy Policy
-        </Label>
-      </div>
-      {errors.terms && (
-        <p className="text-red-500 text-xs">{errors.terms}</p>
-      )}
-
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition"
-      >
-        {isLoading ? "Creating Account..." : "Create Account"}
-      </button>
-    </form>
+          className="w-full py-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-semibold transition"
+        >
+          {isLoading ? "Creating Account..." : "Create Account"}
+        </button>
+      </form>
+    </div>
   );
 };
 
