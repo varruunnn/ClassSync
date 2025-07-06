@@ -28,27 +28,6 @@ export default function TeacherNavbar({ student, title = "Teacher Dashboard" }: 
       
       <div className="flex items-center gap-4">
       <ClassroomSelector />
-        <div className="hidden md:flex items-center gap-2">
-          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            New Assignment
-          </Button>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="relative">
-            <MessageSquare className="h-5 w-5" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-green-500">
-              3
-            </Badge>
-          </Button>
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500">
-              5
-            </Badge>
-          </Button>
-        </div>
       </div>
     </header>
   );
