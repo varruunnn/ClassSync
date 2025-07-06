@@ -27,7 +27,7 @@ const navigation = [
   { name: "Assignments", href: "/teacher/assignments", icon: FilePlus2 },
   { name: "GradeBook", href: "/teacher/gradebook", icon: UserCircle },
   { name: "Message", href: "/teacher/messages", icon: Calendar },
-  { name: "Calender", href: "/teacher/calendar", icon: BellRing },
+  { name: "Notices", href: "/teacher/notices", icon: BellRing },
   { name: "Settings", href: "/teacher/settings", icon: Settings },
 ];
 
@@ -103,7 +103,7 @@ const TeacherSidebar = () => {
           <div className="flex items-center justify-between h-16 px-4 border-b border-primary-foreground/10">
             <Link to="/dashboard" className="flex items-center space-x-2">
               <span className={cn("text-xl font-bold", collapsed && "hidden")}>
-                logo
+                ClassSync
               </span>
             </Link>
             <button
