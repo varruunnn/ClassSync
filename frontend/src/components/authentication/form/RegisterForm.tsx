@@ -50,6 +50,45 @@ const RegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  type PasswordRequirements = {
+    length: boolean;
+    uppercase: boolean;
+    lowercase: boolean;
+    number: boolean;
+    special: boolean;
+  };
+
+  type PasswordStrength = {
+    requirements: PasswordRequirements;
+    score: number;
+    isStrong: boolean;
+  };
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
+    requirements: {
+      length: false,
+      uppercase: false,
+      lowercase: false,
+      number: false,
+      special: false,
+    },
+    score: 0,
+    isStrong: false,
+  });
+
+  const validatePasswordStrength = (password: string): PasswordStrength => {
+    const requirements: PasswordRequirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password),
+    };
+
+    const score = Object.values(requirements).filter(Boolean).length;
+    const isStrong = score >= 4 && requirements.length;
+
+    return { requirements, score, isStrong };
+  };
 
   const navigate = useNavigate();
 
@@ -178,7 +217,7 @@ const RegisterForm: React.FC = () => {
               <Input
                 id="fullName"
                 value={fullName}
-                onChange={e => setFullName(e.target.value)}
+                onChange={(e) => setFullName(e.target.value)}
                 disabled={isLoading}
                 className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
                 placeholder="Enter your full name"
@@ -197,7 +236,7 @@ const RegisterForm: React.FC = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
                 className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
                 placeholder="Enter your email"
@@ -216,10 +255,10 @@ const RegisterForm: React.FC = () => {
             <Input
               id="schoolId"
               value={schoolId}
-              onChange={e => setSchoolId(e.target.value)}
-                disabled={isLoading}
-                className={`pl-10 ${errors.schoolId ? "border-red-500" : ""}`}
-                placeholder="Enter your school ID"
+              onChange={(e) => setSchoolId(e.target.value)}
+              disabled={isLoading}
+              className={`pl-10 ${errors.schoolId ? "border-red-500" : ""}`}
+              placeholder="Enter your school ID"
             />
           </div>
           {errors.schoolId && (
@@ -237,7 +276,7 @@ const RegisterForm: React.FC = () => {
           <Label htmlFor="role">I am a</Label>
           <Select
             value={role}
-            onValueChange={val => setRole(val as "student" | "teacher")}
+            onValueChange={(val) => setRole(val as "student" | "teacher")}
             disabled={isLoading}
           >
             <SelectTrigger
@@ -273,12 +312,14 @@ const RegisterForm: React.FC = () => {
               <Label htmlFor="studentClass">Class</Label>
               <Select
                 value={studentClass?.toString() || ""}
-                onValueChange={v => setStudentClass(Number(v))}
+                onValueChange={(v) => setStudentClass(Number(v))}
                 disabled={isLoading}
               >
                 <SelectTrigger
                   id="studentClass"
-                  className={`mt-1 ${errors.studentClass ? "border-red-500" : ""}`}
+                  className={`mt-1 ${
+                    errors.studentClass ? "border-red-500" : ""
+                  }`}
                 >
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
@@ -304,7 +345,7 @@ const RegisterForm: React.FC = () => {
                 <Input
                   id="section"
                   value={section}
-                  onChange={e => setSection(e.target.value)}
+                  onChange={(e) => setSection(e.target.value)}
                   disabled={isLoading}
                   className={`pl-10 ${errors.section ? "border-red-500" : ""}`}
                   placeholder="e.g., A, B, C"
@@ -322,9 +363,11 @@ const RegisterForm: React.FC = () => {
                 <Input
                   id="rollNumber"
                   value={rollNumber}
-                  onChange={e => setRollNumber(e.target.value)}
+                  onChange={(e) => setRollNumber(e.target.value)}
                   disabled={isLoading}
-                  className={`pl-10 ${errors.rollNumber ? "border-red-500" : ""}`}
+                  className={`pl-10 ${
+                    errors.rollNumber ? "border-red-500" : ""
+                  }`}
                   placeholder="Enter roll number"
                 />
               </div>
@@ -341,7 +384,7 @@ const RegisterForm: React.FC = () => {
               <Input
                 id="parentContact"
                 value={parentContact}
-                onChange={e => setParentContact(e.target.value)}
+                onChange={(e) => setParentContact(e.target.value)}
                 disabled={isLoading}
                 className={`pl-10 ${
                   errors.parentContact ? "border-red-500" : ""
@@ -372,7 +415,7 @@ const RegisterForm: React.FC = () => {
                 <Input
                   id="subject"
                   value={subject}
-                  onChange={e => setSubject(e.target.value)}
+                  onChange={(e) => setSubject(e.target.value)}
                   disabled={isLoading}
                   className={`pl-10 ${errors.subject ? "border-red-500" : ""}`}
                   placeholder="Enter your subject"
@@ -390,7 +433,7 @@ const RegisterForm: React.FC = () => {
                 <Input
                   id="phone"
                   value={phone}
-                  onChange={e => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value)}
                   disabled={isLoading}
                   className={`pl-10 ${errors.phone ? "border-red-500" : ""}`}
                   placeholder="Enter your phone"
@@ -406,7 +449,7 @@ const RegisterForm: React.FC = () => {
             <Label htmlFor="classAssigned">Assigned Class</Label>
             <Select
               value={classAssigned?.toString() || ""}
-              onValueChange={v => setClassAssigned(Number(v))}
+              onValueChange={(v) => setClassAssigned(Number(v))}
               disabled={isLoading}
             >
               <SelectTrigger
@@ -448,7 +491,11 @@ const RegisterForm: React.FC = () => {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => {
+                  const newPassword = e.target.value;
+                  setPassword(newPassword);
+                  setPasswordStrength(validatePasswordStrength(newPassword));
+                }}
                 disabled={isLoading}
                 className={`pl-10 pr-10 ${
                   errors.password ? "border-red-500" : ""
@@ -467,10 +514,59 @@ const RegisterForm: React.FC = () => {
                 )}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-            )}
-          </div>
+             {password && (
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        className={`h-2 rounded-full transition-all ${
+                          passwordStrength.score <= 2 ? 'bg-red-500' : 
+                          passwordStrength.score === 3 ? 'bg-yellow-500' : 
+                          passwordStrength.score === 4 ? 'bg-blue-500' : 'bg-green-500'
+                        }`}
+                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
+                      />
+                    </div>
+                    <span className={`text-xs font-medium ${
+                      passwordStrength.score <= 2 ? 'text-red-600' : 
+                      passwordStrength.score === 3 ? 'text-yellow-600' : 
+                      passwordStrength.score === 4 ? 'text-blue-600' : 'text-green-600'
+                    }`}>
+                      {passwordStrength.score <= 2 ? 'Weak' : 
+                       passwordStrength.score === 3 ? 'Fair' : 
+                       passwordStrength.score === 4 ? 'Good' : 'Strong'}
+                    </span>
+                  </div>
+                  
+                  <div className="text-xs space-y-1">
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.length === true ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      At least 8 characters
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.uppercase ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One uppercase letter
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.lowercase ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One lowercase letter
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.number ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One number
+                    </div>
+                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.special ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className="w-2 h-2 rounded-full bg-current"></span>
+                      One special character
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              )}
+            </div>
 
           <div>
             <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -480,7 +576,7 @@ const RegisterForm: React.FC = () => {
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isLoading}
                 className={`pl-10 pr-10 ${
                   errors.confirmPassword ? "border-red-500" : ""
@@ -514,7 +610,7 @@ const RegisterForm: React.FC = () => {
           id="terms"
           type="checkbox"
           checked={agreeToTerms}
-          onChange={e => setAgreeToTerms(e.target.checked)}
+          onChange={(e) => setAgreeToTerms(e.target.checked)}
           disabled={isLoading}
           className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
         />
@@ -522,9 +618,7 @@ const RegisterForm: React.FC = () => {
           I agree to the Terms of Service and Privacy Policy
         </Label>
       </div>
-      {errors.terms && (
-        <p className="text-red-500 text-xs">{errors.terms}</p>
-      )}
+      {errors.terms && <p className="text-red-500 text-xs">{errors.terms}</p>}
 
       <button
         type="submit"
