@@ -10,52 +10,84 @@ interface TeacherProfile {
   schoolId: number;
   classAssigned: string;
 }
-
+interface ExamSubject {
+  _id: string;
+  name: string;
+}
 interface Student {
   _id: string;
   name: string;
   rollNumber: string;
+  email: string;
   unitTestAvg?: number;
   halfYearlyAvg?: number;
   yearlyAvg?: number;
+}
+interface ExamEntry {
+  studentId: string;
+  studentEmail: string;
+  marks: { subjectId: string; marks: number }[];
 }
 
 export default function TeacherGradebook() {
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [students, setStudents] = useState<Student[]>([]);
-  const [grades, setGrades] = useState<Record<string, { unitTestAvg: number; halfYearlyAvg: number; yearlyAvg: number }>>({});
+  const [examMarks, setExamMarks] = useState<Record<string, Record<string, number>>>({});
+  const [grades, setGrades] = useState<
+    Record<
+      string,
+      { unitTestAvg: number; halfYearlyAvg: number; yearlyAvg: number }
+    >
+  >({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
+  const [savingExam, setSavingExam] = useState(false);
+  const [subjects, setSubjects] = useState<ExamSubject[]>([]);
   useEffect(() => {
-    fetch("http://localhost:3001/api/auth/me", { credentials: "include" })
-      .then(res => res.json())
-      .then((data: TeacherProfile) => {
-        setProfile(data);
-        return data;
-      })
-      .then(data => {
-        return fetch(
-          `http://localhost:3001/api/admin/${data.schoolId}/students?class=${data.classAssigned}`,
+    async function loadAll() {
+      try {
+        const meRes = await fetch("http://localhost:3001/api/auth/me", { credentials: "include" });
+        const meData: TeacherProfile = await meRes.json();
+        setProfile(meData);
+        const stuRes = await fetch(
+          `http://localhost:3001/api/admin/${meData.schoolId}/students?class=${meData.classAssigned}`,
           { credentials: "include" }
         );
-      })
-      .then(res => res.json())
-      .then(data => {
-        setStudents(data.students || []);
-        // initialize grades state
-        const initialGrades: typeof grades = {};
-        (data.students || []).forEach((s: Student) => {
-          initialGrades[s._id] = {
+        const stuJson = await stuRes.json();
+        const stuList: Student[] = stuJson.students || [];
+        setStudents(stuList);
+        setSubjects(stuJson.subjects || []);
+        const initGrades: typeof grades = {};
+        stuList.forEach((s) => {
+          initGrades[s._id] = {
             unitTestAvg: s.unitTestAvg || 0,
             halfYearlyAvg: s.halfYearlyAvg || 0,
             yearlyAvg: s.yearlyAvg || 0,
           };
         });
-        setGrades(initialGrades);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+        setGrades(initGrades);
+        const examRes = await fetch(
+          `http://localhost:3001/api/exams/latest?class=${meData.classAssigned}&section=A&examType=classTest`,
+          { credentials: "include" }
+        );
+        const examJson = await examRes.json();
+        if (examJson.success) {
+          const grid: Record<string, Record<string, number>> = {};
+          examJson.data.forEach((entry: any) => {
+            grid[entry.studentId] = {};
+            entry.marks.forEach((m: any) => {
+              grid[entry.studentId][m.subjectId] = m.marks;
+            });
+          });
+          setExamMarks(grid);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAll();
   }, []);
 
   const handleChange = (
@@ -63,19 +95,55 @@ export default function TeacherGradebook() {
     field: keyof (typeof grades)[string],
     value: number
   ) => {
-    setGrades(prev => ({
+    setGrades((prev) => ({
       ...prev,
-      [studentId]: { ...prev[studentId], [field]: value }
+      [studentId]: { ...prev[studentId], [field]: value },
     }));
   };
-
+  const saveExamMarks = async () => {
+    if (!profile) return;
+    setSavingExam(true);
+    try {
+      const entries: ExamEntry[] = students.map((s) => ({
+        studentId: s._id,
+        studentEmail: s.email,
+        marks: subjects.map((sub) => ({
+          subjectId: sub._id,
+          marks: examMarks[s._id]?.[sub._id] || 0,
+        })),
+      }));
+      await fetch("http://localhost:3001/api/exams/latest", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          class: profile?.classAssigned,
+          section: "A",
+          examType: "classTest",
+          entries,
+        }),
+      });
+      alert("Exam marks saved successfully");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save exam marks");
+    } finally {
+      setSavingExam(false);
+    }
+  };
+    const handleExamChange = (studentId: string, subjectId: string, value: number) => {
+    setExamMarks((prev) => ({
+      ...prev,
+      [studentId]: { ...prev[studentId], [subjectId]: value }
+    }));
+  };
   const saveGrades = async () => {
     if (!profile) return;
     setSaving(true);
     try {
       const payload = Object.entries(grades).map(([studentId, vals]) => ({
         studentId,
-        ...vals
+        ...vals,
       }));
       await fetch("http://localhost:3001/api/grades/bulk-update", {
         method: "PUT",
@@ -83,8 +151,8 @@ export default function TeacherGradebook() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           class: profile.classAssigned,
-          grades: payload
-        })
+          grades: payload,
+        }),
       });
       alert("Grades updated successfully");
     } catch (err) {
@@ -160,10 +228,10 @@ export default function TeacherGradebook() {
               {/* Student Rows */}
               <div className="divide-y divide-gray-200">
                 {students.map((student, index) => (
-                  <div 
-                    key={student._id} 
+                  <div
+                    key={student._id}
                     className={`px-6 py-4 hover:bg-gray-50 transition-colors duration-200 ${
-                      index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
                     }`}
                   >
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 items-center">
@@ -185,9 +253,13 @@ export default function TeacherGradebook() {
                           type="number"
                           min="0"
                           max="100"
-                          value={grades[student._id]?.unitTestAvg || ''}
+                          value={grades[student._id]?.unitTestAvg || ""}
                           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleChange(student._id, "unitTestAvg", Number(e.target.value))
+                            handleChange(
+                              student._id,
+                              "unitTestAvg",
+                              Number(e.target.value)
+                            )
                           }
                           className="text-center font-medium border-blue-200 focus:border-blue-500 focus:ring-blue-500"
                           placeholder="0-100"
@@ -200,9 +272,13 @@ export default function TeacherGradebook() {
                           type="number"
                           min="0"
                           max="100"
-                          value={grades[student._id]?.halfYearlyAvg || ''}
+                          value={grades[student._id]?.halfYearlyAvg || ""}
                           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleChange(student._id, "halfYearlyAvg", Number(e.target.value))
+                            handleChange(
+                              student._id,
+                              "halfYearlyAvg",
+                              Number(e.target.value)
+                            )
                           }
                           className="text-center font-medium border-green-200 focus:border-green-500 focus:ring-green-500"
                           placeholder="0-100"
@@ -215,9 +291,13 @@ export default function TeacherGradebook() {
                           type="number"
                           min="0"
                           max="100"
-                          value={grades[student._id]?.yearlyAvg || ''}
+                          value={grades[student._id]?.yearlyAvg || ""}
                           onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            handleChange(student._id, "yearlyAvg", Number(e.target.value))
+                            handleChange(
+                              student._id,
+                              "yearlyAvg",
+                              Number(e.target.value)
+                            )
                           }
                           className="text-center font-medium border-purple-200 focus:border-purple-500 focus:ring-purple-500"
                           placeholder="0-100"
@@ -232,10 +312,11 @@ export default function TeacherGradebook() {
               <div className="bg-gray-50 px-6 py-6 border-t border-gray-200">
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
                   <div className="text-sm text-gray-600">
-                    📝 {students.length} students • Remember to save your changes
+                    📝 {students.length} students • Remember to save your
+                    changes
                   </div>
-                  <Button 
-                    onClick={saveGrades} 
+                  <Button
+                    onClick={saveGrades}
                     disabled={saving}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
@@ -255,11 +336,63 @@ export default function TeacherGradebook() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Footer Info */}
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>💡 Tip: Grades are automatically validated (0-100). Changes are saved to the database when you click "Save All Grades".</p>
+          <div>
+            <h2 className="text-2xl font-bold mb-4">
+              📋 Class Test Marks Entry(%)
+            </h2>
+            <Card>
+              <CardHeader className="bg-gray-100">
+                <CardTitle>Enter Class Test Marks (0-100)</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <table className="w-full table-auto border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="border p-2">Student</th>
+                      {subjects.map((sub) => (
+                        <th key={sub._id} className="border p-2 text-center">
+                          {sub.name}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {students.map((s) => (
+                      <tr key={s._id} className="hover:bg-gray-50">
+                        <td className="border p-2">
+                          {s.name} (#{s.rollNumber})
+                        </td>
+                        {subjects.map((sub) => (
+                          <td key={sub._id} className="border p-1">
+                            <Input
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={examMarks[s._id]?.[sub._id] ?? ""}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                handleExamChange(
+                                  s._id,
+                                  sub._id,
+                                  Number(e.target.value)
+                                )
+                              }
+                              className="w-full text-center"
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="p-4 border-t flex justify-end">
+                  <Button onClick={saveExamMarks} disabled={savingExam}>
+                    {savingExam ? "Saving..." : "Save Class Test Marks"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
+
         </div>
       </div>
     </TeacherDashboard>

@@ -16,6 +16,7 @@ import teacherDashboardRoutes from "./src/routes/teacherDashboard.js";
 import assignmentRoutes from './src/routes/assignmentRoutes.js';
 import messagingRoutes from "./src/routes/messagingRoutes.js";
 import gradesRoutes from './src/routes/gradesRoutes.js'; 
+import examRoutes from './src/routes/examsRoutes.js';
 const app = express();
 
 // Connect to MongoDB
@@ -45,6 +46,7 @@ app.use("/api/teacher", teacherDashboardRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use("/api", messagingRoutes);
 app.use('/api/grades', gradesRoutes);
+app.use('/api/exams', examRoutes);
 
 const PORT = process.env.PORT || 3001;
 

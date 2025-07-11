@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import Assignment from '../models/Assignment.js';
+import mongoose from 'mongoose';
 export const createAssignment = asyncHandler(async (req, res) => {
   const { title, subject, className, description, dueDate ,sec } = req.body;
   if (!title || !subject || !className) {
@@ -44,4 +45,25 @@ export const getAssignments = asyncHandler(async (req, res) => {
 
   const list = await Assignment.find(filter).sort('-createdAt');
   res.json(list);
+});
+
+
+export const deleteAssignment = asyncHandler(async (req, res) => {
+  const assignmentId = req.params.id;
+  if (!assignmentId || !mongoose.Types.ObjectId.isValid(assignmentId)) {
+    res.status(400);
+    throw new Error('Invalid assignment ID provided.');
+  }
+  const assignment = await Assignment.findById(assignmentId);
+  if (!assignment) {
+    res.status(404);
+    throw new Error('Assignment not found.');
+  }
+  if (assignment.createdBy.toString() !== req.user._id.toString()) {
+    res.status(403); 
+    throw new Error('Not authorized to delete this assignment.');
+  }
+  await assignment.deleteOne(); 
+
+  res.status(200).json({ message: 'Assignment deleted successfully.' });
 });
