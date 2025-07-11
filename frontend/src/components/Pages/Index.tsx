@@ -10,8 +10,6 @@ import {
   Clock,
   Target,
   BarChart3,
-  CheckCircle,
-  XCircle,
   RefreshCw,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -63,18 +61,20 @@ interface Subject {
 }
 
 interface StudentInfo {
+  _id: string;
   name: string;
   class: string;
   section: string;
   rollNumber: string;
   email: string;
 }
-
-interface AttendanceData {
-  presentDays: number;
-  totalDays: number;
-  attendancePercentage: number;
-  monthlyRecord: boolean[];
+interface ExamMark {
+  subjectId: string;
+  marks: number;
+}
+interface LatestExamEntry {
+  studentId: string;
+  marks: ExamMark[];
 }
 
 interface PerformanceStats {
@@ -87,20 +87,18 @@ interface PerformanceStats {
 const StudentDashboard = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [attendanceData, setAttendanceData] = useState<AttendanceData | null>(
-    null
-  );
   const [performanceStats, setPerformanceStats] =
     useState<PerformanceStats | null>(null);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [loadingStudentInfo, setLoadingStudentInfo] = useState(true);
+  const [latestExam, setLatestExam] = useState<LatestExamEntry | null>(null);
+  const [loadingExam, setLoadingExam] = useState(true);
   const {
     isAuthenticated,
     userRole,
     schoolId: ctxSchoolId,
     loading,
   } = useAuth();
-  const [loadingAttendance, setLoadingAttendance] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -165,6 +163,7 @@ const StudentDashboard = () => {
       console.error("Error fetching student info:", err);
       // Fallback data for demo
       setStudentInfo({
+        _id: "demo-student-id",
         name: "John Doe",
         class: "12th",
         section: "A",
@@ -176,73 +175,54 @@ const StudentDashboard = () => {
     }
   };
 
-  const fetchAttendance = async () => {
-    try {
-      setLoadingAttendance(true);
-      const response = await fetch(
-        "http://localhost:3001/api/students/attendance/me",
-        {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setAttendanceData(data.data);
-      } else {
-        // Fallback data
-        setAttendanceData({
-          presentDays: 18,
-          totalDays: 20,
-          attendancePercentage: 90,
-          monthlyRecord: Array.from(
-            { length: 20 },
-            (_, i) => i !== 7 && i !== 14
-          ),
-        });
-      }
-    } catch (err: any) {
-      console.error("Error fetching attendance:", err);
-      // Fallback data
-      setAttendanceData({
-        presentDays: 18,
-        totalDays: 20,
-        attendancePercentage: 90,
-        monthlyRecord: Array.from(
-          { length: 20 },
-          (_, i) => i !== 7 && i !== 14
-        ),
-      });
-    } finally {
-      setLoadingAttendance(false);
-    }
-  };
-
-  // Initialize data on component mount
   useEffect(() => {
-    const initializeData = async () => {
-      await Promise.all([
-        fetchSubjects(),
-        fetchStudentInfo(),
-        fetchAttendance(),
-      ]);
-
-      // Set mock performance stats
-      setPerformanceStats({
-        averageScore: 89.5,
-        totalTests: 24,
-        rank: 5,
-        improvement: 12,
-      });
-    };
-
-    initializeData();
+    Promise.all([fetchSubjects(), fetchStudentInfo()]);
   }, []);
+
+  useEffect(() => {
+    if (!studentInfo) return;
+
+    setLoadingExam(true);
+    fetch(
+      `http://localhost:3001/api/exams/latest?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data.length) {
+          const myEntry = (json.data as LatestExamEntry[]).find(
+            (e) => e.studentId === studentInfo._id
+          );
+          setLatestExam(myEntry || null);
+        }
+      })
+      .catch((err) => console.error("Failed to load latest exam:", err))
+      .finally(() => setLoadingExam(false));
+  }, [studentInfo]);
+
+  useEffect(() => {
+    if (!studentInfo) return;
+
+    setLoadingExam(true);
+    fetch(
+      `http://localhost:3001/api/exams/latest?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
+      { credentials: "include" }
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && json.data.length) {
+          const myEntry = (json.data as LatestExamEntry[]).find(
+            (e) => e.studentId === studentInfo._id
+          );
+          setLatestExam(myEntry || null);
+        }
+      })
+      .catch((err) => console.error("Failed to load latest exam:", err))
+      .finally(() => setLoadingExam(false));
+  }, [studentInfo]);
   const refreshData = () => {
     fetchSubjects();
     fetchStudentInfo();
-    fetchAttendance();
   };
   useEffect(() => {
     if (!loading) {
@@ -381,57 +361,11 @@ const StudentDashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {subject.name}
                 </h3>
-                <p className="text-sm text-gray-500">{subject.code}</p>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            {subject.grade && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">
-                  Current Grade
-                </span>
-                <span className="px-2 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded">
-                  {subject.grade}
-                </span>
-              </div>
-            )}
-
-            {subject.teacher && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">
-                  Teacher
-                </span>
-                <span className="text-sm text-gray-900">{subject.teacher}</span>
-              </div>
-            )}
-
-            {subject.completedAssignments && subject.totalAssignments && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600">
-                    Assignments
-                  </span>
-                  <span className="text-sm text-gray-900">
-                    {subject.completedAssignments}/{subject.totalAssignments}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                    style={{
-                      width: `${
-                        (subject.completedAssignments /
-                          subject.totalAssignments) *
-                        100
-                      }%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-            )}
-
             {subject.nextTest && (
               <div className="flex items-center space-x-2 text-sm text-gray-600 bg-yellow-50 p-2 rounded-lg border border-yellow-200">
                 <Calendar className="h-4 w-4" />
@@ -444,139 +378,58 @@ const StudentDashboard = () => {
     </div>
   );
 
-  // Attendance Card
-  const AttendanceCard = ({
-    attendanceData,
-  }: {
-    attendanceData: AttendanceData;
-  }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <Calendar className="h-6 w-6 text-blue-500" />
-          <h2 className="text-xl font-semibold text-gray-900">
-            Monthly Attendance
-          </h2>
-        </div>
-        <div className="flex items-center space-x-2">
-          <span className="text-sm font-medium text-gray-600">
-            {attendanceData.presentDays}/{attendanceData.totalDays} days
-          </span>
-          <span
-            className={`px-2 py-1 text-sm font-semibold rounded ${
-              attendanceData.attendancePercentage >= 90
-                ? "bg-green-100 text-green-800"
-                : attendanceData.attendancePercentage >= 75
-                ? "bg-yellow-100 text-yellow-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {attendanceData.attendancePercentage}%
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className="bg-blue-500 h-3 rounded-full transition-all duration-300"
-            style={{ width: `${attendanceData.attendancePercentage}%` }}
-          ></div>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {attendanceData.monthlyRecord.map((isPresent, i) => (
-            <div
-              key={i}
-              className={`w-10 h-10 flex items-center justify-center rounded-lg text-xs font-bold transition-all hover:scale-105 ${
-                isPresent
-                  ? "bg-green-100 text-green-700 border-2 border-green-200"
-                  : "bg-red-100 text-red-700 border-2 border-red-200"
-              }`}
-            >
-              {isPresent ? (
-                <CheckCircle className="h-4 w-4" />
-              ) : (
-                <XCircle className="h-4 w-4" />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {attendanceData.attendancePercentage < 75 && (
-          <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-            <div className="flex items-center space-x-2 text-sm text-red-800">
-              <AlertCircle className="h-4 w-4" />
-              <span className="font-medium">
-                ⚠️ Attendance below 75% may affect academic standing
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
   // Performance Chart
-  const PerformanceChart = () => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center space-x-3 mb-4">
-        <BarChart3 className="h-6 w-6 text-blue-500" />
-        <h2 className="text-xl font-semibold text-gray-900">
-          Performance Trend
-        </h2>
-      </div>
-      <div className="h-64 flex items-end justify-between space-x-2">
-        {mockPerformanceHistory.map((data, index) => (
-          <div key={index} className="flex-1 flex flex-col items-center">
-            <div
-              className="w-full bg-blue-500 rounded-t-lg transition-all duration-300 hover:bg-blue-600"
-              style={{ height: `${(data.score / 100) * 200}px` }}
-            ></div>
-            <span className="text-xs text-gray-600 mt-2">{data.month}</span>
-            <span className="text-xs font-semibold text-gray-900">
-              {data.score}%
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  const PerformanceChart = () => {
+    if (loadingExam)
+      return <LoadingCard message="Loading class test data..." />;
+    if (!latestExam) return <p>No class test data available.</p>;
 
-  const RecentTests = () => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center space-x-3 mb-4">
-        <Clock className="h-6 w-6 text-blue-500" />
-        <h2 className="text-xl font-semibold text-gray-900">Recent Tests</h2>
+    return (
+      <div className="bg-white rounded-lg p-6">
+        {/* header… */}
+        <div className="h-64 flex items-end space-x-4">
+          {subjects.map((s) => {
+            const markObj = latestExam.marks.find((m) => m.subjectId === s.id);
+            const score = markObj?.marks ?? 0;
+            return (
+              <div key={s.id} className="flex-1 flex flex-col items-center">
+                <div
+                  className="w-full bg-blue-500 rounded-t-lg"
+                  style={{ height: `${(score / 100) * 200}px` }}
+                />
+                <span className="text-xs text-gray-600 mt-2">{s.name}</span>
+                <span className="text-xs font-semibold text-gray-900">
+                  {score}%
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="space-y-3">
-        {mockRecentTests.map((test) => (
-          <div
-            key={test.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-          >
-            <div>
-              <p className="font-medium text-gray-900">{test.subject}</p>
-              <p className="text-sm text-gray-500">
-                {test.type} • {test.date}
-              </p>
-            </div>
-            <span
-              className={`px-3 py-1 text-sm font-semibold rounded ${
-                test.score >= 90
-                  ? "bg-green-100 text-green-800"
-                  : test.score >= 75
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {test.score}%
-            </span>
-          </div>
-        ))}
+    );
+  };
+
+  const RecentTests = () => {
+    if (loadingExam) return <LoadingCard message="Loading recent test data…" />;
+    if (!latestExam) return <p>No recent test data.</p>;
+
+    return (
+      <div className="bg-white rounded-lg p-6">
+        {/* header… */}
+        <ul className="space-y-2">
+          {latestExam.marks.map((m) => {
+            const subj = subjects.find((s) => s.id === m.subjectId);
+            return (
+              <li key={m.subjectId} className="flex justify-between">
+                <span>{subj?.name || m.subjectId}</span>
+                <span className="font-semibold">{m.marks}%</span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -629,17 +482,6 @@ const StudentDashboard = () => {
               <ErrorCard message={error} />
             ) : (
               <SubjectCards subjects={subjects} />
-            )}
-          </div>
-
-          {/* Attendance */}
-          <div>
-            {loadingAttendance ? (
-              <LoadingCard message="Loading attendance data..." />
-            ) : (
-              attendanceData && (
-                <AttendanceCard attendanceData={attendanceData} />
-              )
             )}
           </div>
         </div>

@@ -36,7 +36,6 @@ const StudentsDiscussionPage: React.FC = () => {
       .catch((err) => setError(err.message));
   }, []);
 
-  // 2) Fetch discussions whenever subject changes
   useEffect(() => {
     if (!selectedSubject) return;
     setLoading(true);

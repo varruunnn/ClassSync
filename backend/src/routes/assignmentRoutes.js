@@ -4,6 +4,7 @@ import authorizeTeacher from '../middlewares/authorizeTeacher.js';
 import { uploadPDF } from '../middlewares/upload.js';
 import {
   createAssignment,
+  deleteAssignment,
   getAssignments,
 } from '../controllers/assignmentController.js';
 
@@ -16,6 +17,12 @@ router.post(
   authorizeTeacher,
   uploadPDF.single("file"),    
   createAssignment
+);
+router.delete(
+  "/:id", 
+  protect,
+  authorizeTeacher, 
+  deleteAssignment
 );
 
 export default router;
