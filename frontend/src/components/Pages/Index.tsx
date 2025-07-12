@@ -2,46 +2,24 @@ import { useEffect, useState } from "react";
 import {
   AlertCircle,
   BookOpen,
-  Calendar,
   User,
   GraduationCap,
   TrendingUp,
-  Award,
-  Clock,
   Target,
   BarChart3,
   RefreshCw,
+  CheckCircle,
+  Star,
+  BookMarked,
+  Trophy,
+  Activity,
+  FileText,
+  Medal
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-const mockPerformanceHistory = [
-  { month: "Jan", score: 85 },
-  { month: "Feb", score: 88 },
-  { month: "Mar", score: 92 },
-  { month: "Apr", score: 87 },
-  { month: "May", score: 94 },
-  { month: "Jun", score: 91 },
-];
 
-const mockRecentTests = [
-  {
-    id: 1,
-    subject: "Mathematics",
-    score: 94,
-    date: "2024-06-15",
-    type: "Quiz",
-  },
-  { id: 2, subject: "Physics", score: 87, date: "2024-06-12", type: "Test" },
-  {
-    id: 3,
-    subject: "Chemistry",
-    score: 91,
-    date: "2024-06-10",
-    type: "Assignment",
-  },
-];
 
-// Interfaces
 interface ApiSubject {
   _id: string;
   name: string;
@@ -161,7 +139,6 @@ const StudentDashboard = () => {
       setStudentInfo(data.data);
     } catch (err: any) {
       console.error("Error fetching student info:", err);
-      // Fallback data for demo
       setStudentInfo({
         _id: "demo-student-id",
         name: "John Doe",
@@ -234,55 +211,51 @@ const StudentDashboard = () => {
 
   // Loading Component
   const LoadingCard = ({ message }: { message: string }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center space-x-3">
-        <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
-        <span className="text-gray-600">{message}</span>
+        <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+        <span className="text-gray-600 font-medium">{message}</span>
       </div>
     </div>
   );
 
   // Error Component
   const ErrorCard = ({ message }: { message: string }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-red-200 p-6">
+   <div className="bg-white rounded-2xl shadow-sm border border-red-100 p-6">
       <div className="flex items-center space-x-3 text-red-600">
-        <AlertCircle className="h-5 w-5" />
-        <span>Error: {message}</span>
+        <AlertCircle className="h-6 w-6" />
+        <span className="font-medium">Error: {message}</span>
       </div>
     </div>
   );
-
   // Student Info Card
   const StudentInfoCard = ({ studentInfo }: { studentInfo: StudentInfo }) => (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <div className="flex items-center space-x-3 mb-4">
-        <User className="h-6 w-6 text-blue-500" />
-        <h2 className="text-xl font-semibold text-gray-900">Student Profile</h2>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div>
-          <p className="text-sm font-medium text-gray-500">Name</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {studentInfo.name}
-          </p>
+     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-sm border border-blue-100 p-8 mb-8">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
+            <User className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Welcome back, {studentInfo.name}!</h2>
+            <p className="text-blue-600 font-medium">Ready to ace your studies today?</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-gray-500">Class</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {studentInfo.class}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-500">Section</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {studentInfo.section}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-medium text-gray-500">Roll Number</p>
-          <p className="text-lg font-semibold text-gray-900">
-            {studentInfo.rollNumber}
-          </p>
+        <div className="text-right">
+          <div className="flex items-center space-x-6">
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-500">Class</p>
+              <p className="text-xl font-bold text-gray-900">{studentInfo.class}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-500">Section</p>
+              <p className="text-xl font-bold text-gray-900">{studentInfo.section}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-gray-500">Roll No.</p>
+              <p className="text-xl font-bold text-gray-900">{studentInfo.rollNumber}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -290,88 +263,102 @@ const StudentDashboard = () => {
 
   // Performance Stats Cards
   const PerformanceStatsCards = ({ stats }: { stats: PerformanceStats }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-blue-100 rounded-lg">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-3 bg-blue-100 rounded-xl">
             <TrendingUp className="h-6 w-6 text-blue-600" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Average Score</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats.averageScore}%
-            </p>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-gray-900">{stats.averageScore}%</div>
+            <div className="text-sm text-gray-500 font-medium">Average Score</div>
           </div>
         </div>
+        <div className="w-full bg-gray-100 rounded-full h-2">
+          <div 
+            className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${stats.averageScore}%` }}
+          ></div>
+        </div>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-100 rounded-lg">
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-3 bg-green-100 rounded-xl">
             <Target className="h-6 w-6 text-green-600" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Total Tests</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {stats.totalTests}
-            </p>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-gray-900">{stats.totalTests}</div>
+            <div className="text-sm text-gray-500 font-medium">Tests Taken</div>
           </div>
         </div>
-      </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-purple-100 rounded-lg">
-            <Award className="h-6 w-6 text-purple-600" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Class Rank</p>
-            <p className="text-2xl font-bold text-gray-900">#{stats.rank}</p>
-          </div>
+        <div className="flex items-center space-x-2 text-green-600">
+          <CheckCircle className="h-4 w-4" />
+          <span className="text-sm font-medium">All completed</span>
         </div>
       </div>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-orange-100 rounded-lg">
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-3 bg-purple-100 rounded-xl">
+            <Trophy className="h-6 w-6 text-purple-600" />
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-gray-900">#{stats.rank}</div>
+            <div className="text-sm text-gray-500 font-medium">Class Rank</div>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2 text-purple-600">
+          <Medal className="h-4 w-4" />
+          <span className="text-sm font-medium">Top performer</span>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-3 bg-orange-100 rounded-xl">
             <BarChart3 className="h-6 w-6 text-orange-600" />
           </div>
-          <div>
-            <p className="text-sm font-medium text-gray-500">Improvement</p>
-            <p className="text-2xl font-bold text-gray-900">
-              +{stats.improvement}%
-            </p>
+          <div className="text-right">
+            <div className="text-3xl font-bold text-gray-900">+{stats.improvement}%</div>
+            <div className="text-sm text-gray-500 font-medium">Improvement</div>
           </div>
+        </div>
+        <div className="flex items-center space-x-2 text-orange-600">
+          <Activity className="h-4 w-4" />
+          <span className="text-sm font-medium">Great progress!</span>
         </div>
       </div>
     </div>
   );
 
+
   // Subject Cards
   const SubjectCards = ({ subjects }: { subjects: Subject[] }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {subjects.map((subject) => (
         <div
           key={subject.id}
-          className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BookOpen className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
+                <BookOpen className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {subject.name}
-                </h3>
+                <h3 className="text-lg font-bold text-gray-900">{subject.name}</h3>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3">
-            {subject.nextTest && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600 bg-yellow-50 p-2 rounded-lg border border-yellow-200">
-                <Calendar className="h-4 w-4" />
-                <span>{subject.nextTest}</span>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm font-medium text-gray-700">Assignments</span>
               </div>
-            )}
+            </div>
           </div>
         </div>
       ))}
@@ -380,27 +367,41 @@ const StudentDashboard = () => {
 
   // Performance Chart
   const PerformanceChart = () => {
-    if (loadingExam)
-      return <LoadingCard message="Loading class test data..." />;
-    if (!latestExam) return <p>No class test data available.</p>;
+     if (loadingExam) return <LoadingCard message="Loading performance data..." />;
+    if (!latestExam) return <div className="text-center py-8 text-gray-500">No performance data available.</div>;
 
     return (
-      <div className="bg-white rounded-lg p-6">
-        {/* header… */}
-        <div className="h-64 flex items-end space-x-4">
-          {subjects.map((s) => {
-            const markObj = latestExam.marks.find((m) => m.subjectId === s.id);
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <BarChart3 className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Latest Test Performance</h3>
+              <p className="text-sm text-gray-500">Your scores across all subjects</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="h-80 flex items-end justify-between space-x-3">
+          {subjects.map((subject) => {
+            const markObj = latestExam.marks.find((m) => m.subjectId === subject.id);
             const score = markObj?.marks ?? 0;
+            const height = (score / 100) * 250;
+            
             return (
-              <div key={s.id} className="flex-1 flex flex-col items-center">
-                <div
-                  className="w-full bg-blue-500 rounded-t-lg"
-                  style={{ height: `${(score / 100) * 200}px` }}
-                />
-                <span className="text-xs text-gray-600 mt-2">{s.name}</span>
-                <span className="text-xs font-semibold text-gray-900">
-                  {score}%
-                </span>
+              <div key={subject.id} className="flex-1 flex flex-col items-center">
+                <div className="w-full flex flex-col items-center">
+                  <div className="text-xs font-semibold text-gray-900 mb-2">{score}%</div>
+                  <div
+                    className="w-full bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-xl transition-all duration-1000 hover:from-blue-600 hover:to-blue-500"
+                    style={{ height: `${height}px`, minHeight: '20px' }}
+                  ></div>
+                </div>
+                <div className="mt-3 text-center">
+                  <div className="text-xs font-medium text-gray-900 mb-1">{subject.name}</div>
+                </div>
               </div>
             );
           })}
@@ -410,50 +411,72 @@ const StudentDashboard = () => {
   };
 
   const RecentTests = () => {
-    if (loadingExam) return <LoadingCard message="Loading recent test data…" />;
-    if (!latestExam) return <p>No recent test data.</p>;
+    if (loadingExam) return <LoadingCard message="Loading recent tests..." />;
+    if (!latestExam) return <div className="text-center py-8 text-gray-500">No recent test data.</div>;
 
     return (
-      <div className="bg-white rounded-lg p-6">
-        {/* header… */}
-        <ul className="space-y-2">
-          {latestExam.marks.map((m) => {
-            const subj = subjects.find((s) => s.id === m.subjectId);
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-green-100 rounded-xl">
+              <FileText className="h-6 w-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">Recent Test Scores</h3>
+              <p className="text-sm text-gray-500">Your latest examination results</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="space-y-4">
+          {latestExam.marks.map((mark) => {
+            const subject = subjects.find((s) => s.id === mark.subjectId);
             return (
-              <li key={m.subjectId} className="flex justify-between">
-                <span>{subj?.name || m.subjectId}</span>
-                <span className="font-semibold">{m.marks}%</span>
-              </li>
+              <div key={mark.subjectId} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-blue-50 rounded-lg">
+                    <BookMarked className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">{subject?.name || mark.subjectId}</div>
+                    <div className="text-sm text-gray-500">{subject?.teacher}</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-gray-900">{mark.marks}%</div>
+                  </div>
+                  {mark.marks >= 90 && <Star className="h-5 w-5 text-yellow-500" />}
+                </div>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back{studentInfo?.name ? `, ${studentInfo.name}` : ""}!
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Here's what's happening with your studies today.
-            </p>
-          </div>
           <div className="flex items-center space-x-4">
-            <button
-              onClick={refreshData}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </button>
-            <GraduationCap className="h-8 w-8 text-blue-500" />
+            <div className="p-3 bg-blue-100 rounded-2xl">
+              <GraduationCap className="h-8 w-8 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
+              <p className="text-gray-600 mt-1">Track your academic progress and stay organized</p>
+            </div>
           </div>
+          <button
+            onClick={refreshData}
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <RefreshCw className="h-5 w-5" />
+            <span className="font-medium">Refresh</span>
+          </button>
         </div>
 
         {/* Student Info */}
@@ -467,14 +490,20 @@ const StudentDashboard = () => {
         {performanceStats && <PerformanceStatsCards stats={performanceStats} />}
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
           {/* Subjects */}
           <div className="lg:col-span-2">
-            <div className="flex items-center space-x-3 mb-4">
-              <BookOpen className="h-6 w-6 text-blue-500" />
-              <h2 className="text-2xl font-semibold text-gray-900">
-                My Subjects
-              </h2>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <BookOpen className="h-7 w-7 text-blue-600" />
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">My Subjects</h2>
+                  <p className="text-gray-500">Track your progress across all subjects</p>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500">
+                {subjects.length} subjects enrolled
+              </div>
             </div>
             {loadingSubjects ? (
               <LoadingCard message="Loading subjects..." />
@@ -484,10 +513,16 @@ const StudentDashboard = () => {
               <SubjectCards subjects={subjects} />
             )}
           </div>
+
+          {/* Side Panel */}
+          <div className="space-y-6">
+            <RecentTests />
+          </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Performance Chart */}
+        <div className="mb-8">
           <PerformanceChart />
-          <RecentTests />
         </div>
       </div>
     </div>
