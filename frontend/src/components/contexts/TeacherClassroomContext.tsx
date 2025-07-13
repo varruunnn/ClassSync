@@ -48,8 +48,8 @@ export const TeacherClassroomProvider: React.FC<
 > = ({ children }) => {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [selected, setSelected] = useState<Classroom | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [_loading, setLoading] = useState(true);
+  const [_error, setError] = useState<string | null>(null);
   useEffect(() => {
     const fetchMe = async () => {
       setLoading(true);
