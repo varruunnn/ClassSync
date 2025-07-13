@@ -12,6 +12,7 @@ import {
   Upload,
   X,
   File,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -56,10 +57,8 @@ const TeacherAssignments = () => {
     dueDate: "",
     topics: "",
     schoolId: 1,
-    createdBy: "6847354b34eb2262bfabd594", // You might want to get this from user context
+    createdBy: "6847354b34eb2262bfabd594", 
   });
-
-  // Fetch assignments from API
   useEffect(() => {
     fetchAssignments();
   }, []);
@@ -81,11 +80,22 @@ const TeacherAssignments = () => {
       setLoading(false);
     }
   };
-
+  const deleteAssignment = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this assignment?")) return;
+    try {
+      const res = await fetch(`http://localhost:3001/api/assignments/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      setAssignments(prev => prev.filter(a => a._id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Delete error");
+    }
+  };
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Check if file is PDF
       if (file.type !== "application/pdf") {
         alert("Please select a PDF file only");
         return;
@@ -94,14 +104,16 @@ const TeacherAssignments = () => {
         alert("File size must be less than 10MB");
         return;
       }
-      
+
       setSelectedFile(file);
     }
   };
 
   const removeSelectedFile = () => {
     setSelectedFile(null);
-    const fileInput = document.getElementById("assignment-file") as HTMLInputElement;
+    const fileInput = document.getElementById(
+      "assignment-file"
+    ) as HTMLInputElement;
     if (fileInput) {
       fileInput.value = "";
     }
@@ -177,8 +189,6 @@ const TeacherAssignments = () => {
       const createdAssignment = await response.json();
       setAssignments((prev) => [...prev, createdAssignment]);
       setShowNewAssignmentDialog(false);
-      
-      // Reset form
       setNewAssignment({
         title: "",
         subject: "",
@@ -191,9 +201,11 @@ const TeacherAssignments = () => {
         createdBy: "6847354b34eb2262bfabd594",
       });
       setSelectedFile(null);
-      
     } catch (err) {
-      alert("Error creating assignment: " + (err instanceof Error ? err.message : "Unknown error"));
+      alert(
+        "Error creating assignment: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
     } finally {
       setIsCreating(false);
     }
@@ -289,14 +301,6 @@ const TeacherAssignments = () => {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-            <Button variant="outline">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
             <Dialog
               open={showNewAssignmentDialog}
               onOpenChange={setShowNewAssignmentDialog}
@@ -421,7 +425,9 @@ const TeacherAssignments = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="assignment-file">Assignment File (PDF)</Label>
+                    <Label htmlFor="assignment-file">
+                      Assignment File (PDF)
+                    </Label>
                     <div className="mt-2">
                       {!selectedFile ? (
                         <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
@@ -440,7 +446,9 @@ const TeacherAssignments = () => {
                             type="button"
                             variant="outline"
                             onClick={() =>
-                              document.getElementById("assignment-file")?.click()
+                              document
+                                .getElementById("assignment-file")
+                                ?.click()
                             }
                           >
                             Choose File
@@ -456,7 +464,8 @@ const TeacherAssignments = () => {
                                   {selectedFile.name}
                                 </p>
                                 <p className="text-xs text-gray-500">
-                                  {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                                  {(selectedFile.size / 1024 / 1024).toFixed(2)}{" "}
+                                  MB
                                 </p>
                               </div>
                             </div>
@@ -485,7 +494,7 @@ const TeacherAssignments = () => {
                     >
                       Cancel
                     </Button>
-                    <Button 
+                    <Button
                       onClick={handleCreateAssignment}
                       disabled={isCreating}
                     >
@@ -571,7 +580,9 @@ const TeacherAssignments = () => {
                   <div className="mb-4">
                     <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
                       <File className="h-4 w-4 text-red-500" />
-                      <span className="text-sm font-medium">Assignment File</span>
+                      <span className="text-sm font-medium">
+                        Assignment File
+                      </span>
                       <a
                         href={`http://localhost:3001${assignment.fileUrl}`}
                         target="_blank"
@@ -601,14 +612,12 @@ const TeacherAssignments = () => {
                 )}
 
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" variant="outline">
-                    Edit
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    Grade
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    View Details
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => deleteAssignment(assignment._id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete
                   </Button>
                 </div>
               </CardContent>

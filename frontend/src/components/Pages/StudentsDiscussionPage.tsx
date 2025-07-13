@@ -36,7 +36,6 @@ const StudentsDiscussionPage: React.FC = () => {
       .catch((err) => setError(err.message));
   }, []);
 
-  // 2) Fetch discussions whenever subject changes
   useEffect(() => {
     if (!selectedSubject) return;
     setLoading(true);
@@ -80,10 +79,26 @@ const StudentsDiscussionPage: React.FC = () => {
       setQuestion("");
       setContact("");
       setError(null);
+      window.location.reload();
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+  const deleteDiscussion = async (discussionId: string) => {
+    try {
+      const res = await fetch(
+        `http://localhost:3001/api/students/discussions/${discussionId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!res.ok) throw new Error("Failed to delete");
+      setDiscussions((prev) => prev.filter((d) => d._id !== discussionId));
+    } catch (err: any) {
+      setError(err.message);
     }
   };
 
@@ -109,7 +124,9 @@ const StudentsDiscussionPage: React.FC = () => {
             <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
               <span className="text-purple-600 text-xl">📚</span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-800">Select Subject</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Select Subject
+            </h2>
           </div>
           <select
             className="w-full border-2 border-gray-300 rounded-lg p-3 text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white"
@@ -130,9 +147,11 @@ const StudentsDiscussionPage: React.FC = () => {
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
               <span className="text-green-600 text-xl">✏️</span>
             </div>
-            <h2 className="text-xl font-semibold text-gray-800">Ask a Question</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Ask a Question
+            </h2>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -146,7 +165,7 @@ const StudentsDiscussionPage: React.FC = () => {
                 onChange={(e) => setQuestion(e.target.value)}
               />
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Contact Information (Optional)
@@ -158,7 +177,7 @@ const StudentsDiscussionPage: React.FC = () => {
                 onChange={(e) => setContact(e.target.value)}
               />
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 items-start">
               <button
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2"
@@ -177,7 +196,7 @@ const StudentsDiscussionPage: React.FC = () => {
                   </>
                 )}
               </button>
-              
+
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
                   <span className="text-red-500 text-sm">⚠️</span>
@@ -206,11 +225,12 @@ const StudentsDiscussionPage: React.FC = () => {
                 </h2>
               </div>
               <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                {discussions.length} {discussions.length === 1 ? 'question' : 'questions'}
+                {discussions.length}{" "}
+                {discussions.length === 1 ? "question" : "questions"}
               </div>
             </div>
           </div>
-          
+
           <div className="p-6">
             {loading && (
               <div className="flex items-center justify-center py-12">
@@ -220,15 +240,19 @@ const StudentsDiscussionPage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {!loading && discussions.length === 0 && (
               <div className="text-center py-12 space-y-3">
                 <div className="text-6xl">🤔</div>
-                <h3 className="text-lg font-medium text-gray-700">No discussions yet</h3>
-                <p className="text-gray-500">Be the first to ask a question in this subject!</p>
+                <h3 className="text-lg font-medium text-gray-700">
+                  No discussions yet
+                </h3>
+                <p className="text-gray-500">
+                  Be the first to ask a question in this subject!
+                </p>
               </div>
             )}
-            
+
             {!loading && discussions.length > 0 && (
               <div className="space-y-4">
                 {discussions.map((d, index) => (
@@ -242,22 +266,26 @@ const StudentsDiscussionPage: React.FC = () => {
                           {d.author.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <h4 className="font-semibold text-gray-800">{d.author.name}</h4>
+                          <h4 className="font-semibold text-gray-800">
+                            {d.author.name}
+                          </h4>
                           <span className="text-xs text-gray-500 bg-white px-2 py-1 rounded-full">
-                            {new Date(d.createdAt).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
+                            {new Date(d.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </span>
                         </div>
-                        
-                        <p className="text-gray-700 leading-relaxed mb-3">{d.question}</p>
-                        
+
+                        <p className="text-gray-700 leading-relaxed mb-3">
+                          {d.question}
+                        </p>
+
                         {d.contactInfo && (
                           <div className="flex items-center gap-2 text-sm">
                             <span className="text-gray-500">📧</span>
@@ -266,6 +294,18 @@ const StudentsDiscussionPage: React.FC = () => {
                             </span>
                           </div>
                         )}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <span>💬</span>
+                          </div>
+                          <button
+                            onClick={() => deleteDiscussion(d._id)}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all duration-200"
+                            title="Delete discussion"
+                          >
+                            <span className="text-lg">🗑️</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -277,7 +317,10 @@ const StudentsDiscussionPage: React.FC = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>💡 Tip: Use clear, specific questions to get better responses from your classmates</p>
+          <p>
+            💡 Tip: Use clear, specific questions to get better responses from
+            your classmates
+          </p>
         </div>
       </div>
     </div>

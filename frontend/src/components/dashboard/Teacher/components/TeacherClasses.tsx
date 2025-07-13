@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, Save, CheckCircle, UserCheck, BookOpen, TrendingUp } from "lucide-react";
+import { Users, BookOpen, UserCheck, Mail, Phone, Hash, User, GraduationCap } from "lucide-react";
 
 interface TeacherProfile {
   name: string;
@@ -16,10 +16,20 @@ interface TeacherProfile {
   classAssigned: string;
 }
 
-interface Student {
+interface StudentSummary {
   _id: string;
   name: string;
   rollNumber: string;
+}
+
+interface StudentDetail {
+  _id: string;
+  name: string;
+  email: string;
+  class: string;
+  section: string;
+  rollNumber: string;
+  parentContact: string;
 }
 
 export default function TeacherClasses() {
@@ -28,72 +38,60 @@ export default function TeacherClasses() {
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [sections] = useState<string[]>(["A", "B", "C", "D"]);
   const [selectedSection, setSelectedSection] = useState<string>("");
-  const [students, setStudents] = useState<Student[]>([]);
-  const [attendance, setAttendance] = useState<Record<string, boolean>>({});
+  const [students, setStudents] = useState<StudentSummary[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<StudentDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [success, setSuccess] = useState("");
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => setSuccess(""), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success]);
   useEffect(() => {
     setIsLoading(true);
     fetch("http://localhost:3001/api/auth/me", { credentials: "include" })
-      .then((res) => res.json())
+      .then(res => res.json())
       .then((data: TeacherProfile) => {
         setProfile(data);
-        const classes = Array.from(
-          new Set([...(data.classes || []), data.classAssigned])
-        );
+        const classes = Array.from(new Set([...(data.classes || []), data.classAssigned]));
         setAllClasses(classes);
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
+
   useEffect(() => {
     if (!selectedClass || !selectedSection || !profile) return;
-
+    setSelectedStudent(null);
     setIsLoading(true);
+    const schoolId = profile.schoolId;
     fetch(
-      `http://localhost:3001/api/admin/${profile.schoolId}/students?class=${selectedClass}&section=${selectedSection}`,
+      `http://localhost:3001/api/admin/${schoolId}/students?class=${selectedClass}&section=${selectedSection}`,
       { credentials: "include" }
     )
-      .then((res) => res.json())
+      .then(res => res.json())
       .then((data) => {
         setStudents(data.students || []);
-        const initial: Record<string, boolean> = {};
-        (data.students || []).forEach((s: Student) => {
-          initial[s._id] = false;
-        });
-        setAttendance(initial);
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, [selectedClass, selectedSection, profile]);
 
-  const toggleAttendance = (studentId: string) => {
-    setAttendance((prev) => ({ ...prev, [studentId]: !prev[studentId] }));
+  const handleStudentClick = (studentId: string) => {
+    if (!profile) return;
+    setIsLoadingDetail(true);
+    const schoolId = profile.schoolId;
+    fetch(
+      `http://localhost:3001/api/admin/${schoolId}/students/${studentId}`,
+      { credentials: "include" }
+    )
+      .then(res => res.json())
+      .then((data) => {
+        setSelectedStudent(data.student);
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingDetail(false));
   };
-
-  const saveAttendance = async () => {
-    setIsSaving(true);
-    console.log("Saving attendance for class", selectedClass, selectedSection, attendance);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSuccess("Attendance saved successfully!");
-    setIsSaving(false);
-  };
-
-  const presentCount = Object.values(attendance).filter(Boolean).length;
-  const totalCount = students.length;
-  const attendancePercentage = totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0;
 
   if (isLoading && !profile) {
     return (
-      <TeacherDashboard student={null as any} title="Attendance">
+      <TeacherDashboard student={null as any} title="Student Details">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -102,241 +100,246 @@ export default function TeacherClasses() {
   }
 
   return (
-    <TeacherDashboard student={null as any} title="Attendance">
-      <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <div className="p-3 bg-blue-600 rounded-full">
-              <UserCheck className="h-8 w-8 text-white" />
+    <TeacherDashboard student={null as any} title="Student Details">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="max-w-7xl mx-auto p-6 space-y-8">
+          {/* Enhanced Header */}
+          <div className="text-center space-y-6 py-8">
+            <div className="flex items-center justify-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-blue-600 rounded-full blur-xl opacity-20"></div>
+                <div className="relative p-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full shadow-lg">
+                  <UserCheck className="h-10 w-10 text-white" />
+                </div>
+              </div>
+              <div className="text-left">
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Class Management
+                </h1>
+                <p className="text-xl text-gray-600 mt-2">
+                  Welcome back, <span className="font-semibold text-blue-600">{profile?.name}</span>!
+                </p>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">Class Management</h1>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+              Select a class and section to view and manage your students efficiently
+            </p>
           </div>
-          <p className="text-gray-600 text-lg">
-            Welcome back, {profile?.name}! Track your class attendance efficiently.
-          </p>
-        </div>
 
-        {/* Stats Cards */}
-        {selectedClass && selectedSection && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-blue-100 rounded-full">
-                    <Users className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Total Students</p>
-                    <p className="text-2xl font-bold text-gray-900">{totalCount}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-green-100 rounded-full">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Present Today</p>
-                    <p className="text-2xl font-bold text-gray-900">{presentCount}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-purple-100 rounded-full">
-                    <TrendingUp className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Attendance Rate</p>
-                    <p className="text-2xl font-bold text-gray-900">{attendancePercentage}%</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Class Selection */}
-        <Card className="bg-white border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Select Class
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              {allClasses.map((cls) => (
-                <Button
-                  key={cls}
-                  variant={cls === selectedClass ? "default" : "outline"}
-                  onClick={() => {
-                    setSelectedClass(cls);
-                    setSelectedSection("");
-                    setStudents([]);
-                  }}
-                  className={`px-6 py-3 text-lg font-medium transition-all duration-200 ${
-                    cls === selectedClass
-                      ? "bg-blue-600 hover:bg-blue-700 shadow-lg scale-105"
-                      : "hover:bg-blue-50 hover:border-blue-300"
-                  }`}
-                >
-                  Class {cls}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Section Selection */}
-        {selectedClass && (
-          <Card className="bg-white border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Select Section
+          {/* Class Selection with improved design */}
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <BookOpen className="h-6 w-6" />
+                Select Class
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-3">
-                {sections.map((sec) => (
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {allClasses.map((cls) => (
                   <Button
-                    key={sec}
-                    variant={sec === selectedSection ? "default" : "outline"}
-                    onClick={() => setSelectedSection(sec)}
-                    className={`px-6 py-3 text-lg font-medium transition-all duration-200 ${
-                      sec === selectedSection
-                        ? "bg-blue-600 hover:bg-blue-700 shadow-lg scale-105"
-                        : "hover:bg-blue-50 hover:border-blue-300"
+                    key={cls}
+                    variant={cls === selectedClass ? "default" : "outline"}
+                    onClick={() => {
+                      setSelectedClass(cls);
+                      setSelectedSection("");
+                    }}
+                    className={`h-12 text-lg font-medium transition-all duration-200 ${
+                      cls === selectedClass 
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105" 
+                        : "hover:bg-blue-50 hover:border-blue-300 hover:scale-102"
                     }`}
                   >
-                    Section {sec}
+                    Class {cls}
                   </Button>
                 ))}
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Attendance List */}
-        {selectedSection && (
-          <Card className="bg-white border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Attendance: Class {selectedClass} - Section {selectedSection}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {new Date().toLocaleDateString('en-US', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <span className="ml-3 text-gray-600">Loading students...</span>
-                </div>
-              ) : students.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>No students found for this class and section.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {students.map((stu) => (
-                    <div
-                      key={stu._id}
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
-                        attendance[stu._id]
-                          ? "bg-green-50 border-green-200"
-                          : "bg-gray-50 border-gray-200 hover:border-gray-300"
+          {/* Section Selection with improved design */}
+          {selectedClass && (
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+              <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <Users className="h-6 w-6" />
+                  Select Section
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {sections.map((sec) => (
+                    <Button
+                      key={sec}
+                      variant={sec === selectedSection ? "default" : "outline"}
+                      onClick={() => setSelectedSection(sec)}
+                      className={`h-12 text-lg font-medium transition-all duration-200 ${
+                        sec === selectedSection 
+                          ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg scale-105" 
+                          : "hover:bg-indigo-50 hover:border-indigo-300 hover:scale-102"
                       }`}
-                      onClick={() => toggleAttendance(stu._id)}
                     >
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={attendance[stu._id]}
-                          onChange={() => toggleAttendance(stu._id)}
-                          className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer"
-                        />
-                        {attendance[stu._id] && (
-                          <CheckCircle className="absolute -top-1 -right-1 h-4 w-4 text-green-600" />
-                        )}
+                      Section {sec}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Main Content Grid */}
+          {selectedSection && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Student List */}
+              <div className="lg:col-span-2">
+                <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+                  <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+                    <CardTitle className="text-xl">
+                      Students in Class {selectedClass} Section {selectedSection}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {isLoading ? (
+                      <div className="flex items-center justify-center py-16">
+                        <div className="flex flex-col items-center space-y-4">
+                          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+                          <p className="text-gray-500">Loading students...</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                            {stu.name.charAt(0)}
+                    ) : (
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {students.map((stu) => (
+                          <div
+                            key={stu._id}
+                            className="group p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl hover:from-blue-50 hover:to-indigo-50 cursor-pointer border border-gray-200 hover:border-blue-300 transition-all duration-200 hover:shadow-lg hover:scale-102"
+                            onClick={() => handleStudentClick(stu._id)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center">
+                                  <User className="h-5 w-5 text-white" />
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    {stu.name}
+                                  </p>
+                                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                                    <Hash className="h-3 w-3" />
+                                    Roll No: {stu.rollNumber}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <GraduationCap className="h-5 w-5" />
+                              </div>
+                            </div>
                           </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Student Detail Card */}
+              <div className="lg:col-span-1">
+                {isLoadingDetail && (
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                    <CardContent className="p-8">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+                        <p className="text-gray-500">Loading student details...</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {selectedStudent && (
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 sticky top-6">
+                    <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg">
+                      <CardTitle className="text-xl">Student Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-4">
+                      <div className="flex items-center justify-center mb-6">
+                        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                          <User className="h-8 w-8 text-white" />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <User className="h-5 w-5 text-gray-500" />
                           <div>
-                            <p className="font-medium text-gray-900">{stu.name}</p>
-                            <p className="text-sm text-gray-500">Roll No: {stu.rollNumber}</p>
+                            <p className="text-sm text-gray-500">Name</p>
+                            <p className="font-semibold text-gray-900">{selectedStudent.name}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <Mail className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Email</p>
+                            <p className="font-semibold text-gray-900">{selectedStudent.email}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                            <BookOpen className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <p className="text-sm text-gray-500">Class</p>
+                              <p className="font-semibold text-gray-900">{selectedStudent.class}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                            <Users className="h-5 w-5 text-gray-500" />
+                            <div>
+                              <p className="text-sm text-gray-500">Section</p>
+                              <p className="font-semibold text-gray-900">{selectedStudent.section}</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <Hash className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Roll Number</p>
+                            <p className="font-semibold text-gray-900">{selectedStudent.rollNumber}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <Phone className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm text-gray-500">Parent Contact</p>
+                            <p className="font-semibold text-gray-900">{selectedStudent.parentContact}</p>
                           </div>
                         </div>
                       </div>
-                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        attendance[stu._id]
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-600"
-                      }`}>
-                        {attendance[stu._id] ? "Present" : "Absent"}
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {!selectedStudent && !isLoadingDetail && selectedSection && (
+                  <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+                    <CardContent className="p-8 text-center">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                          <User className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="text-gray-500 text-lg">Select a student</p>
+                          <p className="text-sm text-gray-400">Click on any student to view their details</p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {students.length > 0 && (
-                <div className="mt-8 flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
-                    {presentCount} of {totalCount} students marked present
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {success && (
-                      <div className="flex items-center gap-2 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span className="text-sm font-medium">{success}</span>
-                      </div>
-                    )}
-                    <Button
-                      onClick={saveAttendance}
-                      disabled={isSaving}
-                      className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50"
-                    >
-                      {isSaving ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Save Attendance
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </TeacherDashboard>
   );

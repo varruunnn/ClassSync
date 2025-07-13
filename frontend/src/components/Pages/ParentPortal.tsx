@@ -22,17 +22,26 @@ import {
   Clock,
 } from "lucide-react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   BarChart,
-  Bar
+  Bar,
+  LineChart,
+  Line,
 } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+interface ExamMark {
+  subjectId: string;
+  marks: number;
+}
+
+interface LatestExamEntry {
+  studentId: string;
+  marks: ExamMark[];
+}
 
 const ParentPortal = () => {
   const { schoolId, loading: authLoading } = useAuth();
@@ -40,6 +49,7 @@ const ParentPortal = () => {
     _id: string;
     name?: string;
     class?: string;
+    section?: string;
     rollNumber?: string | number;
     email?: string;
     schoolId?: string;
@@ -74,36 +84,13 @@ const ParentPortal = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [messageError, setMessageError] = useState<string | null>(null);
-    const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [loadingSubjects, setLoadingSubjects] = useState(true);
-  const [subjectsError, setSubjectsError] = useState<string | null>(null);
-
-  const performanceData = {
-    unitTests: [
-      { subject: "Mathematics", score: 85, maxScore: 100, grade: "B+" },
-      { subject: "Physics", score: 92, maxScore: 100, grade: "A" },
-      { subject: "Chemistry", score: 78, maxScore: 100, grade: "B" },
-      { subject: "Biology", score: 88, maxScore: 100, grade: "B+" },
-      { subject: "English", score: 94, maxScore: 100, grade: "A" },
-      { subject: "History", score: 81, maxScore: 100, grade: "B+" },
-    ],
-    halfYearly: [
-      { subject: "Mathematics", score: 87, maxScore: 100, grade: "B+" },
-      { subject: "Physics", score: 89, maxScore: 100, grade: "B+" },
-      { subject: "Chemistry", score: 82, maxScore: 100, grade: "B+" },
-      { subject: "Biology", score: 91, maxScore: 100, grade: "A" },
-      { subject: "English", score: 96, maxScore: 100, grade: "A+" },
-      { subject: "History", score: 84, maxScore: 100, grade: "B+" },
-    ],
-    yearly: [
-      { subject: "Mathematics", score: 90, maxScore: 100, grade: "A" },
-      { subject: "Physics", score: 93, maxScore: 100, grade: "A" },
-      { subject: "Chemistry", score: 85, maxScore: 100, grade: "B+" },
-      { subject: "Biology", score: 94, maxScore: 100, grade: "A" },
-      { subject: "English", score: 98, maxScore: 100, grade: "A+" },
-      { subject: "History", score: 87, maxScore: 100, grade: "B+" },
-    ],
-  };
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [_loadingSubjects, setLoadingSubjects] = useState(true);
+  const [_subjectsError, setSubjectsError] = useState<string | null>(null);
+  const [classTestEntry, setClassTestEntry] = useState<LatestExamEntry | null>(
+    null
+  );
+  const [loadingClassTest, setLoadingClassTest] = useState(true);
 
   const progressData = studentData
     ? [
@@ -113,20 +100,32 @@ const ParentPortal = () => {
       ]
     : [];
 
-  const subjectProgressData = !loadingSubjects && !subjectsError
-    ? subjects.map((subj) => ({
-        subject: subj.name,
-        unit:
-          performanceData.unitTests.find((d) => d.subject === subj.name)
-            ?.score ?? 0,
-        halfYearly:
-          performanceData.halfYearly.find((d) => d.subject === subj.name)
-            ?.score ?? 0,
-        yearly:
-          performanceData.yearly.find((d) => d.subject === subj.name)
-            ?.score ?? 0,
-      }))
-    : [];
+  const subjectProgressData = subjects.map((subj) => {
+    const markObj = classTestEntry?.marks.find((m) => m.subjectId === subj._id);
+    const score = markObj?.marks ?? 0;
+    return { subject: subj.name, score };
+  });
+
+  useEffect(() => {
+    if (!studentData) return;
+
+    setLoadingClassTest(true);
+    fetch(
+      `http://localhost:3001/api/exams/latest?class=${studentData.class}&section=${studentData.section}&examType=classTest`,
+      { credentials: "include" }
+    )
+      .then((r) => r.json())
+      .then((json) => {
+        if (json.success && json.data.length) {
+          const me = json.data.find(
+            (e: LatestExamEntry) => e.studentId === studentData._id
+          );
+          setClassTestEntry(me || null);
+        }
+      })
+      .catch((e) => console.error(e))
+      .finally(() => setLoadingClassTest(false));
+  }, [studentData]);
 
   useEffect(() => {
     fetch("http://localhost:3001/api/students/myinfo", {
@@ -140,59 +139,65 @@ const ParentPortal = () => {
     // …
   }, []);
 
-useEffect(() => {
-  let isMounted = true; 
+  useEffect(() => {
+    let isMounted = true;
 
-  const loadStudentAndSubjects = async () => {
-    try {
-      // 1) fetch student info
-      const resInfo = await fetch("http://localhost:3001/api/students/myinfo", {
-        credentials: "include",
-      });
-      if (!resInfo.ok) {
-        throw new Error(`Info Error ${resInfo.status}: ${resInfo.statusText}`);
+    const loadStudentAndSubjects = async () => {
+      try {
+        const resInfo = await fetch(
+          "http://localhost:3001/api/students/myinfo",
+          {
+            credentials: "include",
+          }
+        );
+        if (!resInfo.ok) {
+          throw new Error(
+            `Info Error ${resInfo.status}: ${resInfo.statusText}`
+          );
+        }
+        const infoJson = await resInfo.json();
+        if (!infoJson.success) {
+          throw new Error("Student info fetch failed");
+        }
+        const resSubs = await fetch(
+          "http://localhost:3001/api/students/subjects/me",
+          {
+            credentials: "include",
+          }
+        );
+        if (!resSubs.ok) {
+          throw new Error(
+            `Subjects Error ${resSubs.status}: ${resSubs.statusText}`
+          );
+        }
+        const subsJson = await resSubs.json();
+        if (!Array.isArray(subsJson.subjects)) {
+          throw new Error("Subjects response malformed");
+        }
+        if (isMounted) {
+          setStudentData(infoJson.data);
+          setSubjects(subsJson.subjects);
+        }
+      } catch (err: any) {
+        console.error("Failed to load data:", err);
+        if (isMounted) {
+          setStudentError(err.message);
+          setSubjectsError(err.message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingStudent(false);
+          setLoadingSubjects(false);
+        }
       }
-      const infoJson = await resInfo.json();
-      if (!infoJson.success) {
-        throw new Error("Student info fetch failed");
-      }
+    };
 
-      // 2) fetch subjects
-      const resSubs = await fetch("http://localhost:3001/api/students/subjects/me", {
-        credentials: "include",
-      });
-      if (!resSubs.ok) {
-        throw new Error(`Subjects Error ${resSubs.status}: ${resSubs.statusText}`);
-      }
-      const subsJson = await resSubs.json();
-      if (!Array.isArray(subsJson.subjects)) {
-        throw new Error("Subjects response malformed");
-      }
-      if (isMounted) {
-        setStudentData(infoJson.data);
-        setSubjects(subsJson.subjects);
-      }
-    } catch (err: any) {
-      console.error("Failed to load data:", err);
-      if (isMounted) {
-        setStudentError(err.message);
-        setSubjectsError(err.message);
-      }
-    } finally {
-      if (isMounted) {
-        setLoadingStudent(false);
-        setLoadingSubjects(false);
-      }
-    }
-  };
+    loadStudentAndSubjects();
 
-  loadStudentAndSubjects();
-
-  return () => {
-    isMounted = false;
-  };
-}, []);
-
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (authLoading || !schoolId) return;
@@ -230,12 +235,6 @@ useEffect(() => {
       })
       .finally(() => setLoadingMessages(false));
   }, []);
-
-  type ExamType = "unitTests" | "halfYearly" | "yearly";
-  const calculateOverallAverage = (examType: ExamType) => {
-    const scores = performanceData[examType].map((subject) => subject.score);
-    return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -422,60 +421,113 @@ useEffect(() => {
           </div>
 
           {/* Performance Trends */}
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
-          Performance Progress
-        </CardTitle>
-        <CardDescription>
-          Academic performance across different assessments
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="h-64 w-full">
-          {loadingSubjects ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading subjects…
-            </div>
-          ) : subjectsError ? (
-            <div className="text-center py-8 text-red-600">
-              Error loading subjects: {subjectsError}
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={subjectProgressData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="subject" />
-                <YAxis domain={[70, 100]} />
-                <Tooltip formatter={(value: number) => `${value}%`} />
-                <Line
-                  type="monotone"
-                  dataKey="unit"
-                  name="Unit Tests"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="halfYearly"
-                  name="Half Yearly"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="yearly"
-                  name="Yearly"
-                  stroke="#8b5cf6"
-                  strokeWidth={2}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+                <TrendingUp className="h-5 w-5" />
+                Performance Progress (Class Test)
+              </CardTitle>
+              <CardDescription className="text-blue-100">
+                Your most recent class test marks by subject
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="h-80 w-full bg-white rounded-lg shadow-inner p-4">
+                {loadingClassTest ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-slate-500 font-medium">
+                        Loading class test data…
+                      </p>
+                    </div>
+                  </div>
+                ) : !classTestEntry ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <TrendingUp className="h-8 w-8 text-slate-400" />
+                      </div>
+                      <p className="text-slate-500 font-medium">
+                        No class test data available.
+                      </p>
+                      <p className="text-slate-400 text-sm mt-2">
+                        Take a test to see your progress here
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={subjectProgressData}
+                      margin={{ left: 20, right: 20, top: 20, bottom: 20 }}
+                    >
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#e2e8f0"
+                        strokeOpacity={0.6}
+                      />
+                      <XAxis
+                        dataKey="subject"
+                        tick={{ fontSize: 12, fill: "#64748b" }}
+                        axisLine={{ stroke: "#cbd5e1" }}
+                        tickLine={{ stroke: "#cbd5e1" }}
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        tickFormatter={(v) => `${v}%`}
+                        tick={{ fontSize: 12, fill: "#64748b" }}
+                        axisLine={{ stroke: "#cbd5e1" }}
+                        tickLine={{ stroke: "#cbd5e1" }}
+                      />
+                      <Tooltip
+                        formatter={(val: number) => [`${val}%`, "Score"]}
+                        contentStyle={{
+                          backgroundColor: "#1e293b",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "#f1f5f9",
+                          boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="url(#colorGradient)"
+                        strokeWidth={3}
+                        dot={{
+                          fill: "#3b82f6",
+                          strokeWidth: 2,
+                          stroke: "#ffffff",
+                          r: 6,
+                        }}
+                        activeDot={{
+                          r: 8,
+                          fill: "#1d4ed8",
+                          stroke: "#ffffff",
+                          strokeWidth: 2,
+                        }}
+                        name="Score"
+                      />
+                      <defs>
+                        <linearGradient
+                          id="colorGradient"
+                          x1="0"
+                          y1="0"
+                          x2="1"
+                          y2="0"
+                        >
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="100%" stopColor="#6366f1" />
+                        </linearGradient>
+                      </defs>
+                    </LineChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </CardContent>
+          </Card>
           <Card>
             <CardHeader>
               <CardTitle>Assessment Comparison</CardTitle>
