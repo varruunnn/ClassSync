@@ -1,9 +1,16 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import disposableDomains from "../utils/disposableDomains.js";
 
 export const register = async (req, res) => {
+  const verifyEmail = req.body.email;
+  const emailDomain = verifyEmail.split("@")[1];
+  if (disposableDomains.includes(emailDomain)) {
+    return res
+      .status(400)
+      .json({ message: "Disposable email addresses are not allowed." });
+  }
   const {
     name,
     email,
@@ -23,7 +30,7 @@ export const register = async (req, res) => {
       message: "Name, email, password, role, and schoolId are required.",
     });
   }
-  if (role === 'student') {
+  if (role === "student") {
     if (!studentClass || !rollNumber || !parentContact) {
       return res.status(400).json({
         message:
@@ -32,11 +39,10 @@ export const register = async (req, res) => {
     }
   }
 
-  if (role === 'teacher') {
+  if (role === "teacher") {
     if (!subject || !phone) {
       return res.status(400).json({
-        message:
-          "For role 'teacher', you must supply subject and phone.",
+        message: "For role 'teacher', you must supply subject and phone.",
       });
     }
   }
@@ -44,7 +50,9 @@ export const register = async (req, res) => {
   try {
     const existing = await User.findOne({ email: email.toLowerCase().trim() });
     if (existing) {
-      return res.status(400).json({ message: "User with this email already exists." });
+      return res
+        .status(400)
+        .json({ message: "User with this email already exists." });
     }
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
@@ -56,14 +64,14 @@ export const register = async (req, res) => {
       schoolId: Number(schoolId),
     };
 
-    if (role === 'student') {
+    if (role === "student") {
       newUserData.class = studentClass;
       newUserData.section = studentSection;
       newUserData.rollNumber = rollNumber;
       newUserData.parentContact = parentContact;
     }
 
-    if (role === 'teacher') {
+    if (role === "teacher") {
       newUserData.subject = subject;
       newUserData.phone = phone;
       if (classAssigned) {
@@ -86,15 +94,15 @@ export const register = async (req, res) => {
         email: user.email,
         role: user.role,
         schoolId: user.schoolId,
-        ...(user.role === 'student'
+        ...(user.role === "student"
           ? {
               class: user.class,
-              section : user.section,
+              section: user.section,
               rollNumber: user.rollNumber,
               parentContact: user.parentContact,
             }
           : {}),
-        ...(user.role === 'teacher'
+        ...(user.role === "teacher"
           ? {
               subject: user.subject,
               phone: user.phone,
@@ -105,10 +113,11 @@ export const register = async (req, res) => {
     });
   } catch (err) {
     console.error("Registration error:", err);
-    return res.status(500).json({ message: "Server error during registration." });
+    return res
+      .status(500)
+      .json({ message: "Server error during registration." });
   }
 };
-
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
@@ -134,12 +143,12 @@ export const login = async (req, res) => {
     );
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "lax", 
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.json({
-      message: 'Login successful!',
+      message: "Login successful!",
       name: user.name,
       email: user.email,
       role: user.role,
@@ -155,13 +164,15 @@ export const logout = (req, res) => {
     const token = req.cookies?.token;
 
     if (!token) {
-      return res.status(400).json({ message: "Already logged out or no token found." });
+      return res
+        .status(400)
+        .json({ message: "Already logged out or no token found." });
     }
 
     res.clearCookie("token", {
       httpOnly: true,
       sameSite: "none",
-      secure:true
+      secure: true,
     });
 
     return res.status(200).json({ message: "Logged out successfully." });
@@ -179,20 +190,20 @@ export const me = (req, res) => {
     email: req.user.email,
     Id: req.user._id,
     subject: req.user.subject,
-    phone:req.user.phone,
+    phone: req.user.phone,
     classes: req.user.classes,
     classAssigned: req.user.classAssigned,
   });
 };
 
-export const changePassword = async (req,res) =>{
-  const {currentPassword,newPassword} = req.body;
+export const changePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
   const user = await User.findById(req.user);
-  const match = await bcrypt.compare(currentPassword,user.password);
-  if(!match) return res.status(400).json({ error: 'Current password incorrect.' });
+  const match = await bcrypt.compare(currentPassword, user.password);
+  if (!match)
+    return res.status(400).json({ error: "Current password incorrect." });
   const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(newPassword,salt);
+  user.password = await bcrypt.hash(newPassword, salt);
   await user.save();
-  res.json({message:'password changed'})
-}
-
+  res.json({ message: "password changed" });
+};
