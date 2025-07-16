@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Users,
-   
   Calendar,
   GraduationCap,
   MessageSquare,
@@ -23,41 +22,54 @@ import {
 } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+
+// Define the type for recentClasses
+interface RecentClass {
+  id: number;
+  name: string;
+  students: number;
+  present: number;
+  time: string;
+  room: string;
+  type: string;
+  nextClass: string;
+}
 
 const Dashboard = () => {
-  // Mock data for demonstration
-  const recentClasses = [
-    {
-      id: 1,
-      name: "Mathematics Grade 10A",
-      students: 28,
-      present: 26,
-      time: "9:00 AM",
-      room: "Room 201",
-      type: "Homeroom",
-      nextTopic: "Quadratic Equations",
-    },
-    {
-      id: 2,
-      name: "Physics Grade 11B",
-      students: 25,
-      present: 23,
-      time: "11:00 AM",
-      room: "Lab 3",
-      type: "Subject",
-      nextTopic: "Wave Motion",
-    },
-    {
-      id: 3,
-      name: "Chemistry Grade 12C",
-      students: 22,
-      present: 21,
-      time: "2:00 PM",
-      room: "Lab 1",
-      type: "Subject",
-      nextTopic: "Organic Compounds",
-    },
-  ];
+  const [recentClasses, setRecentClasses] = useState<RecentClass[]>([]);
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const response = await axios.get("http://localhost:3001/api/teacher/classes");
+  
+        const mapped: RecentClass[] = response.data.map((item: any, index: number) => {
+  
+          return {
+            id: index + 1,
+            name: item.name,
+            students: item.students,
+            present: Math.floor((item.attendance / 100) * item.students),
+            time: item.schedule,
+            room: `Room ${item.room}`,
+            type: "Subject",
+            nextClass: item.nextClass,
+          };
+        });
+  
+        setRecentClasses(mapped);
+      } catch (error) {
+        console.error("Failed to fetch classes:", error);
+      }
+    };
+  
+    fetchClasses();
+  }, []);
+  
+  
 
   const recentAssignments = [
     {
@@ -262,7 +274,7 @@ const Dashboard = () => {
                 <div className="space-y-1 text-sm text-white/80">
                   <div className="flex justify-between">
                     <span> {classItem.room}</span>
-                    <span>🕒 {classItem.time}</span>
+                    <span>{classItem.time}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>
@@ -276,18 +288,20 @@ const Dashboard = () => {
                       %
                     </span>
                   </div>
-                  <p className="text-white font-medium">
-                    Next: {classItem.nextTopic}
+                  <p className="text-white ">
+                    Next Class: {classItem.nextClass}
                   </p>
                 </div>
               </div>
             ))}
-            <Button
+            <Link to="/teacher/classes">
+            <Button 
               variant="outline"
               className="w-full mt-3 bg-blue-300 border-white/30 text-white hover:bg-blue-400"
             >
               View All Classes
             </Button>
+            </Link>
           </div>
         </DashboardCard>
 
