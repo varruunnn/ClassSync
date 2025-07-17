@@ -24,6 +24,7 @@ export const register = async (req, res) => {
     subject,
     phone,
     classAssigned,
+    classAssignedSection,
   } = req.body;
   if (!name || !email || !password || !role || !schoolId) {
     return res.status(400).json({
@@ -40,9 +41,10 @@ export const register = async (req, res) => {
   }
 
   if (role === "teacher") {
-    if (!subject || !phone) {
+    if (!subject || !phone || !classAssignedSection) {
       return res.status(400).json({
-        message: "For role 'teacher', you must supply subject and phone.",
+        message:
+          "For role 'teacher', you must supply classAssignedSection, subject and phone.",
       });
     }
   }
@@ -76,6 +78,9 @@ export const register = async (req, res) => {
       newUserData.phone = phone;
       if (classAssigned) {
         newUserData.classAssigned = classAssigned;
+      }
+      if (classAssignedSection) {
+        newUserData.classAssignedSection = classAssignedSection;
       }
     }
     const user = new User(newUserData);
@@ -193,6 +198,7 @@ export const me = (req, res) => {
     phone: req.user.phone,
     classes: req.user.classes,
     classAssigned: req.user.classAssigned,
+    classAssignedSection: req.user.classAssignedSection,
   });
 };
 

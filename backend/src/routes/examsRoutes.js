@@ -35,7 +35,6 @@ router.post(
 router.get(
   '/latest/:schoolId',
   protect,
-  authorizeTeacher,
   asyncHandler(async (req, res) => {
     const { class: className, section, examType } = req.query;
     if (parseInt(req.params.schoolId) !== req.user.schoolId) {

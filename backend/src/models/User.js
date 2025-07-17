@@ -59,6 +59,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    classAssignedSection: {
+      type: String,
+      default : null,
+    },
     classes: {
       type: [String],
       default: [],

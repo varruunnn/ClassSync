@@ -43,6 +43,7 @@ interface StudentInfo {
   name: string;
   class: string;
   section: string;
+  schoolId: number;
   rollNumber: string;
   email: string;
 }
@@ -145,6 +146,7 @@ const StudentDashboard = () => {
         class: "12th",
         section: "A",
         rollNumber: "2024001",
+        schoolId:1,
         email: "john.doe@school.edu",
       });
     } finally {
@@ -161,7 +163,7 @@ const StudentDashboard = () => {
 
     setLoadingExam(true);
     fetch(
-      `http://localhost:3001/api/exams/latest?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
+      `http://localhost:3001/api/exams/latest/${studentInfo.schoolId}?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
       { credentials: "include" }
     )
       .then((res) => res.json())
@@ -177,26 +179,6 @@ const StudentDashboard = () => {
       .finally(() => setLoadingExam(false));
   }, [studentInfo]);
 
-  useEffect(() => {
-    if (!studentInfo) return;
-
-    setLoadingExam(true);
-    fetch(
-      `http://localhost:3001/api/exams/latest?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((json) => {
-        if (json.success && json.data.length) {
-          const myEntry = (json.data as LatestExamEntry[]).find(
-            (e) => e.studentId === studentInfo._id
-          );
-          setLatestExam(myEntry || null);
-        }
-      })
-      .catch((err) => console.error("Failed to load latest exam:", err))
-      .finally(() => setLoadingExam(false));
-  }, [studentInfo]);
   const refreshData = () => {
     fetchSubjects();
     fetchStudentInfo();

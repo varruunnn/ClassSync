@@ -119,97 +119,65 @@ const TeacherAssignments = () => {
     }
   };
 
-  const uploadFile = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("type", "assignment");
 
+const handleCreateAssignment = async () => {
+  try {
+    setIsCreating(true);
+
+    const { title, subject, className, dueDate } = newAssignment;
+
+    if (!title.trim()) return alert("Title is required");
+    if (!subject.trim()) return alert("Subject is required");
+    if (!className.trim()) return alert("Class name is required");
+    if (!dueDate) return alert("Due date is required");
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("subject", subject);
+    formData.append("className", className);
+    formData.append("sec", newAssignment.sec || "");
+    formData.append("description", newAssignment.description || "");
+    formData.append("dueDate", new Date(dueDate).toISOString());
+
+    const topicsArray = newAssignment.topics
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    topicsArray.forEach((topic) => formData.append("topics", topic));
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
     const response = await fetch("http://localhost:3001/api/assignments", {
       method: "POST",
       credentials: "include",
       body: formData,
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to upload file");
-    }
+    if (!response.ok) throw new Error("Failed to create assignment");
 
-    const data = await response.json();
-    return data.fileUrl;
-  };
+    const created = await response.json();
+    setAssignments((prev) => [...prev, created]);
+    setShowNewAssignmentDialog(false);
+    setSelectedFile(null);
+    setNewAssignment({
+      title: "",
+      subject: "",
+      className: "",
+      sec: "",
+      description: "",
+      dueDate: "",
+      topics: "",
+      schoolId: 1,
+      createdBy: "6847354b34eb2262bfabd594",
+    });
+  } catch (err) {
+    alert("Error creating assignment: " + (err instanceof Error ? err.message : "Unknown"));
+  } finally {
+    setIsCreating(false);
+  }
+};
 
-  const handleCreateAssignment = async () => {
-    try {
-      setIsCreating(true);
-      if (!newAssignment.title.trim()) {
-        alert("Title is required");
-        return;
-      }
-      if (!newAssignment.subject.trim()) {
-        alert("Subject is required");
-        return;
-      }
-      if (!newAssignment.className.trim()) {
-        alert("Class name is required");
-        return;
-      }
-      if (!newAssignment.dueDate) {
-        alert("Due date is required");
-        return;
-      }
-
-      let fileUrl = "";
-      if (selectedFile) {
-        fileUrl = await uploadFile(selectedFile);
-      }
-
-      const assignmentData = {
-        ...newAssignment,
-        topics: newAssignment.topics
-          .split(",")
-          .map((topic: string) => topic.trim())
-          .filter((topic: string) => topic),
-        dueDate: new Date(newAssignment.dueDate).toISOString(),
-        fileUrl: fileUrl || undefined,
-      };
-
-      const response = await fetch("http://localhost:3001/api/assignments", {
-        credentials: "include",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(assignmentData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create assignment");
-      }
-
-      const createdAssignment = await response.json();
-      setAssignments((prev) => [...prev, createdAssignment]);
-      setShowNewAssignmentDialog(false);
-      setNewAssignment({
-        title: "",
-        subject: "",
-        className: "",
-        sec: "",
-        description: "",
-        dueDate: "",
-        topics: "",
-        schoolId: 1,
-        createdBy: "6847354b34eb2262bfabd594",
-      });
-      setSelectedFile(null);
-    } catch (err) {
-      alert(
-        "Error creating assignment: " +
-          (err instanceof Error ? err.message : "Unknown error")
-      );
-    } finally {
-      setIsCreating(false);
-    }
-  };
 
   const getStatusColor = (assignment: Assignment) => {
     const now = new Date();
