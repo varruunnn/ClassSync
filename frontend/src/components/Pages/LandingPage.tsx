@@ -2,10 +2,10 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion, useInView } from "framer-motion"
-import studentDashboardImage from '@/assets/studentDashboard.png';
-import teacherDashboardImage from '@/assets/teacherDashboard.png';
-import adminDashboardImage from '@/assets/admin.png'
-import parentDashboardImage from '@/assets/parentDashboard.png'
+import studentDashboardImage from "@/assets/studentDashboard.png"
+import teacherDashboardImage from "@/assets/teacherDashboard.png"
+import adminDashboardImage from "@/assets/admin.png"
+import parentDashboardImage from "@/assets/parentDashboard.png"
 import {
   ArrowRight,
   Bell,
@@ -17,26 +17,26 @@ import {
   Users,
   Menu,
   X,
-  Star,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("hero")
-  const [gradientPosition, setGradientPosition] = useState({ x: 0, y: 0 })
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const x = e.clientX / window.innerWidth;
-      const y = e.clientY / window.innerHeight;
-      setGradientPosition({ x, y });
-    };
+      const x = (e.clientX / window.innerWidth) * 100
+      const y = (e.clientY / window.innerHeight) * 100
+      setMousePosition({ x, y })
+    }
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+    window.addEventListener("mousemove", handleMouseMove)
+    return () => window.removeEventListener("mousemove", handleMouseMove)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,81 +57,64 @@ const LandingPage: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  const [title, setTitle] = useState("Login");
+  const [title, setTitle] = useState("Login")
 
-  useEffect(()=>{
-     setTitle("Login");
-  },[])
+  useEffect(() => {
+    setTitle("Login")
+  }, [])
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 overflow-hidden">
-      <div
-        className="fixed inset-0 opacity-5 pointer-events-none"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 text-black overflow-hidden">
+      <motion.div
+        className="fixed inset-0 opacity-[0.02] pointer-events-none z-0"
         style={{
-          backgroundImage: `radial-gradient(circle at ${gradientPosition.x * 100}% ${gradientPosition.y * 100}%, rgba(59, 130, 246, 0.3), transparent 40%)`,
-          backgroundSize: "100% 100%",
-          backgroundPosition: "center",
-          zIndex: 0,
+          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, black 0%, transparent 50%)`,
         }}
       />
-
-      {/* Decorative elements */}
-      <div className="absolute top-1/3 left-10 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-1/3 right-10 w-40 h-40 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-slate-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '3s' }}></div>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <BookOpen className="h-8 w-8 text-blue-600" />
-                <span className="ml-2 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                  Classync 
-                </span>
+                <BookOpen className="h-8 w-8 text-black" />
+                <span className="ml-2 text-2xl font-bold text-black">Classync</span>
               </div>
             </div>
-            
+
             <div className="hidden md:flex items-center space-x-8">
-              {["features","for-admin", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
+              {["features", "for-admin", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
                 <a
                   key={item}
                   href={`#${item}`}
                   className={cn(
                     "text-sm font-medium transition-colors",
-                    activeSection === item
-                      ? "text-blue-600"
-                      : "text-gray-600 hover:text-gray-900"
+                    activeSection === item ? "text-black" : "text-gray-600 hover:text-black",
                   )}
                 >
                   {item
                     .split("-")
                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                    .join(" ")  
-                  }
+                    .join(" ")}
                 </a>
               ))}
               <button
-                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium shadow-lg"
+                className="px-6 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-all duration-200 font-medium shadow-lg"
                 onClick={() => navigate("/login")}
               >
-               {title}
+                {title}
               </button>
             </div>
-            
+
             <div className="flex items-center md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-md text-gray-600 hover:text-gray-900"
+                className="p-2 rounded-md text-gray-600 hover:text-black"
               >
                 {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
           </div>
         </div>
-        
-        {/* Mobile menu */}
         {isMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
             <div className="px-4 py-2 space-y-1">
@@ -139,7 +122,7 @@ const LandingPage: React.FC = () => {
                 <a
                   key={item}
                   href={`#${item}`}
-                  className="block px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  className="block px-3 py-2 rounded-md text-gray-600 hover:text-black hover:bg-gray-50"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item
@@ -149,7 +132,7 @@ const LandingPage: React.FC = () => {
                 </a>
               ))}
               <button
-                className="w-full mt-4 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200"
+                className="w-full mt-4 px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Login
@@ -158,87 +141,119 @@ const LandingPage: React.FC = () => {
           </div>
         )}
       </nav>
-
-      {/* Hero Section */}
-      <HeroSection />
+      <HeroSection mousePosition={mousePosition} />
       <FeaturesSection />
       <HowItWorksSection />
       <StatisticsSection />
-      <TestimonialsSection />
       <CTASection />
       <FooterSection />
     </div>
   )
 }
 
-const HeroSection = () => {
+const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number } }) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, amount: 0.3 })
 
   return (
-    <div id="hero" ref={ref} className="relative z-10 pt-20 pb-16 lg:pb-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center">
+    <section id="hero" ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
+      <motion.div
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, black 0%, transparent 50%)`,
+        }}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              <span className="block text-gray-900">Transform school</span>
-              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">management digitally</span>
-            </h1>
-            <p className="mt-6 text-xl text-gray-600 max-w-2xl">
-              Connect students, parents, and teachers on one comprehensive platform. Manage assignments, track
-              progress, view timetables, and facilitate transparent communication throughout the educational
-              journey.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <a
-                href="/signup"
-                className="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-              <a
-                href="#learn-more"
-                className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-colors"
-              >
-                Learn More
-              </a>
-            </div>
-          </motion.div>
-          
-          <motion.div
-            className="mt-12 lg:mt-0"
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            className="inline-flex mt-[100px] items-center px-4 py-2 rounded-full border border-gray-200 bg-white/50 backdrop-blur-sm text-sm font-medium text-gray-700 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
           >
-            <div className="relative">
-              <div className="absolute -inset-4 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-2xl blur-lg"></div>
-              <div className="relative bg-white/80 backdrop-blur-md rounded-xl shadow-2xl p-6 border border-gray-200">
-                <div className="flex items-center space-x-4 mb-4">
-                  <Calendar className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Math Quiz</div>
-                    <div className="text-sm text-gray-500">Today, 2:00 PM</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <LineChart className="h-8 w-8 text-green-600" />
-                  <div>
-                    <div className="font-semibold text-gray-900">Grade Improved</div>
-                    <div className="text-sm text-green-600">+15% this month</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Sparkles className="h-4 w-4 mr-2" />
+            Trusted by 500+ schools nationwide
           </motion.div>
-        </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+            <motion.span
+              className="block text-black"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              Transform
+            </motion.span>
+            <motion.span
+              className="block text-black relative"
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              Education
+              <motion.div
+                className="absolute -bottom-2 left-0 right-0 h-1 bg-black"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+              />
+            </motion.span>
+            <motion.span
+              className="block text-gray-600 mt-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+            >
+              Digitally
+            </motion.span>
+          </h1>
+
+          <motion.p
+            className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+          >
+            Connect students, parents, and teachers on one comprehensive platform. Manage assignments, track progress,
+            and facilitate transparent communication.
+          </motion.p>
+
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+          >
+            <a
+              href="/register"
+              className="inline-flex items-center justify-center px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 shadow-lg"
+            >
+              Get Started
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </a>
+            <a
+              href="#learn-more"
+              className="inline-flex items-center justify-center px-8 py-3 border border-gray-300 text-gray-700 font-medium rounded-full hover:bg-gray-50 hover:text-black transition-colors"
+            >
+              Learn More
+            </a>
+          </motion.div>
+        </motion.div>
+        <motion.div
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+        ></motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -280,7 +295,7 @@ const FeaturesSection = () => {
   ]
 
   return (
-    <div id="features" ref={ref} className="relative z-10 py-20 bg-gray-50">
+    <div id="features" ref={ref} className="relative z-10 py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -288,9 +303,7 @@ const FeaturesSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-            Everything you need in one place
-          </h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Everything you need in one place</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Classync brings together all essential educational management tools on a single, intuitive platform.
           </p>
@@ -313,15 +326,15 @@ const FeatureCard = ({ feature, index }: { feature: any; index: number }) => {
   return (
     <motion.div
       ref={ref}
-      className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:border-blue-300 hover:shadow-xl transition-all duration-200"
+      className="bg-white rounded-xl p-6 shadow-lg border border-gray-200 hover:border-black hover:shadow-xl transition-all duration-200"
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, delay: 0.1 * index }}
     >
-      <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white mb-4">
+      <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-black text-white mb-4">
         {feature.icon}
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+      <h3 className="text-lg font-semibold text-black mb-2">{feature.title}</h3>
       <p className="text-gray-600">{feature.description}</p>
     </motion.div>
   )
@@ -332,7 +345,7 @@ const HowItWorksSection = () => {
   const isInView = useInView(ref, { once: true, amount: 0.2 })
 
   return (
-    <div id="learn-more" ref={ref} className="relative z-10 py-20 bg-white">
+    <div id="learn-more" ref={ref} className="relative z-10 py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-16"
@@ -340,9 +353,7 @@ const HowItWorksSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-            Simple workflow for everyone
-          </h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Simple workflow for everyone</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Our platform is designed to be intuitive and accessible for students, parents, and teachers alike.
           </p>
@@ -367,7 +378,7 @@ const HowItWorksSection = () => {
             id="for-students"
             title="For Students"
             description="Access assignments, check timetables, download admit cards, and view results in real-time."
-            image={studentDashboardImage} 
+            image={studentDashboardImage}
             steps={[
               "Log in with your school code and student credentials",
               "View your personalized dashboard with pending tasks",
@@ -443,16 +454,12 @@ const WorkflowItem = ({
       transition={{ duration: 0.6, delay: 0.2 * index }}
     >
       <div className={isReversed ? "lg:col-start-2" : ""}>
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">
-          {title}
-        </h3>
-        <p className="text-lg text-gray-600 mb-6">
-          {description}
-        </p>
+        <h3 className="text-2xl font-bold text-black mb-4">{title}</h3>
+        <p className="text-lg text-gray-600 mb-6">{description}</p>
         <ol className="space-y-4">
           {steps.map((step, i) => (
             <li key={i} className="flex items-start">
-              <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium text-sm mr-3">
+              <span className="flex-shrink-0 flex items-center justify-center h-6 w-6 rounded-full bg-black text-white font-medium text-sm mr-3">
                 {i + 1}
               </span>
               <span className="text-gray-600">{step}</span>
@@ -460,9 +467,9 @@ const WorkflowItem = ({
           ))}
         </ol>
       </div>
-      
+
       <div className={`mt-8 lg:mt-0 ${isReversed ? "lg:col-start-1" : ""}`}>
-        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-2xl border border-gray-200">
+        <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
           <img src={image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
         </div>
       </div>
@@ -481,7 +488,7 @@ const StatisticsSection = () => {
   ]
 
   return (
-    <div ref={ref} className="relative z-10 py-20 bg-gradient-to-r from-blue-50 to-indigo-50">
+    <div ref={ref} className="relative z-10 py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="text-center mb-12"
@@ -489,11 +496,9 @@ const StatisticsSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-            Trusted by schools across the country
-          </h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Trusted by schools across the country</h2>
           <p className="text-xl text-gray-600">
-            Join thousands of students, parents, and teachers already using Classync 
+            Join thousands of students, parents, and teachers already using Classync
           </p>
         </motion.div>
 
@@ -505,7 +510,7 @@ const StatisticsSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 * index }}
             >
-              <div className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">{stat.value}</div>
+              <div className="text-4xl font-bold text-black mb-2">{stat.value}</div>
               <div className="text-gray-600">{stat.label}</div>
             </motion.div>
           ))}
@@ -515,83 +520,6 @@ const StatisticsSection = () => {
   )
 }
 
-const TestimonialsSection = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
-
-  const testimonials = [
-    {
-      quote:
-        "Classync has transformed how we manage assignments and communicate with parents. The platform is intuitive and saves us hours of administrative work.",
-      name: "John Davis",
-      role: "Principal, Lincoln High School",
-      rating: 5,
-    },
-    {
-      quote:
-        "As a parent, I love getting real-time updates about my daughter's progress. Being able to directly message her teachers has improved our collaboration tremendously.",
-      name: "Sarah Mills",
-      role: "Parent",
-      rating: 5,
-    },
-    {
-      quote:
-        "The timetable feature and assignment tracker have helped me stay organized. I never miss deadlines now, and generating my admit card is super convenient.",
-      name: "Kevin Patel",
-      role: "Student, Grade 10",
-      rating: 5,
-    },
-  ]
-
-  return (
-    <div ref={ref} className="relative z-10 py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-            What our users are saying
-          </h2>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} testimonial={testimonial} index={index} />
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const TestimonialCard = ({ testimonial, index }: { testimonial: any; index: number }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.5 })
-
-  return (
-    <motion.div
-      ref={ref}
-      className="bg-white rounded-xl p-6 shadow-lg border border-gray-200"
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: 0.1 * index }}
-    >
-      <div className="flex items-center mb-4">
-        {[...Array(testimonial.rating)].map((_, i) => (
-          <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-        ))}
-      </div>
-      <p className="text-gray-600 mb-4 italic">"{testimonial.quote}"</p>
-      <div>
-        <div className="font-semibold text-gray-900">{testimonial.name}</div>
-        <div className="text-sm text-gray-500">{testimonial.role}</div>
-      </div>
-    </motion.div>
-  )
-}
 
 const CTASection = () => {
   const ref = useRef(null)
@@ -605,15 +533,13 @@ const CTASection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl mb-4">
-            Ready to get started?
-          </h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Ready to get started?</h2>
           <p className="text-xl text-gray-600 mb-8">
             Join thousands of schools already using Classync to streamline education management.
           </p>
           <a
             href="/signup"
-            className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
+            className="inline-flex items-center px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 shadow-lg"
           >
             Get Started
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -626,34 +552,56 @@ const CTASection = () => {
 
 const FooterSection = () => {
   return (
-    <footer id="contact" className="bg-gray-900 text-white">
+    <footer id="contact" className="bg-black text-white">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
-              <BookOpen className="h-8 w-8 text-blue-400" />
+              <BookOpen className="h-8 w-8 text-white" />
               <span className="ml-2 text-2xl font-bold">Classync</span>
             </div>
-            <p className="text-gray-400">
-              Transforming education management with innovative digital solutions.
-            </p>
+            <p className="text-gray-400">Transforming education management with innovative digital solutions.</p>
           </div>
 
           <div>
             <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Solutions</h3>
             <ul className="space-y-2">
-              <li><a href="#for-students" className="text-gray-400 hover:text-white transition-colors">For Students</a></li>
-              <li><a href="#for-parents" className="text-gray-400 hover:text-white transition-colors">For Parents</a></li>
-              <li><a href="#for-teachers" className="text-gray-400 hover:text-white transition-colors">For Teachers</a></li>
+              <li>
+                <a href="#for-students" className="text-gray-400 hover:text-white transition-colors">
+                  For Students
+                </a>
+              </li>
+              <li>
+                <a href="#for-parents" className="text-gray-400 hover:text-white transition-colors">
+                  For Parents
+                </a>
+              </li>
+              <li>
+                <a href="#for-teachers" className="text-gray-400 hover:text-white transition-colors">
+                  For Teachers
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Support</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  Contact Us
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -668,9 +616,7 @@ const FooterSection = () => {
         </div>
 
         <div className="mt-12 border-t border-gray-800 pt-8">
-          <p className="text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} Classync. All rights reserved.
-          </p>
+          <p className="text-gray-400 text-center">&copy; {new Date().getFullYear()} Classync. All rights reserved.</p>
         </div>
       </div>
     </footer>
