@@ -118,3 +118,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+.math-inline {
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+}
+
+.math-display {
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 0.5rem;
+}

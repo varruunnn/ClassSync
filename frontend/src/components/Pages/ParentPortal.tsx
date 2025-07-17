@@ -607,20 +607,29 @@ const ParentPortal = () => {
                         <Avatar className="h-10 w-10">
                           <AvatarImage src="" />
                           <AvatarFallback className="bg-blue-100 text-blue-600 text-sm">
-                            {message.teacherId.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
+                            {typeof message.teacherId === "object" &&
+                            message.teacherId?.name
+                              ? message.teacherId.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")
+                              : "T"}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <div>
                               <h4 className="font-medium text-gray-900">
-                                {message.teacherId.name}
+                                {typeof message.teacherId === "object" &&
+                                message.teacherId?.name
+                                  ? message.teacherId.name
+                                  : "Unknown Teacher"}
                               </h4>
                               <p className="text-sm text-muted-foreground">
-                                {message.teacherId.email}
+                                {typeof message.teacherId === "object" &&
+                                message.teacherId?.email
+                                  ? message.teacherId.email
+                                  : "N/A"}
                               </p>
                             </div>
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">

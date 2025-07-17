@@ -234,10 +234,10 @@ useEffect(() => {
           variant="success"
         />
         <StatsCard
-          title="Assignments Due"
+          title="Assignments"
           value={assignmentCount}
           icon={<ClipboardList className="h-5 w-5 text-white" />}
-          description="This week"
+          description="Posted"
           variant="warning"
         />
         <StatsCard
@@ -254,6 +254,7 @@ useEffect(() => {
           }
           icon={<Award className="h-5 w-5 text-white" />}
           variant="purple"
+          description={classAverage!==null && classAverage>75 ? "Your Class is Doing Great" : "Your Class Needs Improvement"} 
         />
       </div>
 
