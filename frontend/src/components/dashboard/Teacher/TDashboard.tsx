@@ -1,5 +1,6 @@
 import { StatsCard } from "./StatsCard";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import {
   Users,
@@ -10,15 +11,12 @@ import {
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  Plus,
   Target,
   UserCheck,
   BarChart3,
-  BookMarked,
   ClipboardList,
   Home,
   Award,
-  Bell,
 } from "lucide-react";
 import { DashboardCard } from "./DashboardCard";
 import { cn } from "@/lib/utils";
@@ -26,7 +24,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-// Define the type for recentClasses
 interface RecentClass {
   id: number;
   name: string;
@@ -37,39 +34,142 @@ interface RecentClass {
   type: string;
   nextClass: string;
 }
-
+interface Notice {
+  _id: string;
+  title: string;
+  content: string;
+  type: string;
+  status: string;
+  publishDate: string;
+  targetAudience: string;
+}
+interface StudentExamData {
+  studentId: string;
+  email: string;
+  marks: Array<{
+    subjectId: string;
+    marks: number;
+  }>;
+}
 const Dashboard = () => {
   const [recentClasses, setRecentClasses] = useState<RecentClass[]>([]);
-
+  const [assignmentCount, setAssignmentCount] = useState<number>(0);
+  const [noticesCount, setNoticesCount] = useState<number>(0);
+  const [noticesDescription, setNoticesDescription] = useState<string>("");
+  const [classAssigned, setclassAssigned] = useState<string>("");
+  const [classAverage, setClassAverage] = useState<number | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:3001/api/teacher/classes");
-  
-        const mapped: RecentClass[] = response.data.map((item: any, index: number) => {
-  
-          return {
-            id: index + 1,
-            name: item.name,
-            students: item.students,
-            present: Math.floor((item.attendance / 100) * item.students),
-            time: item.schedule,
-            room: `Room ${item.room}`,
-            type: "Subject",
-            nextClass: item.nextClass,
-          };
-        });
-  
+        const response = await axios.get(
+          "http://localhost:3001/api/teacher/classes"
+        );
+
+        const mapped: RecentClass[] = response.data.map(
+          (item: any, index: number) => {
+            return {
+              id: index + 1,
+              name: item.name,
+              students: item.students,
+              present: Math.floor((item.attendance / 100) * item.students),
+              time: item.schedule,
+              room: `Room ${item.room}`,
+              type: "Subject",
+              nextClass: item.nextClass,
+            };
+          }
+        );
+
         setRecentClasses(mapped);
       } catch (error) {
         console.error("Failed to fetch classes:", error);
       }
     };
-  
+    const fetchAssignments = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/api/assignments", {
+          withCredentials: true,
+        });
+        const data = await res.data;
+        setAssignmentCount(Array.isArray(data) ? data.length : 0);
+      } catch (error) {
+        console.error("Error loading assignments:", error);
+        setAssignmentCount(0);
+      }
+    };
+    const fetchNotices = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/api/notices/1", {
+          withCredentials: true,
+        });
+        const data = await res.data;
+        const filtered = (data.notices as Notice[]).filter(
+          (n) => n.status === "published" && n.targetAudience === "teachers"
+        );
+        setNoticesCount(filtered.length);
+
+        if (filtered.length > 0) {
+          setNoticesDescription(filtered[0].title);
+        } else {
+          setNoticesDescription("No current notices");
+        }
+      } catch (error) {
+        console.error("Error loading notices:", error);
+        setNoticesCount(0);
+        setNoticesDescription("Error loading");
+      }
+    };
+    const fetchMyclass = async () => {
+      try {
+        const res = await axios.get("http://localhost:3001/api/auth/me", {
+          withCredentials: true,
+        });
+        const data = await res.data;
+        const filtered = data.classAssigned;
+        setclassAssigned(filtered);
+      } catch (error) {
+        console.error("Error loading notices:", error);
+        setNoticesCount(0);
+        setNoticesDescription("Error loading");
+      }
+    };
+    const fetchClassTestAverages = async () => {
+      try {
+        const res = await fetch(
+          "http://localhost:3001/api/exams/latest/1?class=10&section=A&examType=classTest",
+          { credentials: "include" }
+        );
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const allMarks: number[] = json.data.flatMap(
+            (entry: StudentExamData) =>
+              entry.marks.map((markObj) => markObj.marks)
+          );
+
+          if (allMarks.length > 0) {
+            const total = allMarks.reduce(
+              (sum: number, mark: number) => sum + mark,
+              0
+            );
+            const avg = total / allMarks.length;
+            setClassAverage(avg);
+          } else {
+            setClassAverage(null);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch class test averages:", error);
+        setClassAverage(null);
+      }
+    };
+
     fetchClasses();
+    fetchAssignments();
+    fetchNotices();
+    fetchMyclass();
+    fetchClassTestAverages();
   }, []);
-  
-  
 
   const recentAssignments = [
     {
@@ -104,30 +204,6 @@ const Dashboard = () => {
     },
   ];
 
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Parent-Teacher Conference",
-      date: "Dec 15",
-      time: "3:00 PM",
-      type: "meeting",
-    },
-    {
-      id: 2,
-      title: "Science Fair Preparation",
-      date: "Dec 18",
-      time: "1:00 PM",
-      type: "event",
-    },
-    {
-      id: 3,
-      title: "Final Exams Begin",
-      date: "Dec 22",
-      time: "9:00 AM",
-      type: "exam",
-    },
-  ];
-
   const studentInsights = [
     {
       name: "Emily Chen",
@@ -149,12 +225,6 @@ const Dashboard = () => {
     },
   ];
 
-  const curriculumProgress = [
-    { subject: "Mathematics", completion: 75, onTrack: true },
-    { subject: "Physics", completion: 68, onTrack: true },
-    { subject: "Chemistry", completion: 82, onTrack: true },
-  ];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -167,41 +237,37 @@ const Dashboard = () => {
             Here's what's happening with your classes today.
           </p>
         </div>
-        <Button className="bg-blue-600 shadow-glow hover:shadow-purple transform hover:scale-105 transition-all duration-300">
-          <Plus className="w-4 h-4 mr-2" />
-          Quick Action
-        </Button>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
-          title="Present Today"
-          value="92%"
+          title="Notices"
+          value={noticesCount}
           icon={<UserCheck className="h-5 w-5 text-white" />}
-          description="144 of 156 students"
+          description={noticesDescription}
           variant="success"
         />
         <StatsCard
           title="Assignments Due"
-          value={7}
+          value={assignmentCount}
           icon={<ClipboardList className="h-5 w-5 text-white" />}
           description="This week"
           variant="warning"
         />
         <StatsCard
-          title="Curriculum Progress"
-          value="76%"
+          title="My Class"
+          value={classAssigned}
           icon={<Target className="h-5 w-5 text-white" />}
           description="On track for year-end"
-         
           variant="cyan"
         />
         <StatsCard
           title="Class Average"
-          value="B+"
+          value={
+            classAverage !== null ? `${classAverage.toFixed(1)}%` : "Loading..."
+          }
           icon={<Award className="h-5 w-5 text-white" />}
-        
           variant="purple"
         />
       </div>
@@ -211,33 +277,37 @@ const Dashboard = () => {
         title="Quick Actions"
         icon={<TrendingUp className="h-5 w-5 text-white" />}
         variant="cyan"
-       className="col-span-full hover:scale-100 hover:shadow-none"
+        className="col-span-full hover:scale-100 hover:shadow-none"
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Button
             variant="outline"
-            className="h-16 flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            className="h-16 cursor-pointer flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            onClick={() => navigate("/teacher/notices")}
           >
             <Users className="h-5 w-5" />
-            <span className="text-sm">Add Student</span>
+            <span className="text-sm">Notices</span>
           </Button>
           <Button
             variant="outline"
-            className="h-16 flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            className="h-16 cursor-pointer flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            onClick={() => navigate("/teacher/assignments")}
           >
             <Calendar className="h-5 w-5" />
             <span className="text-sm">Create Assignment</span>
           </Button>
           <Button
             variant="outline"
-            className="h-16 flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            className="h-16 cursor-pointer flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            onClick={() => navigate("/teacher/gradebook")}
           >
             <GraduationCap className="h-5 w-5" />
             <span className="text-sm">Grade Papers</span>
           </Button>
           <Button
             variant="outline"
-            className="h-16 flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            className="h-16 cursor-pointer flex-col space-y-2 bg-white/10 border-white/30 text-white hover:bg-white/20"
+            onClick={()=>navigate('/teacher/messages')}
           >
             <MessageSquare className="h-5 w-5" />
             <span className="text-sm">Send Message</span>
@@ -295,12 +365,12 @@ const Dashboard = () => {
               </div>
             ))}
             <Link to="/teacher/classes">
-            <Button 
-              variant="outline"
-              className="w-full mt-3 bg-blue-300 border-white/30 text-white hover:bg-blue-400"
-            >
-              View All Classes
-            </Button>
+              <Button
+                variant="outline"
+                className="w-full mt-3 bg-blue-300 border-white/30 text-white hover:bg-blue-400"
+              >
+                View All Classes
+              </Button>
             </Link>
           </div>
         </DashboardCard>
@@ -407,98 +477,6 @@ const Dashboard = () => {
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Student Reports
-            </Button>
-          </div>
-        </DashboardCard>
-      </div>
-
-      {/* Secondary Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Curriculum Progress */}
-        <DashboardCard
-          title="Curriculum Progress"
-          icon={<Target className="h-5 w-5 text-white" />}
-          variant="emerald"
-        >
-          <div className="space-y-4">
-            {curriculumProgress.map((subject, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-white">
-                    {subject.subject}
-                  </span>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm text-white/80">
-                      {subject.completion}%
-                    </span>
-                    {subject.onTrack ? (
-                      <CheckCircle className="w-4 h-4 text-white" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-white" />
-                    )}
-                  </div>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-2">
-                  <div
-                    className="bg-white h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${subject.completion}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              className="w-full mt-4 bg-white/10 border-white/30 text-white hover:bg-white/20"
-            >
-              <BookMarked className="w-4 h-4 mr-2" />
-              Curriculum Planner
-            </Button>
-          </div>
-        </DashboardCard>
-
-        {/* Upcoming Events & Reminders */}
-        <DashboardCard
-          title="Events & Reminders"
-          icon={<Bell className="h-5 w-5 text-white" />}
-          variant="rose"
-        >
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start space-x-3 p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
-              >
-                <div
-                  className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${
-                    event.type === "exam"
-                      ? "bg-white"
-                      : event.type === "meeting"
-                      ? "bg-white/80"
-                      : "bg-white/60"
-                  }`}
-                ></div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-medium text-white">{event.title}</h4>
-                    <Badge
-                      variant="outline"
-                      className="text-xs bg-white/20 border-white/30 text-white"
-                    >
-                      {event.type}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-white/80">
-                    📅 {event.date} at {event.time}
-                  </p>
-                </div>
-              </div>
-            ))}
-            <Button
-              variant="outline"
-              className="w-full mt-3 bg-white/10 border-white/30 text-white hover:bg-white/20"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Full Calendar
             </Button>
           </div>
         </DashboardCard>
