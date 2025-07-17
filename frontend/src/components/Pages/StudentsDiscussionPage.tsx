@@ -21,7 +21,11 @@ const StudentsDiscussionPage: React.FC = () => {
   const [question, setQuestion] = useState("");
   const [contact, setContact] = useState("");
   const [loading, setLoading] = useState(false);
+  const [aiResponses, setAiResponses] = useState<{ [key: string]: string }>({});
+  const [aiLoading, setAiLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [expandedResponses, setExpandedResponses] = useState<{ [key: string]: boolean }>({});
+
   useEffect(() => {
     fetch("http://localhost:3001/api/students/subjects/me", {
       credentials: "include",
@@ -53,6 +57,7 @@ const StudentsDiscussionPage: React.FC = () => {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [selectedSubject]);
+
   const submit = async () => {
     if (!question.trim()) {
       setError("Please type a question.");
@@ -86,6 +91,7 @@ const StudentsDiscussionPage: React.FC = () => {
       setLoading(false);
     }
   };
+
   const deleteDiscussion = async (discussionId: string) => {
     try {
       const res = await fetch(
@@ -100,6 +106,74 @@ const StudentsDiscussionPage: React.FC = () => {
     } catch (err: any) {
       setError(err.message);
     }
+  };
+
+  const askAIAboutQuestion = async (id: string, question: string) => {
+    setAiLoading(id);
+    try {
+      const res = await fetch("http://localhost:3001/api/ai/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ question }),
+      });
+
+      const data = await res.json();
+      if (data.answer) {
+        setAiResponses((prev) => ({ ...prev, [id]: data.answer }));
+      }
+    } catch (err) {
+      setAiResponses((prev) => ({
+        ...prev,
+        [id]: "⚠️ Failed to get AI response. Please try again.",
+      }));
+    } finally {
+      setAiLoading(null);
+    }
+  };
+
+  const toggleResponseExpansion = (id: string) => {
+    setExpandedResponses(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+const formatAIResponse = (response: string) => {
+  const processedResponse = response
+    .replace(/\$\$(.*?)\$\$/g, '<div class="math-display">$1</div>') 
+    .replace(/\$(.*?)\$/g, '<span class="math-inline">$1</span>');
+  const paragraphs = processedResponse.split('\n\n').filter(p => p.trim());
+  
+  return paragraphs.map((paragraph, index) => {
+    if (paragraph.includes('•') || paragraph.match(/^\d+\./)) {
+      const items = paragraph.split(/\n(?=•|\d+\.)/);
+      return (
+        <ul key={index} className="list-disc list-inside space-y-1 mb-3">
+          {items.map((item, itemIndex) => (
+            <li key={itemIndex} className="text-gray-700" 
+                dangerouslySetInnerHTML={{ 
+                  __html: item.replace(/^•\s*/, '').replace(/^\d+\.\s*/, '') 
+                }} />
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <p key={index} className="text-gray-700 mb-3 leading-relaxed"
+         dangerouslySetInnerHTML={{ __html: paragraph }} />
+    );
+  });
+};
+
+  const clearAIResponse = (id: string) => {
+    setAiResponses(prev => {
+      const newResponses = { ...prev };
+      delete newResponses[id];
+      return newResponses;
+    });
   };
 
   return (
@@ -287,17 +361,35 @@ const StudentsDiscussionPage: React.FC = () => {
                         </p>
 
                         {d.contactInfo && (
-                          <div className="flex items-center gap-2 text-sm">
+                          <div className="flex items-center gap-2 text-sm mb-3">
                             <span className="text-gray-500">📧</span>
                             <span className="text-gray-600 bg-white px-2 py-1 rounded border">
                               {d.contactInfo}
                             </span>
                           </div>
                         )}
+
                         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>💬</span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => askAIAboutQuestion(d._id, d.question)}
+                              disabled={aiLoading === d._id}
+                              className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                            >
+                              {aiLoading === d._id ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                  <span>Asking AI...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span>🤖</span>
+                                  <span>Ask AI</span>
+                                </>
+                              )}
+                            </button>
                           </div>
+                          
                           <button
                             onClick={() => deleteDiscussion(d._id)}
                             className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all duration-200"
@@ -306,6 +398,55 @@ const StudentsDiscussionPage: React.FC = () => {
                             <span className="text-lg">🗑️</span>
                           </button>
                         </div>
+
+                        {/* AI Response Section */}
+                        {aiResponses[d._id] && (
+                          <div className="mt-4 border-t border-gray-200 pt-4">
+                            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 overflow-hidden">
+                              <div className="flex items-center justify-between bg-gradient-to-r from-blue-100 to-purple-100 px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-blue-600">🤖</span>
+                                  <span className="font-semibold text-blue-800">AI Assistant</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => toggleResponseExpansion(d._id)}
+                                    className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors"
+                                  >
+                                    {expandedResponses[d._id] ? "Collapse" : "Expand"}
+                                  </button>
+                                  <button
+                                    onClick={() => clearAIResponse(d._id)}
+                                    className="text-red-500 hover:text-red-700 text-sm font-medium transition-colors"
+                                  >
+                                    Clear
+                                  </button>
+                                </div>
+                              </div>
+                              
+                              <div className="p-4">
+                                <div className={`overflow-hidden transition-all duration-300 ${
+                                  expandedResponses[d._id] ? 'max-h-none' : 'max-h-32'
+                                }`}>
+                                  <div className="text-sm">
+                                    {formatAIResponse(aiResponses[d._id])}
+                                  </div>
+                                </div>
+                                
+                                {!expandedResponses[d._id] && aiResponses[d._id].length > 200 && (
+                                  <div className="bg-gradient-to-t from-blue-50 to-transparent h-8 -mt-8 relative">
+                                    <button
+                                      onClick={() => toggleResponseExpansion(d._id)}
+                                      className="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-medium transition-colors"
+                                    >
+                                      Show more
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -319,7 +460,7 @@ const StudentsDiscussionPage: React.FC = () => {
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>
             💡 Tip: Use clear, specific questions to get better responses from
-            your classmates
+            your classmates and AI assistant
           </p>
         </div>
       </div>

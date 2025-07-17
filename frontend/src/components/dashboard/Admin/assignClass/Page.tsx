@@ -23,11 +23,12 @@ interface Teacher {
   name: string;
   subject: string;
   email: string;
-  classAssigned: string | null; // homeroom class
-  classes: string[]; // all teaching classes
+  classAssigned: string | null; 
+  classes: string[]; 
 }
 
-const allClasses = ["1", "2", "3", "4", "5", "6", "7", "8"];
+const allClasses = ["1", "2", "3", "4", "5", "6", "7", "8","9","10"];
+const sections = ["A","B","C","D"]
 
 export default function AssignClass() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
@@ -131,15 +132,27 @@ export default function AssignClass() {
           <div className="space-y-2">
             <Label>Select Classes to Teach</Label>
             <div className="flex flex-wrap gap-2">
-              {allClasses.map((c) => (
-                <Button
-                  key={c}
-                  size="sm"
-                  variant={selectedClasses.includes(c) ? "default" : "outline"}
-                  onClick={() => toggleClass(c)}
-                >
-                  Class {c}
-                </Button>
+              {allClasses.map((cls) => (
+                <div key={cls} className="flex items-center gap-2">
+                  <span className="w-12">Class {cls}</span>
+                  {sections.map((sec) => {
+                    const combo = `${cls}-${sec}`;
+                    return (
+                      <Button
+                        key={combo}
+                        size="sm"
+                        variant={
+                          selectedClasses.includes(combo)
+                            ? "default"
+                            : "outline"
+                        }
+                        onClick={() => toggleClass(combo)}
+                      >
+                        {sec}
+                      </Button>
+                    );
+                  })}
+                </div>
               ))}
             </div>
           </div>

@@ -44,40 +44,37 @@ export const assignTeacher = async (req, res) => {
       return res.status(400).json({ error: "Invalid teacher ID." });
     }
 
-    const { className } = req.body;
-    if (!className || typeof className !== "string") {
-      return res.status(400).json({ error: "className is required." });
+    const { classes } = req.body;
+    if (!Array.isArray(classes)) {
+      return res.status(400).json({ error: "Classes must be an array." });
     }
+
     const teacher = await User.findById(teacherId);
     if (!teacher) {
       return res.status(404).json({ error: "Teacher not found." });
     }
     if (teacher.role !== "teacher" || teacher.schoolId !== paramSid) {
-      return res
-        .status(403)
-        .json({ error: "Forbidden: not a teacher in this school." });
+      return res.status(403).json({ error: "Not authorized." });
     }
-    teacher.classAssigned = className;
+
+    teacher.classes = classes;
     await teacher.save();
 
     return res.json({
-      message: `Assigned ${teacher.name} to class ${className}.`,
+      message: `Assigned ${teacher.name} to classes.`,
       teacher: {
         id: teacher._id,
         name: teacher.name,
-        subject: teacher.subject,
-        email: teacher.email,
-        phone: teacher.phone,
+        classes: teacher.classes,
         classAssigned: teacher.classAssigned,
       },
     });
   } catch (err) {
-    console.error("assignTeacher error:", err);
-    return res
-      .status(500)
-      .json({ error: "Server error while assigning teacher." });
+    console.error("assignTeachingClasses error:", err);
+    return res.status(500).json({ error: "Server error." });
   }
 };
+
 
 export const unassignTeacher = async (req, res) => {
   try {
