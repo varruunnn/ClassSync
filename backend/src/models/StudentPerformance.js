@@ -1,4 +1,3 @@
-// models/StudentPerformance.js
 import mongoose from "mongoose";
 const StudentPerformanceSchema = new mongoose.Schema({
     name: String,
