@@ -1,26 +1,9 @@
 import { useEffect, useState } from "react";
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Users,
-  BookOpen,
-  FileText,
-  Calendar,
-  Clock,
-  TrendingUp,
-  CheckCircle,
-  AlertCircle,
-  Star,
-  Award,
-} from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Progress } from "@/components/ui/progress";
 import { useTeacherClassroom } from "@/components/contexts/TeacherClassroomContext";
 import { useNavigate } from "react-router-dom";
-import Index from "./TDashboard";
 import Dashboard from "./TDashboard";
 
 interface teacherInfo {

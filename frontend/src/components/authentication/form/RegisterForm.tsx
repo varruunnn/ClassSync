@@ -49,6 +49,7 @@ const RegisterForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [classAssignedSection, setClassAssignedSection] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   type PasswordRequirements = {
     length: boolean;
@@ -105,6 +106,10 @@ const RegisterForm: React.FC = () => {
       valid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       errs.email = "Email is invalid";
+      valid = false;
+    }
+    if (!classAssignedSection.trim()) {
+      errs.classAssignedSection = "Assigned section is required";
       valid = false;
     }
     if (!password) {
@@ -185,6 +190,7 @@ const RegisterForm: React.FC = () => {
       payload.subject = subject;
       payload.phone = phone;
       payload.classAssigned = classAssigned;
+      payload.classAssignedSection = classAssignedSection;
     }
 
     try {
@@ -474,6 +480,27 @@ const RegisterForm: React.FC = () => {
               </p>
             )}
           </div>
+          <div>
+            <Label htmlFor="classAssignedSection">Assigned Section</Label>
+            <div className="relative mt-1">
+              <Users className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="classAssignedSection"
+                value={classAssignedSection}
+                onChange={(e) => setClassAssignedSection(e.target.value)}
+                disabled={isLoading}
+                className={`pl-10 ${
+                  errors.classAssignedSection ? "border-red-500" : ""
+                }`}
+                placeholder="e.g., A, B, C"
+              />
+            </div>
+            {errors.classAssignedSection && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.classAssignedSection}
+              </p>
+            )}
+          </div>
         </div>
       )}
 
@@ -514,59 +541,105 @@ const RegisterForm: React.FC = () => {
                 )}
               </button>
             </div>
-             {password && (
-                <div className="mt-2 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full transition-all ${
-                          passwordStrength.score <= 2 ? 'bg-red-500' : 
-                          passwordStrength.score === 3 ? 'bg-yellow-500' : 
-                          passwordStrength.score === 4 ? 'bg-blue-500' : 'bg-green-500'
-                        }`}
-                        style={{ width: `${(passwordStrength.score / 5) * 100}%` }}
-                      />
-                    </div>
-                    <span className={`text-xs font-medium ${
-                      passwordStrength.score <= 2 ? 'text-red-600' : 
-                      passwordStrength.score === 3 ? 'text-yellow-600' : 
-                      passwordStrength.score === 4 ? 'text-blue-600' : 'text-green-600'
-                    }`}>
-                      {passwordStrength.score <= 2 ? 'Weak' : 
-                       passwordStrength.score === 3 ? 'Fair' : 
-                       passwordStrength.score === 4 ? 'Good' : 'Strong'}
-                    </span>
+            {password && (
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        passwordStrength.score <= 2
+                          ? "bg-red-500"
+                          : passwordStrength.score === 3
+                          ? "bg-yellow-500"
+                          : passwordStrength.score === 4
+                          ? "bg-blue-500"
+                          : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${(passwordStrength.score / 5) * 100}%`,
+                      }}
+                    />
                   </div>
-                  
-                  <div className="text-xs space-y-1">
-                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.length === true ? 'text-green-600' : 'text-red-600'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      At least 8 characters
-                    </div>
-                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.uppercase ? 'text-green-600' : 'text-red-600'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      One uppercase letter
-                    </div>
-                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.lowercase ? 'text-green-600' : 'text-red-600'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      One lowercase letter
-                    </div>
-                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.number ? 'text-green-600' : 'text-red-600'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      One number
-                    </div>
-                    <div className={`flex items-center gap-1 ${passwordStrength.requirements.special ? 'text-green-600' : 'text-red-600'}`}>
-                      <span className="w-2 h-2 rounded-full bg-current"></span>
-                      One special character
-                    </div>
+                  <span
+                    className={`text-xs font-medium ${
+                      passwordStrength.score <= 2
+                        ? "text-red-600"
+                        : passwordStrength.score === 3
+                        ? "text-yellow-600"
+                        : passwordStrength.score === 4
+                        ? "text-blue-600"
+                        : "text-green-600"
+                    }`}
+                  >
+                    {passwordStrength.score <= 2
+                      ? "Weak"
+                      : passwordStrength.score === 3
+                      ? "Fair"
+                      : passwordStrength.score === 4
+                      ? "Good"
+                      : "Strong"}
+                  </span>
+                </div>
+
+                <div className="text-xs space-y-1">
+                  <div
+                    className={`flex items-center gap-1 ${
+                      passwordStrength.requirements.length === true
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-current"></span>
+                    At least 8 characters
+                  </div>
+                  <div
+                    className={`flex items-center gap-1 ${
+                      passwordStrength.requirements.uppercase
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-current"></span>
+                    One uppercase letter
+                  </div>
+                  <div
+                    className={`flex items-center gap-1 ${
+                      passwordStrength.requirements.lowercase
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-current"></span>
+                    One lowercase letter
+                  </div>
+                  <div
+                    className={`flex items-center gap-1 ${
+                      passwordStrength.requirements.number
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-current"></span>
+                    One number
+                  </div>
+                  <div
+                    className={`flex items-center gap-1 ${
+                      passwordStrength.requirements.special
+                        ? "text-green-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-current"></span>
+                    One special character
                   </div>
                 </div>
-              )}
-              
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
+              </div>
+            )}
+
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
+          </div>
 
           <div>
             <Label htmlFor="confirmPassword">Confirm Password</Label>

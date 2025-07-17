@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
 interface RecentClass {
   id: number;
   name: string;
@@ -59,34 +58,43 @@ const Dashboard = () => {
   const [classAssigned, setclassAssigned] = useState<string>("");
   const [classAverage, setClassAverage] = useState<number | null>(null);
   const navigate = useNavigate();
-  useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:3001/api/teacher/classes"
-        );
+useEffect(() => {
+  const fetchDashboardData = async () => {
+    try {
+      // 1. Fetch teacher's info
+      const meRes = await axios.get("http://localhost:3001/api/auth/me", {
+        withCredentials: true,
+      });
+      const me = await meRes.data;
+      const assignedClass = me.classAssigned;
+      const assignedSection = me.classAssignedSection;
+      const schoolId = me.schoolId;
 
-        const mapped: RecentClass[] = response.data.map(
-          (item: any, index: number) => {
-            return {
-              id: index + 1,
-              name: item.name,
-              students: item.students,
-              present: Math.floor((item.attendance / 100) * item.students),
-              time: item.schedule,
-              room: `Room ${item.room}`,
-              type: "Subject",
-              nextClass: item.nextClass,
-            };
-          }
-        );
+      setclassAssigned(assignedClass);
+
+      // 2. Fetch classes 
+      try {
+        const response = await axios.get("http://localhost:3001/api/teacher/classes", {
+          withCredentials: true,
+        });
+
+        const mapped: RecentClass[] = response.data.map((item: any, index: number) => ({
+          id: index + 1,
+          name: item.name,
+          students: item.students,
+          present: Math.floor((item.attendance / 100) * item.students),
+          time: item.schedule,
+          room: `Room ${item.room}`,
+          type: "Subject",
+          nextClass: item.nextClass,
+        }));
 
         setRecentClasses(mapped);
       } catch (error) {
         console.error("Failed to fetch classes:", error);
       }
-    };
-    const fetchAssignments = async () => {
+
+      // 3. Fetch assignments 
       try {
         const res = await axios.get("http://localhost:3001/api/assignments", {
           withCredentials: true,
@@ -97,10 +105,10 @@ const Dashboard = () => {
         console.error("Error loading assignments:", error);
         setAssignmentCount(0);
       }
-    };
-    const fetchNotices = async () => {
+
+      // 4. Fetch notices
       try {
-        const res = await axios.get("http://localhost:3001/api/notices/1", {
+        const res = await axios.get(`http://localhost:3001/api/notices/${schoolId}`, {
           withCredentials: true,
         });
         const data = await res.data;
@@ -108,36 +116,17 @@ const Dashboard = () => {
           (n) => n.status === "published" && n.targetAudience === "teachers"
         );
         setNoticesCount(filtered.length);
+        setNoticesDescription(filtered[0]?.title || "No current notices");
+      } catch (error) {
+        console.error("Error loading notices:", error);
+        setNoticesCount(0);
+        setNoticesDescription("Error loading");
+      }
 
-        if (filtered.length > 0) {
-          setNoticesDescription(filtered[0].title);
-        } else {
-          setNoticesDescription("No current notices");
-        }
-      } catch (error) {
-        console.error("Error loading notices:", error);
-        setNoticesCount(0);
-        setNoticesDescription("Error loading");
-      }
-    };
-    const fetchMyclass = async () => {
-      try {
-        const res = await axios.get("http://localhost:3001/api/auth/me", {
-          withCredentials: true,
-        });
-        const data = await res.data;
-        const filtered = data.classAssigned;
-        setclassAssigned(filtered);
-      } catch (error) {
-        console.error("Error loading notices:", error);
-        setNoticesCount(0);
-        setNoticesDescription("Error loading");
-      }
-    };
-    const fetchClassTestAverages = async () => {
+      // 5. Fetch class test averages
       try {
         const res = await fetch(
-          "http://localhost:3001/api/exams/latest/1?class=10&section=A&examType=classTest",
+          `http://localhost:3001/api/exams/latest/${schoolId}?class=${assignedClass}&section=${assignedSection}&examType=classTest`,
           { credentials: "include" }
         );
         const json = await res.json();
@@ -148,12 +137,8 @@ const Dashboard = () => {
           );
 
           if (allMarks.length > 0) {
-            const total = allMarks.reduce(
-              (sum: number, mark: number) => sum + mark,
-              0
-            );
-            const avg = total / allMarks.length;
-            setClassAverage(avg);
+            const total = allMarks.reduce((sum: number, mark: number) => sum + mark, 0);
+            setClassAverage(total / allMarks.length);
           } else {
             setClassAverage(null);
           }
@@ -162,14 +147,14 @@ const Dashboard = () => {
         console.error("Failed to fetch class test averages:", error);
         setClassAverage(null);
       }
-    };
+    } catch (err) {
+      console.error("Failed to load teacher info:", err);
+    }
+  };
 
-    fetchClasses();
-    fetchAssignments();
-    fetchNotices();
-    fetchMyclass();
-    fetchClassTestAverages();
-  }, []);
+  fetchDashboardData();
+}, []);
+
 
   const recentAssignments = [
     {

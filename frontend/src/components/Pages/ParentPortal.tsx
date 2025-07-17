@@ -111,7 +111,7 @@ const ParentPortal = () => {
 
     setLoadingClassTest(true);
     fetch(
-      `http://localhost:3001/api/exams/latest?class=${studentData.class}&section=${studentData.section}&examType=classTest`,
+      `http://localhost:3001/api/exams/latest/${studentData.schoolId}?class=${studentData.class}&section=${studentData.section}&examType=classTest`,
       { credentials: "include" }
     )
       .then((r) => r.json())
