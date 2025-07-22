@@ -4,20 +4,13 @@ import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout
 import { currentStudent } from "@/data/mockData";
 import {
   Card,
-  CardContent,
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
 import {
   BookOpen,
-  Users,
-  FileText,
-  Calendar,
-  Plus,
-  Search
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 type subjectInfo = {
   id: string;
@@ -103,36 +96,6 @@ const TeacherSubjects = () => {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      Students
-                    </div>
-                    <div className="text-2xl font-bold">{subject.totalStudents}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                      <FileText className="h-4 w-4" />
-                      Assignments
-                    </div>
-                    <div className="text-2xl font-bold">{subject.assignments}</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      Tests
-                    </div>
-                    <div className="text-2xl font-bold">{subject.upcomingTests}</div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1">Manage</Button>
-                  <Button size="sm" variant="outline">View Syllabus</Button>
-                  <Button size="sm" variant="outline">Resources</Button>
-                </div>
-              </CardContent>
             </Card>
           ))}
         </div>
