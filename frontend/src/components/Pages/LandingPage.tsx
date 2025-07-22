@@ -1,11 +1,11 @@
-import type React from "react"
-import { useEffect, useRef, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { motion, useInView } from "framer-motion"
-import studentDashboardImage from "@/assets/studentDashboard.png"
-import teacherDashboardImage from "@/assets/teacherDashboard.png"
-import adminDashboardImage from "@/assets/admin.png"
-import parentDashboardImage from "@/assets/parentDashboard.png"
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, useInView } from "framer-motion";
+import studentDashboardImage from "@/assets/studentDashboard.png";
+import teacherDashboardImage from "@/assets/teacherDashboard.png";
+import adminDashboardImage from "@/assets/admin.png";
+import parentDashboardImage from "@/assets/parentDashboard.png";
 import {
   ArrowRight,
   Bell,
@@ -18,50 +18,57 @@ import {
   Menu,
   X,
   Sparkles,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const LandingPage: React.FC = () => {
-  const navigate = useNavigate()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState("hero")
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("hero");
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) * 100
-      const y = (e.clientY / window.innerHeight) * 100
-      setMousePosition({ x, y })
-    }
+      const x = (e.clientX / window.innerWidth) * 100;
+      const y = (e.clientY / window.innerHeight) * 100;
+      setMousePosition({ x, y });
+    };
 
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["hero", "features", "learn-more", "for-parents", "for-teachers", "contact"]
+      const sections = [
+        "hero",
+        "features",
+        "learn-more",
+        "for-parents",
+        "for-teachers",
+        "contact",
+      ];
       const currentSection = sections.find((section) => {
-        const element = document.getElementById(section)
-        if (!element) return false
-        const rect = element.getBoundingClientRect()
-        return rect.top <= 200 && rect.bottom >= 200
-      })
+        const element = document.getElementById(section);
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return rect.top <= 200 && rect.bottom >= 200;
+      });
 
       if (currentSection) {
-        setActiveSection(currentSection)
+        setActiveSection(currentSection);
       }
-    }
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const [title, setTitle] = useState("Login")
+  const [title, setTitle] = useState("Login");
 
   useEffect(() => {
-    setTitle("Login")
-  }, [])
+    setTitle("Login");
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 text-black overflow-hidden">
@@ -77,18 +84,29 @@ const LandingPage: React.FC = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <BookOpen className="h-8 w-8 text-black" />
-                <span className="ml-2 text-2xl font-bold text-black">Classync</span>
+                <span className="ml-2 text-2xl font-bold text-black">
+                  Classync
+                </span>
               </div>
             </div>
 
             <div className="hidden md:flex items-center space-x-8">
-              {["features", "for-admin", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
+              {[
+                "features",
+                "for-admin",
+                "for-students",
+                "for-parents",
+                "for-teachers",
+                "contact",
+              ].map((item) => (
                 <a
                   key={item}
                   href={`#${item}`}
                   className={cn(
                     "text-sm font-medium transition-colors",
-                    activeSection === item ? "text-black" : "text-gray-600 hover:text-black",
+                    activeSection === item
+                      ? "text-black"
+                      : "text-gray-600 hover:text-black"
                   )}
                 >
                   {item
@@ -110,7 +128,11 @@ const LandingPage: React.FC = () => {
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 rounded-md text-gray-600 hover:text-black"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
@@ -118,7 +140,13 @@ const LandingPage: React.FC = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200">
             <div className="px-4 py-2 space-y-1">
-              {["features", "for-students", "for-parents", "for-teachers", "contact"].map((item) => (
+              {[
+                "features",
+                "for-students",
+                "for-parents",
+                "for-teachers",
+                "contact",
+              ].map((item) => (
                 <a
                   key={item}
                   href={`#${item}`}
@@ -148,15 +176,28 @@ const LandingPage: React.FC = () => {
       <CTASection />
       <FooterSection />
     </div>
-  )
-}
+  );
+};
 
-const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number } }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.3 })
+const HeroSection = ({
+  mousePosition,
+}: {
+  mousePosition: { x: number; y: number };
+}) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const navigate = useNavigate();
 
+  const handleGetStarted = () => {
+    navigate("/register");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   return (
-    <section id="hero" ref={ref} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section
+      id="hero"
+      ref={ref}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
       <motion.div
         className="absolute inset-0 opacity-[0.02]"
@@ -172,7 +213,7 @@ const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number 
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <motion.div
-            className="inline-flex mt-[100px] items-center px-4 py-2 rounded-full border border-gray-200 bg-white/50 backdrop-blur-sm text-sm font-medium text-gray-700 mb-8"
+            className="inline-flex mt-[100px] items-center px-4 py-2 rounded-full border border-gray-700 bg-white/50 backdrop-blur-sm text-sm font-medium text-gray-700 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -221,8 +262,9 @@ const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number 
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
           >
-            Connect students, parents, and teachers on one comprehensive platform. Manage assignments, track progress,
-            and facilitate transparent communication.
+            Connect students, parents, and teachers on one comprehensive
+            platform. Manage assignments, track progress, and facilitate
+            transparent communication.
           </motion.p>
 
           <motion.div
@@ -232,7 +274,7 @@ const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number 
             transition={{ duration: 0.8, delay: 1.1 }}
           >
             <a
-              href="/register"
+              onClick={handleGetStarted}
               className="inline-flex items-center justify-center px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 shadow-lg"
             >
               Get Started
@@ -254,45 +296,51 @@ const HeroSection = ({ mousePosition }: { mousePosition: { x: number; y: number 
         ></motion.div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 const FeaturesSection = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   const features = [
     {
       icon: <CheckCircle className="h-6 w-6" />,
       title: "Assignment Management",
-      description: "Track homework and assignments with due dates, submissions, and feedback all in one place.",
+      description:
+        "Track homework and assignments with due dates, submissions, and feedback all in one place.",
     },
     {
       icon: <Calendar className="h-6 w-6" />,
       title: "Interactive Timetables",
-      description: "View personalized schedules for classes, exams, and extracurricular activities.",
+      description:
+        "View personalized schedules for classes, exams, and extracurricular activities.",
     },
     {
       icon: <FileText className="h-6 w-6" />,
       title: "Document Generation",
-      description: "Generate admit cards, result sheets, and other important documents with just a few clicks.",
+      description:
+        "Generate admit cards, result sheets, and other important documents with just a few clicks.",
     },
     {
       icon: <Bell className="h-6 w-6" />,
       title: "Real-time Notifications",
-      description: "Stay updated with important announcements, grade releases, and upcoming deadlines.",
+      description:
+        "Stay updated with important announcements, grade releases, and upcoming deadlines.",
     },
     {
       icon: <Users className="h-6 w-6" />,
       title: "Parent-Teacher Collaboration",
-      description: "Facilitate direct communication between parents and teachers for better student support.",
+      description:
+        "Facilitate direct communication between parents and teachers for better student support.",
     },
     {
       icon: <LineChart className="h-6 w-6" />,
       title: "Performance Analytics",
-      description: "Track academic progress with insightful reports and visualization tools.",
+      description:
+        "Track academic progress with insightful reports and visualization tools.",
     },
-  ]
+  ];
 
   return (
     <div id="features" ref={ref} className="relative z-10 py-20 bg-white">
@@ -303,9 +351,12 @@ const FeaturesSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Everything you need in one place</h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">
+            Everything you need in one place
+          </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Classync brings together all essential educational management tools on a single, intuitive platform.
+            Classync brings together all essential educational management tools
+            on a single, intuitive platform.
           </p>
         </motion.div>
 
@@ -316,12 +367,12 @@ const FeaturesSection = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const FeatureCard = ({ feature, index }: { feature: any; index: number }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.5 })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
 
   return (
     <motion.div
@@ -337,12 +388,12 @@ const FeatureCard = ({ feature, index }: { feature: any; index: number }) => {
       <h3 className="text-lg font-semibold text-black mb-2">{feature.title}</h3>
       <p className="text-gray-600">{feature.description}</p>
     </motion.div>
-  )
-}
+  );
+};
 
 const HowItWorksSection = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
     <div id="learn-more" ref={ref} className="relative z-10 py-20 bg-gray-50">
@@ -353,9 +404,12 @@ const HowItWorksSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Simple workflow for everyone</h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">
+            Simple workflow for everyone
+          </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Our platform is designed to be intuitive and accessible for students, parents, and teachers alike.
+            Our platform is designed to be intuitive and accessible for
+            students, parents, and teachers alike.
           </p>
         </motion.div>
 
@@ -421,8 +475,8 @@ const HowItWorksSection = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const WorkflowItem = ({
   id,
@@ -433,22 +487,24 @@ const WorkflowItem = ({
   isReversed,
   index,
 }: {
-  id: string
-  title: string
-  description: string
-  image: string
-  steps: string[]
-  isReversed: boolean
-  index: number
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  steps: string[];
+  isReversed: boolean;
+  index: number;
 }) => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.3 })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
     <motion.div
       id={id}
       ref={ref}
-      className={`lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center ${isReversed ? "lg:grid-flow-col-dense" : ""}`}
+      className={`lg:grid lg:grid-cols-2 lg:gap-12 lg:items-center ${
+        isReversed ? "lg:grid-flow-col-dense" : ""
+      }`}
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: 0.2 * index }}
@@ -470,22 +526,26 @@ const WorkflowItem = ({
 
       <div className={`mt-8 lg:mt-0 ${isReversed ? "lg:col-start-1" : ""}`}>
         <div className="bg-white rounded-xl overflow-hidden shadow-2xl border border-gray-200">
-          <img src={image || "/placeholder.svg"} alt={title} className="w-full h-64 object-cover" />
+          <img
+            src={image || "/placeholder.svg"}
+            alt={title}
+            className="w-full h-64 object-cover"
+          />
         </div>
       </div>
     </motion.div>
-  )
-}
+  );
+};
 
 const StatisticsSection = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.3 })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.3 });
 
   const stats = [
     { label: "Schools", value: "500+" },
     { label: "Students", value: "100,000+" },
     { label: "Assignments Completed", value: "5M+" },
-  ]
+  ];
 
   return (
     <div ref={ref} className="relative z-10 py-20 bg-white">
@@ -496,9 +556,12 @@ const StatisticsSection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Trusted by schools across the country</h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">
+            Trusted by schools across the country
+          </h2>
           <p className="text-xl text-gray-600">
-            Join thousands of students, parents, and teachers already using Classync
+            Join thousands of students, parents, and teachers already using
+            Classync
           </p>
         </motion.div>
 
@@ -510,21 +573,26 @@ const StatisticsSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 * index }}
             >
-              <div className="text-4xl font-bold text-black mb-2">{stat.value}</div>
+              <div className="text-4xl font-bold text-black mb-2">
+                {stat.value}
+              </div>
               <div className="text-gray-600">{stat.label}</div>
             </motion.div>
           ))}
         </div>
       </div>
     </div>
-  )
-}
-
+  );
+};
 
 const CTASection = () => {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.5 })
-
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const navigate = useNavigate();
+  const handleGetStarted = () => {
+    navigate("/register");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   return (
     <div ref={ref} className="relative z-10 py-20 bg-white">
       <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
@@ -533,12 +601,15 @@ const CTASection = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">Ready to get started?</h2>
+          <h2 className="text-3xl font-bold text-black sm:text-4xl mb-4">
+            Ready to get started?
+          </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join thousands of schools already using Classync to streamline education management.
+            Join thousands of schools already using Classync to streamline
+            education management.
           </p>
           <a
-            href="/signup"
+            onClick={handleGetStarted}
             className="inline-flex items-center px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-gray-800 transition-all duration-200 shadow-lg"
           >
             Get Started
@@ -547,8 +618,8 @@ const CTASection = () => {
         </motion.div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const FooterSection = () => {
   return (
@@ -560,67 +631,83 @@ const FooterSection = () => {
               <BookOpen className="h-8 w-8 text-white" />
               <span className="ml-2 text-2xl font-bold">Classync</span>
             </div>
-            <p className="text-gray-400">Transforming education management with innovative digital solutions.</p>
+            <p className="text-gray-400">
+              Transforming education management with innovative digital
+              solutions.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">
+              Company
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <a
+                  href="#features"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a className="text-gray-400 hover:text-white transition-colors blur-[1px]">
+                  Careers
+                </a>
+              </li>
+              <li>
+                <a className="text-gray-400 hover:text-white transition-colors blur-[1px]">
+                  FAQ
+                </a>
+              </li>
+            </ul>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Solutions</h3>
+            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">
+              Solutions
+            </h3>
             <ul className="space-y-2">
               <li>
-                <a href="#for-students" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#for-students"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   For Students
                 </a>
               </li>
               <li>
-                <a href="#for-parents" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#for-parents"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   For Parents
                 </a>
               </li>
               <li>
-                <a href="#for-teachers" className="text-gray-400 hover:text-white transition-colors">
+                <a
+                  href="#for-teachers"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
                   For Teachers
                 </a>
               </li>
             </ul>
           </div>
-
           <div>
-            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Support</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  Contact Us
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">Contact</h3>
+            <h3 className="text-sm font-semibold text-gray-300 tracking-wider uppercase mb-4">
+              Contact
+            </h3>
             <ul className="space-y-2 text-gray-400">
-              <li>Mon-Fri: 9AM - 5PM</li>
-              <li>info@Classync.com</li>
-              <li>1-800-EDU-CONN</li>
+              <li>Email us and we’ll get back to you within 24 hours 😊</li>
+              <li>indianteched@gmail.com</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-gray-800 pt-8">
-          <p className="text-gray-400 text-center">&copy; {new Date().getFullYear()} Classync. All rights reserved.</p>
-        </div>
+        <div className="mt-6 border-t border-gray-800 "></div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;
