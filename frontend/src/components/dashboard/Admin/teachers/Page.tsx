@@ -79,7 +79,7 @@ export default function TeachersPage() {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/admin/${ctxSchoolId}/teachers`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/teachers`, {
         credentials: "include",
       })
       if (!response.ok) {

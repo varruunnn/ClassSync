@@ -90,7 +90,7 @@ export default function StudentsPage() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/students`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/students`,
         {
           credentials: "include",
         }
@@ -120,7 +120,7 @@ export default function StudentsPage() {
     if (typeof ctxSchoolId !== "number") return;
     try {
       const response = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/students/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/students/${id}`,
         {
           method: "DELETE",
           credentials: "include",

@@ -92,7 +92,7 @@ export default function AdminDashboard() {
   const {
     isAuthenticated,
     userRole,
-    schoolId: ctxSchoolId,
+    schoolId: _ctxSchoolId,
     loading,
   } = useAuth();
   const [stats, setStats] = useState<any[]>([]);
@@ -111,7 +111,7 @@ export default function AdminDashboard() {
 
       try {
         const response = await fetch(
-          `http://localhost:3001/api/admin/${storedSchoolId}/stats`,
+          `${import.meta.env.VITE_API_BASE_URL}/admin/${storedSchoolId}/stats`,
           {
             method: "GET",
             credentials: "include",

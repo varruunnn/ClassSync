@@ -92,7 +92,7 @@ export default function AssignTeacherPage() {
 
   const [selectedTeacher, setSelectedTeacher] = useState<string>("")
   const [selectedClass, setSelectedClass] = useState<string>("")
-  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [_assignments, setAssignments] = useState<Assignment[]>([])
 
   const { toast, toasts, setToasts } = useToast()
 
@@ -105,7 +105,7 @@ export default function AssignTeacherPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/teachers`,
         {
           credentials: "include",
         }
@@ -136,7 +136,7 @@ export default function AssignTeacherPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers/${selectedTeacher}/assign`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/teachers/${selectedTeacher}/assign`,
         {
           method: "POST",
           credentials: "include",
@@ -184,7 +184,7 @@ export default function AssignTeacherPage() {
   const handleUnassign = async (teacherId: string) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers/${teacherId}/assign`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/teachers/${teacherId}/assign`,
         {
           method: "DELETE",
           credentials: "include",
