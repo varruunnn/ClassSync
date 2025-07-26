@@ -44,9 +44,18 @@ export const assignTeacher = async (req, res) => {
       return res.status(400).json({ error: "Invalid teacher ID." });
     }
 
-    const { classes } = req.body;
-    if (!Array.isArray(classes)) {
-      return res.status(400).json({ error: "Classes must be an array." });
+    const { classAssigned, classAssignedSection, classes } = req.body;
+
+    if (!classAssigned || typeof classAssigned !== "string") {
+      return res.status(400).json({ error: "classAssigned must be a non-empty string." });
+    }
+
+    if (!classAssignedSection || typeof classAssignedSection !== "string") {
+      return res.status(400).json({ error: "classAssignedSection must be a non-empty string." });
+    }
+
+    if (classes && !Array.isArray(classes)) {
+      return res.status(400).json({ error: "Classes must be an array if provided." });
     }
 
     const teacher = await User.findById(teacherId);
@@ -57,16 +66,19 @@ export const assignTeacher = async (req, res) => {
       return res.status(403).json({ error: "Not authorized." });
     }
 
-    teacher.classes = classes;
+    teacher.classAssigned = classAssigned;
+    teacher.classAssignedSection = classAssignedSection;
+    teacher.classes = classes || [];
     await teacher.save();
 
     return res.json({
-      message: `Assigned ${teacher.name} to classes.`,
+      message: `Assigned ${teacher.name} as class teacher of ${classAssigned}${classAssignedSection} and subject teacher for ${teacher.classes.join(", ") || "none"}.`,
       teacher: {
         id: teacher._id,
         name: teacher.name,
-        classes: teacher.classes,
         classAssigned: teacher.classAssigned,
+        classAssignedSection: teacher.classAssignedSection,
+        classes: teacher.classes,
       },
     });
   } catch (err) {
@@ -74,6 +86,7 @@ export const assignTeacher = async (req, res) => {
     return res.status(500).json({ error: "Server error." });
   }
 };
+
 
 
 export const unassignTeacher = async (req, res) => {
