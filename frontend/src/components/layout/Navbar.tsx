@@ -32,7 +32,7 @@ const Navbar = () => {
 
   const handleLogout = async (): Promise<void> => {
     try {
-      await fetch("http://localhost:3001/api/auth/logout", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -52,7 +52,7 @@ const Navbar = () => {
     }
     try {
       const res = await fetch(
-        "http://localhost:3001/api/auth/change-password",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/change-password`,
         {
           method: "PUT",
           credentials: "include",
@@ -82,7 +82,7 @@ const Navbar = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/students/myinfo", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/students/myinfo`, {
           credentials: "include",
         });
         const data = await res.json();

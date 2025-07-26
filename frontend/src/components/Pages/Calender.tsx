@@ -22,7 +22,7 @@ const AcademicNotices = () => {
       setSeenNotices(true);
     }
     fetch(
-      `http://localhost:3001/api/notices/${ctxSchoolId}?audience=students`,
+      `${import.meta.env.VITE_API_BASE_URL}/notices/${ctxSchoolId}?audience=students`,
       {
         credentials: "include",
       }

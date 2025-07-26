@@ -111,7 +111,7 @@ const ParentPortal = () => {
 
     setLoadingClassTest(true);
     fetch(
-      `http://localhost:3001/api/exams/latest/${studentData.schoolId}?class=${studentData.class}&section=${studentData.section}&examType=classTest`,
+      `${import.meta.env.VITE_API_BASE_URL}/exams/latest/${studentData.schoolId}?class=${studentData.class}&section=${studentData.section}&examType=classTest`,
       { credentials: "include" }
     )
       .then((r) => r.json())
@@ -128,7 +128,7 @@ const ParentPortal = () => {
   }, [studentData]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/students/myinfo", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/students/myinfo`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -145,7 +145,7 @@ const ParentPortal = () => {
     const loadStudentAndSubjects = async () => {
       try {
         const resInfo = await fetch(
-          "http://localhost:3001/api/students/myinfo",
+          `${import.meta.env.VITE_API_BASE_URL}/students/myinfo`,
           {
             credentials: "include",
           }
@@ -160,7 +160,7 @@ const ParentPortal = () => {
           throw new Error("Student info fetch failed");
         }
         const resSubs = await fetch(
-          "http://localhost:3001/api/students/subjects/me",
+          `${import.meta.env.VITE_API_BASE_URL}/students/subjects/me`,
           {
             credentials: "include",
           }
@@ -201,7 +201,7 @@ const ParentPortal = () => {
 
   useEffect(() => {
     if (authLoading || !schoolId) return;
-    fetch(`http://localhost:3001/api/admin/${schoolId}/teachers`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/teachers`, {
       credentials: "include",
     })
       .then((res) => {
@@ -219,7 +219,7 @@ const ParentPortal = () => {
   }, [authLoading, schoolId]);
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/messages", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/messages`, {
       credentials: "include",
     })
       .then((res) => {

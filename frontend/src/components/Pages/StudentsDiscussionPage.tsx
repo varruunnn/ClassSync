@@ -27,7 +27,7 @@ const StudentsDiscussionPage: React.FC = () => {
   const [expandedResponses, setExpandedResponses] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/students/subjects/me", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/students/subjects/me`, {
       credentials: "include",
     })
       .then((res) => res.json())
@@ -44,7 +44,7 @@ const StudentsDiscussionPage: React.FC = () => {
     if (!selectedSubject) return;
     setLoading(true);
     fetch(
-      `http://localhost:3001/api/students/discussions?subject=${encodeURIComponent(
+      `${import.meta.env.VITE_API_BASE_URL}/students/discussions?subject=${encodeURIComponent(
         selectedSubject
       )}`,
       { credentials: "include" }
@@ -66,7 +66,7 @@ const StudentsDiscussionPage: React.FC = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://localhost:3001/api/students/discussions",
+        `${import.meta.env.VITE_API_BASE_URL}/students/discussions`,
         {
           method: "POST",
           credentials: "include",
@@ -95,7 +95,7 @@ const StudentsDiscussionPage: React.FC = () => {
   const deleteDiscussion = async (discussionId: string) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/api/students/discussions/${discussionId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/students/discussions/${discussionId}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -111,7 +111,7 @@ const StudentsDiscussionPage: React.FC = () => {
   const askAIAboutQuestion = async (id: string, question: string) => {
     setAiLoading(id);
     try {
-      const res = await fetch("http://localhost:3001/api/ai/ask", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/ai/ask`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -329,7 +329,7 @@ const formatAIResponse = (response: string) => {
 
             {!loading && discussions.length > 0 && (
               <div className="space-y-4">
-                {discussions.map((d, index) => (
+                {discussions.map((d, _index) => (
                   <div
                     key={d._id}
                     className="bg-gray-50 rounded-lg p-5 border border-gray-200 hover:shadow-md transition-shadow duration-200"

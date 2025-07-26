@@ -28,7 +28,7 @@ const Assignments = () => {
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:3001/api/assignments", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/assignments`, {
         credentials: "include",
       });
 
@@ -219,7 +219,7 @@ const Assignments = () => {
                     <div className="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
                       <span className="text-sm font-medium">Assignment File</span>
                       <a
-                        href={`http://localhost:3001${assignment.fileUrl}`}
+                        href={`${import.meta.env.VITE_API_BASE}${assignment.fileUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline text-sm ml-auto"

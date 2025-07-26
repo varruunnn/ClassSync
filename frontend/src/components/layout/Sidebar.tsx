@@ -34,7 +34,7 @@ const Sidebar = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/students/myinfo", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/students/myinfo`, {
           credentials: "include",
         });
         const data = await res.json();

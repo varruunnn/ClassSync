@@ -85,7 +85,7 @@ const StudentDashboard = () => {
     try {
       setLoadingSubjects(true);
       const response = await fetch(
-        "http://localhost:3001/api/students/subjects/me",
+        `${import.meta.env.VITE_API_BASE_URL}/students/subjects/me`,
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -126,7 +126,7 @@ const StudentDashboard = () => {
     try {
       setLoadingStudentInfo(true);
       const response = await fetch(
-        "http://localhost:3001/api/students/myinfo",
+        `${import.meta.env.VITE_API_BASE_URL}/students/myinfo`,
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -163,7 +163,7 @@ const StudentDashboard = () => {
 
     setLoadingExam(true);
     fetch(
-      `http://localhost:3001/api/exams/latest/${studentInfo.schoolId}?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
+      `${import.meta.env.VITE_API_BASE_URL}/exams/latest/${studentInfo.schoolId}?class=${studentInfo.class}&section=${studentInfo.section}&examType=classTest`,
       { credentials: "include" }
     )
       .then((res) => res.json())
