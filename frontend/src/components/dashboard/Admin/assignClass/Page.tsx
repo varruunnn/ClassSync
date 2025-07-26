@@ -45,7 +45,7 @@ export default function AssignClass() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${schoolId}/teachers`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/teachers`,
         { credentials: "include" }
       );
       if (!res.ok) throw new Error("Failed to fetch teachers");
@@ -75,7 +75,7 @@ export default function AssignClass() {
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${schoolId}/teachers/${selectedTeacherId}/teaching-classes`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/teachers/${selectedTeacherId}/teaching-classes`,
         {
           method: "POST",
           credentials: "include",

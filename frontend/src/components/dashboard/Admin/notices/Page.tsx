@@ -145,11 +145,9 @@ export default function NoticesPage() {
       filterStatus === "all" || notice.status === filterStatus;
     return matchesSearch && matchesType && matchesStatus;
   });
-
-  // 1) Fetch notices when schoolId is known
   useEffect(() => {
     if (!loading && ctxSchoolId) {
-      fetch(`http://localhost:3001/api/notices/${ctxSchoolId}`, {
+      fetch(`${import.meta.env.VITE_API_BASE_URL}/notices/${ctxSchoolId}`, {
         credentials: "include",
       })
         .then((res) => {
@@ -192,7 +190,7 @@ export default function NoticesPage() {
       return;
     }
 
-    fetch("http://localhost:3001/api/notices", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/notices`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -245,10 +243,8 @@ export default function NoticesPage() {
         });
       });
   };
-
-  // 3) Delete a notice
   const handleDeleteNotice = (id: string) => {
-    fetch(`http://localhost:3001/api/notices/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/notices/${id}`, {
       method: "DELETE",
       credentials: "include",
     })
@@ -275,13 +271,12 @@ export default function NoticesPage() {
       });
   };
 
-  // 4) Toggle status between published/draft
   const handleToggleStatus = (id: string) => {
     const notice = notices.find((n) => n.id === id);
     if (!notice) return;
     const newStatus = notice.status === "published" ? "draft" : "published";
 
-    fetch(`http://localhost:3001/api/notices/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/notices/${id}`, {
       method: "PATCH",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

@@ -69,7 +69,7 @@ export default function AdminLayout({
   };
   const [userdata, setuserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-   const { isAuthenticated, userRole, schoolId: ctxSchoolId } = useAuth();
+   const { isAuthenticated, userRole, schoolId: _ctxSchoolId } = useAuth();
   const [error, setError] = useState<unknown>(null);
   const location = useLocation();
   const pathname = location.pathname;
@@ -84,7 +84,7 @@ export default function AdminLayout({
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:3001/api/auth/logout", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -97,7 +97,7 @@ export default function AdminLayout({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
           credentials: "include",
         });
         if (!res.ok) {

@@ -1,77 +1,74 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useAuth } from "@/contexts/AuthContext"
-import { CheckCircle, Users, GraduationCap, User } from "lucide-react"
+} from "@/components/ui/select";
+import { useAuth } from "@/contexts/AuthContext";
+import { CheckCircle, Users, GraduationCap, User } from "lucide-react";
 
 interface Teacher {
-  id: string            
-  name: string
-  subject: string
-  email: string
-  classAssigned?: string
+  id: string;
+  name: string;
+  subject: string;
+  email: string;
+  classAssigned?: string;
+  classAssignedSection?: string;
 }
 
 interface Assignment {
-  id: number
-  teacherName: string
-  className: string
-  subject: string
-  assignedDate: string
+  id: number;
+  teacherName: string;
+  className: string;
+  subject: string;
+  assignedDate: string;
 }
 
-const classes = ["1", "2", "3", "4", "5", "6"]
+const classes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
 const useToast = () => {
   const [toasts, setToasts] = useState<
     Array<{ id: number; title: string; description: string; variant?: string }>
-  >([])
+  >([]);
 
   const toast = ({
     title,
     description,
     variant,
   }: {
-    title: string
-    description: string
-    variant?: string
+    title: string;
+    description: string;
+    variant?: string;
   }) => {
-    const id = Date.now()
-    setToasts((prev) => [...prev, { id, title, description, variant }])
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, title, description, variant }]);
 
     setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id))
-    }, 3000)
-  }
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  };
 
-  return { toast, toasts, setToasts }
-}
+  return { toast, toasts, setToasts };
+};
 
-const Toast = ({
-  toast,
-  onRemove,
-}: {
-  toast: any
-  onRemove: () => void
-}) => (
+const Toast = ({ toast, onRemove }: { toast: any; onRemove: () => void }) => (
   <div
     className={`fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 ${
-      toast.variant === "destructive" ? "bg-red-500 text-white" : "bg-green-500 text-white"
+      toast.variant === "destructive"
+        ? "bg-red-500 text-white"
+        : "bg-green-500 text-white"
     }`}
   >
     <div className="flex justify-between items-start">
@@ -79,122 +76,133 @@ const Toast = ({
         <div className="font-semibold">{toast.title}</div>
         <div className="text-sm">{toast.description}</div>
       </div>
-      <button onClick={onRemove} className="ml-4 text-white hover:text-gray-200">
+      <button
+        onClick={onRemove}
+        className="ml-4 text-white hover:text-gray-200"
+      >
         ×
       </button>
     </div>
   </div>
-)
+);
 
 export default function AssignTeacherPage() {
-  const [teachers, setTeachers] = useState<Teacher[]>([])
-  const { schoolId: ctxSchoolId } = useAuth()
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const { schoolId: ctxSchoolId } = useAuth();
 
-  const [selectedTeacher, setSelectedTeacher] = useState<string>("")
-  const [selectedClass, setSelectedClass] = useState<string>("")
-  const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [selectedTeacher, setSelectedTeacher] = useState<string>("");
+  const [selectedClass, setSelectedClass] = useState<string>("");
+  const [selectedSection, setSelectedSection] = useState<string>("");
+  const [_assignments, setAssignments] = useState<Assignment[]>([]);
 
-  const { toast, toasts, setToasts } = useToast()
+  const { toast, toasts, setToasts } = useToast();
 
   useEffect(() => {
-    fetchTeachers()
-  }, [])
+    fetchTeachers();
+  }, []);
 
   const fetchTeachers = async () => {
-    if (typeof ctxSchoolId !== "number") return
+    if (typeof ctxSchoolId !== "number") return;
 
     try {
       const response = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers`,
+        `${import.meta.env.VITE_API_BASE_URL}/admin/${ctxSchoolId}/teachers`,
         {
           credentials: "include",
         }
-      )
+      );
       if (!response.ok) {
-        throw new Error("Failed to load teachers")
+        throw new Error("Failed to load teachers");
       }
-      const data = await response.json()
-      setTeachers(data.teachers || [])
+      const data = await response.json();
+      setTeachers(data.teachers || []);
     } catch (error) {
-      console.error("Failed to fetch teachers:", error)
+      console.error("Failed to fetch teachers:", error);
     }
-  }
-  const unassignedTeachers = teachers.filter((t) => !t.classAssigned)
-  const assignedTeachers = teachers.filter((t) => t.classAssigned)
-  const assignedClasses = assignedTeachers.map((t) => t.classAssigned!)
-  const availableClasses = classes.filter((c) => !assignedClasses.includes(c))
+  };
+  const unassignedTeachers = teachers.filter((t) => !t.classAssigned);
+  const assignedTeachers = teachers.filter((t) => t.classAssigned);
+  const assignedClasses = assignedTeachers.map((t) => t.classAssigned!);
+  const availableClasses = classes.filter((c) => !assignedClasses.includes(c));
 
   const handleAssignment = async () => {
-    if (!selectedTeacher || !selectedClass) {
+    if (!selectedTeacher || !selectedClass || !selectedSection) {
       toast({
         title: "Error",
-        description: "Please select both a teacher and a class.",
+        description: "Please select a teacher, class, and section.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers/${selectedTeacher}/assign`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/admin/${ctxSchoolId}/teachers/${selectedTeacher}/assign`,
         {
           method: "POST",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ className: selectedClass }),
+          body: JSON.stringify({
+            classAssigned: selectedClass,
+            classAssignedSection: selectedSection,
+          }),
         }
-      )
+      );
       if (!res.ok) {
-        const errPayload = await res.json()
-        throw new Error(errPayload.error || "Failed to assign teacher")
+        const errPayload = await res.json();
+        throw new Error(errPayload.error || "Failed to assign teacher");
       }
-      const payload = await res.json()
+      const payload = await res.json();
       setTeachers((prev) =>
         prev.map((t) =>
           t.id === payload.teacher.id
             ? { ...t, classAssigned: payload.teacher.classAssigned }
             : t
         )
-      )
+      );
       const newAssign: Assignment = {
         id: Date.now(),
         teacherName: payload.teacher.name,
         className: payload.teacher.classAssigned!,
         subject: payload.teacher.subject,
         assignedDate: new Date().toISOString().split("T")[0],
-      }
-      setAssignments((prev) => [newAssign, ...prev])
+      };
+      setAssignments((prev) => [newAssign, ...prev]);
 
       toast({
         title: "Success",
         description: `${payload.teacher.name} assigned to class ${payload.teacher.classAssigned}`,
-      })
-      setSelectedTeacher("")
-      setSelectedClass("")
+      });
+      setSelectedTeacher("");
+      setSelectedClass("");
     } catch (err: any) {
-      console.error("Assignment failed:", err)
+      console.error("Assignment failed:", err);
       toast({
         title: "Error",
         description: err.message,
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleUnassign = async (teacherId: string) => {
     try {
       const res = await fetch(
-        `http://localhost:3001/api/admin/${ctxSchoolId}/teachers/${teacherId}/assign`,
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/admin/${ctxSchoolId}/teachers/${teacherId}/assign`,
         {
           method: "DELETE",
           credentials: "include",
         }
-      )
+      );
       if (!res.ok) {
-        const errPayload = await res.json()
-        throw new Error(errPayload.error || "Failed to unassign teacher")
+        const errPayload = await res.json();
+        throw new Error(errPayload.error || "Failed to unassign teacher");
       }
-      const payload = await res.json()
+      const payload = await res.json();
 
       setTeachers((prev) =>
         prev.map((t) =>
@@ -202,24 +210,24 @@ export default function AssignTeacherPage() {
             ? { ...t, classAssigned: payload.teacher.classAssigned! }
             : t
         )
-      )
+      );
       setAssignments((prev) =>
         prev.filter((a) => a.teacherName !== payload.teacher.name)
-      )
+      );
 
       toast({
         title: "Success",
         description: `${payload.teacher.name} has been unassigned`,
-      })
+      });
     } catch (err: any) {
-      console.error("Unassign failed:", err)
+      console.error("Unassign failed:", err);
       toast({
         title: "Error",
         description: err.message,
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -285,10 +293,7 @@ export default function AssignTeacherPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="class">Select Class</Label>
-              <Select
-                value={selectedClass}
-                onValueChange={setSelectedClass}
-              >
+              <Select value={selectedClass} onValueChange={setSelectedClass}>
                 <SelectTrigger>
                   <SelectValue placeholder="Choose an available class..." />
                 </SelectTrigger>
@@ -305,6 +310,24 @@ export default function AssignTeacherPage() {
                   No unassigned classes available
                 </p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="section">Select Section</Label>
+              <Select
+                value={selectedSection}
+                onValueChange={setSelectedSection}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a section..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {["A", "B", "C", "D", "E"].map((section) => (
+                    <SelectItem key={section} value={section}>
+                      Section {section}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Button
@@ -348,7 +371,13 @@ export default function AssignTeacherPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Badge>Class {teacher.classAssigned}</Badge>
+                    <Badge>
+                      Class {teacher.classAssigned}
+                      {teacher.classAssignedSection
+                        ? teacher.classAssignedSection
+                        : ""}
+                    </Badge>
+
                     <Button
                       variant="outline"
                       size="sm"
@@ -378,9 +407,7 @@ export default function AssignTeacherPage() {
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-2xl font-bold">
-                  {assignedTeachers.length}
-                </p>
+                <p className="text-2xl font-bold">{assignedTeachers.length}</p>
                 <p className="text-sm text-muted-foreground">
                   Assigned Teachers
                 </p>
@@ -394,9 +421,7 @@ export default function AssignTeacherPage() {
             <div className="flex items-center space-x-2">
               <GraduationCap className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-2xl font-bold">
-                  {availableClasses.length}
-                </p>
+                <p className="text-2xl font-bold">{availableClasses.length}</p>
                 <p className="text-sm text-muted-foreground">
                   Available Classes
                 </p>
@@ -422,5 +447,5 @@ export default function AssignTeacherPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

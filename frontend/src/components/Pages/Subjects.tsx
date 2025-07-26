@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Updated interface to match API response
 interface Subject {
   _id: string;
   name: string;
@@ -22,12 +21,11 @@ const Subjects = () => {
     const fetchSubjects = async () => {
       try {
         const res = await fetch(
-          "http://localhost:3001/api/students/subjects/me",
+          `${import.meta.env.VITE_API_BASE_URL}/students/subjects/me`,
           {
             credentials: "include",
             headers: { 
               "Content-Type": "application/json",
-              // Add any additional headers if needed
             },
           }
         );
@@ -37,14 +35,12 @@ const Subjects = () => {
         }
         
         const data: ApiResponse = await res.json();
-        
-        // Additional validation
         if (!data.subjects || !Array.isArray(data.subjects)) {
           throw new Error("Invalid API response format");
         }
 
         setSubjects(data.subjects);
-        setError(null); // Clear any previous errors
+        setError(null);
       } catch (err: any) {
         console.error("Error fetching subjects:", err);
         setError(err.message || "Failed to fetch subjects");
@@ -67,7 +63,6 @@ const Subjects = () => {
     "from-amber-500 to-orange-600",
   ];
 
-  // Function to handle PDF opening with error handling
   const handlePdfClick = (url: string, subjectName: string) => {
     try {
       window.open(url, '_blank', 'noopener,noreferrer');
