@@ -116,6 +116,7 @@ const TeacherSidebar = () => {
                 <ChevronLeft className="w-5 h-5" />
               )}
             </button>
+
           </div>
 
           {/* Navigation */}
@@ -190,6 +191,7 @@ const TeacherSidebar = () => {
             )}
           </div>
         </div>
+        
       </div>
     </>
   );
