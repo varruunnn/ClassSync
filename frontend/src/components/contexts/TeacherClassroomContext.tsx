@@ -54,7 +54,7 @@ export const TeacherClassroomProvider: React.FC<
     const fetchMe = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:3001/api/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
           credentials: "include",
         });
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);

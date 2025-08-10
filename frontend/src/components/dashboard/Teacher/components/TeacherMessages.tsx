@@ -42,7 +42,7 @@ const TeacherMessages = () => {
     setError("");
 
     fetch(
-      `http://localhost:3001/api/admin/${schoolId}/students?class=${cls}&section=${section}`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/students?class=${cls}&section=${section}`,
       { credentials: "include" }
     )
       .then((r) => r.json())
@@ -73,7 +73,7 @@ const TeacherMessages = () => {
     setSuccess("");
 
     try {
-      const res = await fetch("http://localhost:3001/api/messages", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/messages`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

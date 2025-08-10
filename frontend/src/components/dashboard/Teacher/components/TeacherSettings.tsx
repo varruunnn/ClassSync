@@ -45,7 +45,7 @@ const TeacherSettings = () => {
     }
     try {
       const res = await fetch(
-        "http://localhost:3001/api/auth/change-password",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/change-password`,
         {
           method: "PUT",
           credentials: "include",
@@ -72,7 +72,7 @@ const TeacherSettings = () => {
     }
   };
   useEffect(() => {
-    fetch("http://localhost:3001/api/auth/me", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
       credentials: "include",
     })
       .then((res) => res.json())

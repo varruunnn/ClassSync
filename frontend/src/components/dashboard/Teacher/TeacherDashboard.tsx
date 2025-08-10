@@ -39,7 +39,7 @@ const TeacherDashboardPage = () => {
     try {
       setLoadingTeacherInfo(true);
       const response = await fetch(
-        "http://localhost:3001/api/auth/me",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/me`,
         {
           credentials: "include",
           headers: { "Content-Type": "application/json" },

@@ -30,7 +30,7 @@ const TeacherSubjects = () => {
   useEffect(() => {
     const fetchTeacherData = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/api/auth/me", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
           withCredentials: true 
         });
         const data = res.data;

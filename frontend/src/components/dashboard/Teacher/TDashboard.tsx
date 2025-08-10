@@ -62,7 +62,7 @@ useEffect(() => {
   const fetchDashboardData = async () => {
     try {
       // 1. Fetch teacher's info
-      const meRes = await axios.get("http://localhost:3001/api/auth/me", {
+      const meRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
         withCredentials: true,
       });
       const me = await meRes.data;
@@ -74,7 +74,7 @@ useEffect(() => {
 
       // 2. Fetch classes 
       try {
-        const response = await axios.get("http://localhost:3001/api/teacher/classes", {
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/teacher/classes`, {
           withCredentials: true,
         });
 
@@ -96,7 +96,7 @@ useEffect(() => {
 
       // 3. Fetch assignments 
       try {
-        const res = await axios.get("http://localhost:3001/api/assignments", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/assignments`, {
           withCredentials: true,
         });
         const data = await res.data;
@@ -108,7 +108,7 @@ useEffect(() => {
 
       // 4. Fetch notices
       try {
-        const res = await axios.get(`http://localhost:3001/api/notices/${schoolId}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/notices/${schoolId}`, {
           withCredentials: true,
         });
         const data = await res.data;
@@ -126,7 +126,7 @@ useEffect(() => {
       // 5. Fetch class test averages
       try {
         const res = await fetch(
-          `http://localhost:3001/api/exams/latest/${schoolId}?class=${assignedClass}&section=${assignedSection}&examType=classTest`,
+          `${import.meta.env.VITE_API_BASE_URL}/exams/latest/${schoolId}?class=${assignedClass}&section=${assignedSection}&examType=classTest`,
           { credentials: "include" }
         );
         const json = await res.json();

@@ -45,7 +45,7 @@ export default function TeacherClasses() {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch("http://localhost:3001/api/auth/me", { credentials: "include" })
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, { credentials: "include" })
       .then(res => res.json())
       .then((data: TeacherProfile) => {
         setProfile(data);
@@ -62,7 +62,7 @@ export default function TeacherClasses() {
     setIsLoading(true);
     const schoolId = profile.schoolId;
     fetch(
-      `http://localhost:3001/api/admin/${schoolId}/students?class=${selectedClass}&section=${selectedSection}`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/students?class=${selectedClass}&section=${selectedSection}`,
       { credentials: "include" }
     )
       .then(res => res.json())
@@ -78,7 +78,7 @@ export default function TeacherClasses() {
     setIsLoadingDetail(true);
     const schoolId = profile.schoolId;
     fetch(
-      `http://localhost:3001/api/admin/${schoolId}/students/${studentId}`,
+      `${import.meta.env.VITE_API_BASE_URL}/admin/${schoolId}/students/${studentId}`,
       { credentials: "include" }
     )
       .then(res => res.json())

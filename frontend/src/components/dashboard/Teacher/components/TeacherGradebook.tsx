@@ -46,11 +46,11 @@ export default function TeacherGradebook() {
   useEffect(() => {
     async function loadAll() {
       try {
-        const meRes = await fetch("http://localhost:3001/api/auth/me", { credentials: "include" });
+        const meRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, { credentials: "include" });
         const meData: TeacherProfile = await meRes.json();
         setProfile(meData);
         const stuRes = await fetch(
-          `http://localhost:3001/api/admin/${meData.schoolId}/students?class=${meData.classAssigned}`,
+          `${import.meta.env.VITE_API_BASE_URL}/admin/${meData.schoolId}/students?class=${meData.classAssigned}`,
           { credentials: "include" }
         );
         const stuJson = await stuRes.json();
@@ -67,7 +67,7 @@ export default function TeacherGradebook() {
         });
         setGrades(initGrades);
         const examRes = await fetch(
-          `http://localhost:3001/api/exams/latest?class=${meData.classAssigned}&section=A&examType=classTest`,
+          `${import.meta.env.VITE_API_BASE_URL}/exams/latest?class=${meData.classAssigned}&section=A&examType=classTest`,
           { credentials: "include" }
         );
         const examJson = await examRes.json();
@@ -112,7 +112,7 @@ export default function TeacherGradebook() {
           marks: examMarks[s._id]?.[sub._id] || 0,
         })),
       }));
-      await fetch("http://localhost:3001/api/exams/latest", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/exams/latest`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -145,7 +145,7 @@ export default function TeacherGradebook() {
         studentId,
         ...vals,
       }));
-      await fetch("http://localhost:3001/api/grades/bulk-update", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/grades/bulk-update`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

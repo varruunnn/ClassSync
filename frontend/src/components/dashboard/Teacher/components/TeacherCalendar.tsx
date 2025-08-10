@@ -41,7 +41,7 @@ export default function TeacherCalendar() {
     });
   };
   useEffect(() => {
-    fetch("http://localhost:3001/api/notices/1?target=teachers", {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/notices/1?target=teachers`, {
       credentials: "include",
     })
       .then((res) => res.json())

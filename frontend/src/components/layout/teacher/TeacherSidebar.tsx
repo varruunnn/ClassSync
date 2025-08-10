@@ -39,7 +39,7 @@ const TeacherSidebar = () => {
   const location = useLocation();
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:3001/api/auth/logout", {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });
@@ -53,7 +53,7 @@ const TeacherSidebar = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const res = await fetch("http://localhost:3001/api/auth/me", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/me`, {
           credentials: "include",
         });
         const data: User = await res.json();

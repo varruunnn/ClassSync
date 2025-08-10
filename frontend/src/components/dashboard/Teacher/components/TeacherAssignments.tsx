@@ -66,7 +66,7 @@ const TeacherAssignments = () => {
   const fetchAssignments = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:3001/api/assignments", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/assignments`, {
         credentials: "include",
       });
       if (!response.ok) {
@@ -83,7 +83,7 @@ const TeacherAssignments = () => {
   const deleteAssignment = async (id: string) => {
     if (!confirm("Are you sure you want to delete this assignment?")) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/assignments/${id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/assignments/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -148,7 +148,7 @@ const handleCreateAssignment = async () => {
     if (selectedFile) {
       formData.append("file", selectedFile);
     }
-    const response = await fetch("http://localhost:3001/api/assignments", {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/assignments`, {
       method: "POST",
       credentials: "include",
       body: formData,
@@ -552,7 +552,7 @@ const handleCreateAssignment = async () => {
                         Assignment File
                       </span>
                       <a
-                        href={`http://localhost:3001${assignment.fileUrl}`}
+                        href={`${import.meta.env.VITE_API_BASE}${assignment.fileUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:underline text-sm ml-auto"
