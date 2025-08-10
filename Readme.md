@@ -37,8 +37,19 @@ It offers comprehensive academic management tools alongside innovative AI-powere
 - HTTP-only cookies  
 - CSRF protection
 
-**Other Tools**  
-- RESTful APIs  
-- Cloud Hosting (Vercel / DigitalOcean)
-
 ---
+**ADMIN DASHBOARD**
+<img width="2522" height="1182" alt="admin" src="https://github.com/user-attachments/assets/d3d938aa-6185-43b6-a26b-56632d9d80a7" />
+
+**Sudent's dashboard**
+<img width="2519" height="1160" alt="studentDashboard" src="https://github.com/user-attachments/assets/723ab5b7-6597-4c68-bc67-58e5a87cc401" />
+
+
+**Parent's dashboard**
+
+<img width="1231" height="1097" alt="parentDashboard" src="https://github.com/user-attachments/assets/5d74a571-b082-4429-b934-9ac001b6ba76" />
+
+**TEACHER'S Dashboard**
+<img width="2534" height="1184" alt="teacherDashboard" src="https://github.com/user-attachments/assets/ae9bdc4a-ec35-461f-99ba-af8f83e7d5b7" />
+
+
