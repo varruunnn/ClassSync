@@ -65,6 +65,10 @@ const LandingPage: React.FC = () => {
   }, []);
 
   const [title, setTitle] = useState("Login");
+  const handleMoblieLoginCLick = () => {
+    navigate('/login')
+    setIsMenuOpen(false)
+  }
 
   useEffect(() => {
     setTitle("Login");
@@ -161,7 +165,7 @@ const LandingPage: React.FC = () => {
               ))}
               <button
                 className="w-full mt-4 px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-all duration-200"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={handleMoblieLoginCLick}
               >
                 Login
               </button>

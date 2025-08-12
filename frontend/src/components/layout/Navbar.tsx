@@ -119,7 +119,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Button variant="ghost" className="flex items-center gap-2">
+              <Button variant="ghost" className="flex items-center max-[468px]:mr-[17px] max-[365px]:mr-[80px] gap-2">
                 <User size={18} />
                 <span>{user.name}</span>
                 <ChevronDown size={16} />

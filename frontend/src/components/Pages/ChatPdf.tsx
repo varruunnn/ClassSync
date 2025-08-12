@@ -184,7 +184,7 @@ const ChatPdf: React.FC = () => {
     setUploadedFile(null);
     setDocumentInfo(null);
     setError('');
-    setMessages(prev => prev.filter(msg => msg.type === 'bot' && msg.id === 1)); // Keep only welcome message
+    setMessages(prev => prev.filter(msg => msg.type === 'bot' && msg.id === 1));
   };
 
   const handleQuickAction = (action: string) => {

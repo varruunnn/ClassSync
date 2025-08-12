@@ -195,7 +195,7 @@ const RegisterForm: React.FC = () => {
 
     try {
       const res = await axios.post<RegisterResponse>(
-        "http://localhost:3001/api/auth/register",
+        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
         payload,
         { withCredentials: true }
       );
