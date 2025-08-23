@@ -7,8 +7,6 @@ import {
   Calendar,
   Clock,
   Plus,
-  Search,
-  Filter,
   Upload,
   X,
   File,

@@ -134,7 +134,6 @@ const ChatPdf: React.FC = () => {
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || !documentInfo || isLoading) return;
 
-    const userMessage = addMessage('user', inputMessage);
     const currentMessage = inputMessage;
     setInputMessage('');
     setIsLoading(true);

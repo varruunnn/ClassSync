@@ -66,7 +66,7 @@ interface PerformanceStats {
 const StudentDashboard = () => {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
-  const [performanceStats, setPerformanceStats] =
+  const [performanceStats, _setPerformanceStats] =
     useState<PerformanceStats | null>(null);
   const [loadingSubjects, setLoadingSubjects] = useState(true);
   const [loadingStudentInfo, setLoadingStudentInfo] = useState(true);
@@ -75,7 +75,7 @@ const StudentDashboard = () => {
   const {
     isAuthenticated,
     userRole,
-    schoolId: ctxSchoolId,
+    schoolId: _ctxSchoolId,
     loading,
   } = useAuth();
   const [error, setError] = useState<string | null>(null);

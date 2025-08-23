@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import TeacherDashboard from "@/components/layout/teacher/TeacherDashboardLayout";
 import { currentStudent } from "@/data/mockData";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTeacherClassroom } from "@/components/contexts/TeacherClassroomContext";
 import { useNavigate } from "react-router-dom";
 import Dashboard from "./TDashboard";
 
@@ -17,8 +16,7 @@ interface teacherInfo {
 }
 
 const TeacherDashboardPage = () => {
-  const { selectedClassroom } = useTeacherClassroom();
-  const [teacherInfo, setTeacherInfo] = useState<teacherInfo | null>(null);
+  const [_teacherInfo, setTeacherInfo] = useState<teacherInfo | null>(null);
   const [_loadingTeacherInfo, setLoadingTeacherInfo] = useState(true);
   const navigate = useNavigate();
   const {
