@@ -23,14 +23,19 @@ import aiRoutes from './src/routes/askaiRoutes.js'
 const app = express();
 
 // Connect to MongoDB
-connectDB();
+const allowedOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map(s => s.trim())
+  .filter(Boolean);
 
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN, 
-    credentials: true,               
-  })
-);
+app.use(cors({
+  origin: function (origin, cb) {
+    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error("Not allowed by CORS: " + origin));
+  },
+  credentials: true,
+}));
+
 app.set('trust proxy', 1);
 app.use(express.json());
 app.use(cookieParser());
