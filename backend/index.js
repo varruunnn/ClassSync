@@ -23,6 +23,7 @@ import aiRoutes from './src/routes/askaiRoutes.js'
 const app = express();
 
 // Connect to MongoDB
+connectDB();
 const allowedOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
   .map(s => s.trim())
